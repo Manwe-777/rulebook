@@ -5,6 +5,7 @@ import { ArmyDraft } from '../army/ArmyDraft';
 import { loadBundledFiles } from '../sources/loadBundledFiles';
 import { armySummary } from './armySummary';
 import { formatAgo } from './formatAgo';
+import { rulesFreshness } from './rulesFreshness';
 
 const library = Library.fromFiles(loadBundledFiles());
 
@@ -41,5 +42,36 @@ describe('formatAgo', () => {
   it('gives the date after a week, and never a negative time', () => {
     expect(formatAgo(now - 10 * 86_400_000, now)).toBe(new Date(now - 10 * 86_400_000).toLocaleDateString());
     expect(formatAgo(now + 60_000, now)).toBe('just now');
+  });
+});
+
+describe('rulesFreshness', () => {
+  const now = Date.UTC(2026, 10, 19, 12);
+
+  it('says the rules are current once the relays answered, and when', () => {
+    expect(rulesFreshness('relays', now - 2 * 60_000, now)).toEqual({
+      tone: 'good',
+      text: 'Up to date with the relays (checked 2 min ago)',
+    });
+  });
+
+  it('offline, says how old the copy on this device is', () => {
+    expect(rulesFreshness('offline', now - 3 * 86_400_000, now).text).toBe(
+      'Offline: using the copy on this device, last checked 3 days ago',
+    );
+  });
+
+  it('with nothing saved and no relay, says only the demo is available', () => {
+    expect(rulesFreshness('failed', null, now).tone).toBe('bad');
+    expect(rulesFreshness('failed', null, now).text).toMatch(/demo/);
+  });
+});
+
+describe('ArmyDraft.withRelease', () => {
+  it('records the release the list was edited with, and changes nothing when it is the same', () => {
+    const draft = ArmyDraft.create(library, 'demo-host').withRelease('abc');
+
+    expect(draft.list.release).toBe('abc');
+    expect(draft.withRelease('abc')).toBe(draft);
   });
 });

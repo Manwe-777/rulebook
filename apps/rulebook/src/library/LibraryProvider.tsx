@@ -25,15 +25,15 @@ export default function LibraryProvider({ children }: { children: ReactNode }) {
     let stop: () => void = () => undefined;
     let cancelled = false;
 
-    import('@rulebook/sharing').then(({ loadRemoteFiles, ReleaseCache, watchReleasedFiles }) => {
+    import('@rulebook/sharing').then(({ loadRemoteReleases, ReleaseCache, watchReleasedFiles }) => {
       if (cancelled) return;
 
       stop = watchReleasedFiles({
-        load: () => loadRemoteFiles(RELAYS, OWNER_KEY),
+        load: () => loadRemoteReleases(RELAYS, OWNER_KEY),
         cache: new ReleaseCache(OWNER_KEY),
         onChange: (remote, source) => {
           if (remote) {
-            const merged = mergeFiles(loadBundledFiles(), remote);
+            const merged = mergeFiles(loadBundledFiles(), remote.files);
 
             setFiles(merged);
             setLibrary(Library.fromFiles(merged));

@@ -1,3 +1,4 @@
+import type { RulesFile } from '@rulebook/rules';
 import { z } from 'zod';
 
 const hash = z.string().regex(/^[0-9a-f]{64}$/, 'must be a SHA-256 hash in hex');
@@ -50,3 +51,19 @@ export const requestSchema = z.strictObject({ message: z.string().default('') })
 export type Manifest = z.output<typeof manifestSchema>;
 export type Proposal = z.output<typeof proposalSchema>;
 export type Hidden = z.output<typeof hiddenSchema>;
+
+/** What the apps show about a release: which version, when, and how many records it holds. */
+export interface ReleaseInfo {
+  faction: string;
+  version: string;
+  date: string;
+  hash: string;
+  notes: string;
+  records: number;
+}
+
+/** The newest release of every faction: their record files, and what each release is. */
+export interface ReleasedRules {
+  files: RulesFile[];
+  releases: ReleaseInfo[];
+}

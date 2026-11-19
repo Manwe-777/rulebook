@@ -191,7 +191,7 @@ file.
 
 ```yaml
 name: Shield Wall 2000
-release: <hash of the faction release>
+release: <hash of the faction release the list was last edited with>
 core: <hash of the core release>
 battleSize: strike-force
 faction: demo-host

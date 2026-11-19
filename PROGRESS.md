@@ -45,6 +45,10 @@
   options: the release builds the project owner into `install.sh`, and with no owner it runs as an open store. See `docs/hosting.md`.
 - Released rules are cached in IndexedDB (per owner key, shared by both apps on one site): shown at once on the next
   visit, kept when the relays can't be reached. `owner-key` no longer echoes the password.
+- Rules freshness in the builder: a "Rules data" panel on the armies screen (relay check state and when it last
+  succeeded; version, release date and record count per faction and core), the rules version on each army card with a
+  warning when the faction's rules changed since the army was last edited, and the release under the faction picker.
+  Release info comes from `RulebookClient.latestReleases` and is cached with the files. Checked in the browser.
 - Saved armies in the builder: an armies screen (name, faction, battle size, detachments, points against the limit,
   legal or problem count, unit count, last edit, unit photos) with new, open, duplicate and two-step delete. The open
   army is in the address (`?army=<id>`), so back, reload and links work on static hosting. The single list saved by

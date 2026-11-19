@@ -1,10 +1,9 @@
-import type { RulesFile } from '@rulebook/rules';
-
 import { TOPIC } from './constants';
 import { RulebookClient } from './RulebookClient';
+import type { ReleasedRules } from './schemas';
 
-/** The newest release of every faction on the relays, read with a short-lived connection. */
-export async function loadRemoteFiles(relays: string[], owner: string): Promise<RulesFile[]> {
+/** The newest release of every faction on the relays (files and release info), read with a short-lived connection. */
+export async function loadRemoteReleases(relays: string[], owner: string): Promise<ReleasedRules> {
   const { ToolDb } = await import('tool-db');
   const db = new ToolDb({ relays, topic: TOPIC });
 
@@ -18,7 +17,7 @@ export async function loadRemoteFiles(relays: string[], owner: string): Promise<
       });
     }
 
-    return await new RulebookClient(db, owner).latestFiles();
+    return await new RulebookClient(db, owner).latestReleases();
   } finally {
     await db.close();
   }

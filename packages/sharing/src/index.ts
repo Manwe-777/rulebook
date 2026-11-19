@@ -1,6 +1,6 @@
-export { ReleaseCache } from './cache/ReleaseCache';
+export { ReleaseCache, type SavedReleases } from './cache/ReleaseCache';
 export * from './constants';
-export { loadRemoteFiles } from './loadRemoteFiles';
+export { loadRemoteReleases } from './loadRemoteReleases';
 export { type ProposalEntry, RulebookClient } from './RulebookClient';
 export { type Lookup, Roles } from './rules/Roles';
 export { registerWriteRules, type Write, type WriteRule, writeRules } from './rules/writeRules';

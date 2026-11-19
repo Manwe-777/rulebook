@@ -22,7 +22,8 @@ const LINK = 'text-sm font-semibold tracking-wide uppercase hover:underline';
 
 /** The list builder: the saved armies, or the army open in the address (`?army=<id>`). */
 export default function App() {
-  const { library, status } = useBuilderLibrary();
+  const rules = useBuilderLibrary();
+  const { library, status, releases } = rules;
   const [saved, change] = useSavedArmies();
   const [armyId, open] = useArmyRoute();
   const draft = useMemo(() => (armyId ? saved.draft(armyId) : null), [saved, armyId]);
@@ -55,12 +56,18 @@ export default function App() {
         <BuilderPage
           draft={draft}
           library={library}
-          onChange={(next) => change((s) => s.put(armyId, next, Date.now()))}
+          release={releases.find((r) => r.faction === draft.list.faction)}
+          onChange={(next) => {
+            // Remember which release of the rules the army was last edited with.
+            const release = releases.find((r) => r.faction === next.list.faction)?.hash;
+
+            change((s) => s.put(armyId, next.withRelease(release), Date.now()));
+          }}
         />
       ) : (
         <ArmiesPage
           saved={saved}
-          library={library}
+          rules={rules}
           onOpen={open}
           onCreate={create}
           onDuplicate={(id) => change((s) => s.duplicate(id, newArmyId(), Date.now()))}

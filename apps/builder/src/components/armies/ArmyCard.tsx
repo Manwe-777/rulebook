@@ -1,15 +1,19 @@
 import type { Library } from '@rulebook/rules';
+import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { SavedArmy } from '../../army/SavedArmies';
 import { armySummary } from '../../utils/armySummary';
 import { formatAgo } from '../../utils/formatAgo';
 import { BUTTON_QUIET } from '../styles';
+import ArmyRulesLine from './ArmyRulesLine';
 import DeleteArmyButton from './DeleteArmyButton';
 import PhotoThumb from './PhotoThumb';
 
 interface Props {
   army: SavedArmy;
   library: Library;
+  /** The release the army's faction is on now; undefined for the demo. */
+  release: ReleaseInfo | undefined;
   now: number;
   onOpen: () => void;
   onDuplicate: () => void;
@@ -17,7 +21,7 @@ interface Props {
 }
 
 /** A saved army on the armies screen: name, faction, size, detachments, points, legality and photos of its units. */
-export default function ArmyCard({ army, library, now, onOpen, onDuplicate, onDelete }: Props) {
+export default function ArmyCard({ army, library, release, now, onOpen, onDuplicate, onDelete }: Props) {
   const s = armySummary(army.list, library);
   const legal = s.errors === 0;
 
@@ -45,6 +49,7 @@ export default function ArmyCard({ army, library, now, onOpen, onDuplicate, onDe
             {s.units} unit{s.units === 1 ? '' : 's'} · edited {formatAgo(army.updatedAt, now)}
           </span>
         </span>
+        {release && <ArmyRulesLine release={release} editedWith={army.list.release} now={now} />}
         {s.unitTypes.length > 0 && (
           <span className="flex gap-1">
             {s.unitTypes.slice(0, 6).map((unit) => (

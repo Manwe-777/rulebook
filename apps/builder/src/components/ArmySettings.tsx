@@ -1,4 +1,5 @@
 import type { Library } from '@rulebook/rules';
+import type { ReleaseInfo } from '@rulebook/sharing';
 
 import { ArmyDraft } from '../army/ArmyDraft';
 import { INPUT, LABEL, PANEL, PANEL_TITLE } from './styles';
@@ -6,11 +7,12 @@ import { INPUT, LABEL, PANEL, PANEL_TITLE } from './styles';
 interface Props {
   draft: ArmyDraft;
   library: Library;
+  release: ReleaseInfo | undefined;
   onChange: (draft: ArmyDraft) => void;
 }
 
 /** Faction, battle size and detachments. Changing the faction starts a new list. */
-export default function ArmySettings({ draft, library, onChange }: Props) {
+export default function ArmySettings({ draft, library, release, onChange }: Props) {
   const faction = library.faction(draft.list.faction);
 
   return (
@@ -31,6 +33,11 @@ export default function ArmySettings({ draft, library, onChange }: Props) {
               </option>
             ))}
           </select>
+          <span className="text-xs font-normal tracking-normal text-text/60 normal-case">
+            {release
+              ? `Rules ${release.version}, released ${new Date(release.date).toLocaleDateString()}`
+              : 'Built-in demo rules'}
+          </span>
         </label>
         <label className={LABEL}>
           Battle size

@@ -11,6 +11,8 @@ import {
   manifestSchema,
   type Proposal,
   proposalSchema,
+  type ReleasedRules,
+  type ReleaseInfo,
   requestSchema,
   reviewSchema,
 } from './schemas';
@@ -242,17 +244,29 @@ export class RulebookClient {
 
   /** The files of the newest trusted release of every released faction, core included, for `Library.fromFiles`. */
   async latestFiles(): Promise<RulesFile[]> {
+    return (await this.latestReleases()).files;
+  }
+
+  /** The newest trusted release of every released faction (core included): its files and what the release is. */
+  async latestReleases(): Promise<ReleasedRules> {
     const factions = await this.releasedFactions();
 
-    const files = await Promise.all(
+    const found = await Promise.all(
       factions.map(async (faction) => {
         const [newest] = await this.releases(faction);
 
-        return newest ? this.releaseFiles(faction, newest.hash) : [];
+        if (!newest) return null;
+
+        const { version, date, hash, notes, records } = newest;
+        const info: ReleaseInfo = { faction, version, date, hash, notes, records: Object.keys(records).length };
+
+        return { info, files: await this.releaseFiles(faction, hash) };
       }),
     );
 
-    return files.flat();
+    const releases = found.filter((f) => f !== null);
+
+    return { files: releases.flatMap((r) => r.files), releases: releases.map((r) => r.info) };
   }
 
   /** Publishes every record of a faction (or `core`) folder and releases them. Maintainers of that faction only. */

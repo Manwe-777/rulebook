@@ -1,14 +1,16 @@
-import type { Library } from '@rulebook/rules';
+import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { SavedArmies } from '../../army/SavedArmies';
+import type { BuilderRules } from '../../hooks/useBuilderLibrary';
 import { useNow } from '../../hooks/useNow';
 import { PANEL, PANEL_TITLE } from '../styles';
 import ArmyCard from './ArmyCard';
 import NewArmyForm from './NewArmyForm';
+import RulesPanel from './RulesPanel';
 
 interface Props {
   saved: SavedArmies;
-  library: Library;
+  rules: BuilderRules;
   onOpen: (id: string) => void;
   onCreate: (faction: string) => void;
   onDuplicate: (id: string) => void;
@@ -16,8 +18,10 @@ interface Props {
 }
 
 /** Every army saved on this device, newest first, and a form to start a new one. */
-export default function ArmiesPage({ saved, library, onOpen, onCreate, onDuplicate, onDelete }: Props) {
+export default function ArmiesPage({ saved, rules, onOpen, onCreate, onDuplicate, onDelete }: Props) {
   const now = useNow();
+  const { library, releases } = rules;
+  const releaseOf = (faction: string): ReleaseInfo | undefined => releases.find((r) => r.faction === faction);
 
   return (
     <div className="flex flex-col gap-4">
@@ -36,6 +40,7 @@ export default function ArmiesPage({ saved, library, onOpen, onCreate, onDuplica
               key={army.id}
               army={army}
               library={library}
+              release={releaseOf(army.list.faction)}
               now={now}
               onOpen={() => onOpen(army.id)}
               onDuplicate={() => onDuplicate(army.id)}
@@ -44,6 +49,7 @@ export default function ArmiesPage({ saved, library, onOpen, onCreate, onDuplica
           ))}
         </ul>
       )}
+      <RulesPanel library={library} releases={releases} status={rules.status} checkedAt={rules.checkedAt} now={now} />
       <p className="text-xs text-text/60">Armies and photos are saved on this device only.</p>
     </div>
   );

@@ -110,8 +110,10 @@ The project shares game data and players' own explanations of rules. It never sh
 - 11th edition only. Data, validation and UI follow the 11th edition core rules and faction packs.
 - Records are small (one unit, detachment, enhancement or stratagem each), so changes are easy to review and rarely
   clash.
-- The list builder only uses releases: fixed snapshots of a faction signed by one of its maintainers. A saved list
-  names the release it was built against, so it keeps the same result until its owner moves it to a newer release.
+- The list builder only uses releases: fixed snapshots of a faction signed by one of its maintainers, always the newest
+  of each faction. A saved army records the release it was last edited with; the armies screen shows the release each
+  faction is on (version, date, record count), when the relays were last checked, and which armies' rules changed since
+  their last edit.
 - Faction data never contains code. Faction-specific army rules use the declarative constraints in
   [validation.md](validation.md).
 - Every problem found in a list or a dataset is reported with a message and the entry it concerns; nothing throws.

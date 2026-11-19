@@ -130,6 +130,14 @@ export class ArmyDraft {
     return this.withEntry(id, (e) => ({ ...e, attachedTo: bodyguard }));
   }
 
+  /**
+   * Records the release of the faction's rules the list was last edited with (the hash), so the armies screen can say
+   * when the rules changed since. The same draft when nothing changes.
+   */
+  withRelease(release: string | undefined): ArmyDraft {
+    return release === this.list.release ? this : this.with({ release });
+  }
+
   setWarlord(id: string | undefined): ArmyDraft {
     return this.with({ warlord: id });
   }

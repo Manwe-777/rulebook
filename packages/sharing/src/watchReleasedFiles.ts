@@ -1,13 +1,18 @@
-import type { RulesFile } from '@rulebook/rules';
+import type { ReleasedRules } from './schemas';
 
 /** Where the released rules shown come from. */
 export type ReleaseSource = 'loading' | 'cached' | 'offline' | 'relays' | 'failed';
 
 interface Options {
   /** Reads the newest releases from the relays. */
-  load: () => Promise<RulesFile[]>;
-  cache: { read: () => Promise<{ files: RulesFile[] } | null>; write: (files: RulesFile[]) => Promise<void> };
-  onChange: (files: RulesFile[] | null, source: ReleaseSource) => void;
+  load: () => Promise<ReleasedRules>;
+  cache: {
+    read: () => Promise<{ rules: ReleasedRules; savedAt: number } | null>;
+    write: (rules: ReleasedRules, now: number) => Promise<void>;
+  };
+  /** `checkedAt`: when the relays gave these rules (now, or when the cached copy was saved); null with none. */
+  onChange: (rules: ReleasedRules | null, source: ReleaseSource, checkedAt: number | null) => void;
+  now?: () => number;
 }
 
 /**
@@ -15,31 +20,33 @@ interface Options {
  * can't be reached the cached copy stays (`offline`), or there is nothing (`failed`). Returns a function that stops
  * further updates.
  */
-export function watchReleasedFiles({ load, cache, onChange }: Options): () => void {
+export function watchReleasedFiles({ load, cache, onChange, now = Date.now }: Options): () => void {
   let stopped = false;
   let shown = false;
-  const report: Options['onChange'] = (files, source) => !stopped && onChange(files, source);
+  const report: Options['onChange'] = (...args) => !stopped && onChange(...args);
 
   const cached = cache.read().then((saved) => {
-    // The relays may already have answered; never replace newer files with the cache.
+    // The relays may already have answered; never replace newer rules with the cache.
     if (saved && !shown) {
       shown = true;
-      report(saved.files, 'cached');
+      report(saved.rules, 'cached', saved.savedAt);
     }
 
     return saved;
   });
 
   load()
-    .then(async (files) => {
+    .then(async (rules) => {
+      const at = now();
+
       shown = true;
-      report(files, 'relays');
-      await cache.write(files);
+      report(rules, 'relays', at);
+      await cache.write(rules, at);
     })
     .catch(async () => {
       const saved = await cached;
 
-      report(saved?.files ?? null, saved ? 'offline' : 'failed');
+      report(saved?.rules ?? null, saved ? 'offline' : 'failed', saved?.savedAt ?? null);
     });
 
   return () => {

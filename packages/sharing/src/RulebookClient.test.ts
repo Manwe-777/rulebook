@@ -287,6 +287,23 @@ describe('releases', () => {
     expect(library.muster).toBeDefined();
   });
 
+  it('readers learn which release each faction is on: version, date and how many records it holds', async () => {
+    const { files, releases } = await stranger.latestReleases();
+    const newest = (await stranger.releases(FACTION))[0];
+    const info = releases.find((r) => r.faction === FACTION);
+
+    expect(info).toEqual({
+      faction: FACTION,
+      version: newest.version,
+      date: newest.date,
+      hash: newest.hash,
+      notes: newest.notes,
+      records: Object.keys(newest.records).length,
+    });
+
+    expect(files.filter((f) => f.path.startsWith(`${FACTION}/`))).toHaveLength(info!.records);
+  });
+
   it('readers list trusted releases, newest first', async () => {
     const releases = await eventually(
       () => stranger.releases(FACTION),

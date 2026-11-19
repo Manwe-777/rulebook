@@ -1,10 +1,11 @@
-import type { RulesFile } from '@rulebook/rules';
 import { createStore, del, get, set, type UseStore } from 'idb-keyval';
 
 import { CACHE_DB } from '../constants';
+import type { ReleasedRules } from '../schemas';
 
-interface Saved {
-  files: RulesFile[];
+/** Released rules as saved, with when the relays gave them (ms since epoch). */
+export interface SavedReleases {
+  rules: ReleasedRules;
   savedAt: number;
 }
 
@@ -22,24 +23,29 @@ export class ReleaseCache {
     this.store = typeof indexedDB === 'undefined' ? null : createStore(CACHE_DB, 'releases');
   }
 
-  /** The saved files, or null when nothing (readable) is saved or there's no IndexedDB. */
-  async read(): Promise<Saved | null> {
+  /** The saved releases, or null when nothing (readable) is saved or there's no IndexedDB. */
+  async read(): Promise<SavedReleases | null> {
     if (!this.store) return null;
 
     try {
-      const saved = await get<Saved>(this.key, this.store);
+      const saved = await get<{ files?: unknown; releases?: unknown; savedAt?: unknown }>(this.key, this.store);
 
-      return saved && Array.isArray(saved.files) ? saved : null;
+      if (!saved || !Array.isArray(saved.files)) return null;
+
+      // Copies saved before release info was kept have no `releases`; they still give the files.
+      const releases = Array.isArray(saved.releases) ? saved.releases : [];
+
+      return { rules: { files: saved.files, releases } as ReleasedRules, savedAt: Number(saved.savedAt) || 0 };
     } catch {
       return null;
     }
   }
 
-  async write(files: RulesFile[], now = Date.now()): Promise<void> {
+  async write(rules: ReleasedRules, now = Date.now()): Promise<void> {
     if (!this.store) return;
 
     try {
-      await set(this.key, { files, savedAt: now } satisfies Saved, this.store);
+      await set(this.key, { ...rules, savedAt: now }, this.store);
     } catch {
       // Storage full or blocked: the apps still work, only without the offline copy.
     }
