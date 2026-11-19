@@ -45,6 +45,8 @@
   options: the release builds the project owner into `install.sh`, and with no owner it runs as an open store. See `docs/hosting.md`.
 - Released rules are cached in IndexedDB (per owner key, shared by both apps on one site): shown at once on the next
   visit, kept when the relays can't be reached. `owner-key` no longer echoes the password.
+- Smaller first load: tool-db, the editor and the account page load on demand, libraries are split into chunks that
+  stay cached across deploys (rulebook 832 → ~620 kB, builder 643 → ~460 kB before gzip).
 - List builder (`apps/builder`, phase 8 done before the editor): pick faction, battle size and detachments, add units,
   set size, wargear, enhancements, upgrades, attachments and warlord; points and every problem update as you edit; the
   list is saved in the browser (unreadable saves are backed up). Loads relay releases like the rulebook.
@@ -61,8 +63,8 @@
 
 - No relay server is chosen yet; `RULEBOOK_RELAYS` and `RULEBOOK_OWNER` must be set before the Pages build is useful.
 - `tests/installer.sh` for the relay runs by hand (Docker with systemd), not in CI.
-- Prerendered pages only cover the demo content; relay-only pages render in the browser.
-- The JS bundle is ~610 kB (react-markdown, yaml, zod) and every page ships the whole library.
+- First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
+  the whole rules library.
 
 ## Next
 

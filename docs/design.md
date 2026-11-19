@@ -94,9 +94,12 @@ The project shares game data and players' own explanations of rules. It never sh
 - Numbers and structure (characteristics, points, keywords, which units a leader can join, costs and limits) are entered
   as data.
 - No Games Workshop artwork, logos, model photos or fonts are bundled or uploaded. Unit images are links to pictures the
-  contributor has the right to share.
+  contributor has the right to share. Players can add photos of their own models to units in the list builder; those
+  stay in their browser and are never shared.
 - Names are kept to what players need to find a unit or rule. Branding never imitates Games Workshop's.
 - The repository ships only a made-up demo faction. Real factions exist only as community data on the relays.
+- The static sites never contain relay content: only the demo faction is prerendered, and the browser fetches and
+  caches releases itself. Whatever the project's own hosting serves is code and demo data.
 - The owner keeps a hidden list. Clients don't show anything on it and the project's relay deletes it, so the project
   can act on takedown requests. Deletion on public relays is best effort (NIP-09).
 - Every page links to the official sources and states that the project is unofficial and not endorsed by Games

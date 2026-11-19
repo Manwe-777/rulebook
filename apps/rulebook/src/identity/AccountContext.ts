@@ -23,7 +23,7 @@ export interface Account {
   unlock: (password: string) => Promise<string | null>;
   switchToExtension: () => Promise<string | null>;
   forget: () => void;
-  exportNsec: () => string | null;
+  exportNsec: () => Promise<string | null>;
   exportNcryptsec: (password: string) => Promise<string | null>;
 }
 

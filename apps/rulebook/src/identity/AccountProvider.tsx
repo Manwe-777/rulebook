@@ -1,15 +1,21 @@
 import type { RulebookClient } from '@rulebook/sharing';
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
-import { encryptSecretKey, generateSecretKey, getPublicKey, nsecEncode } from 'tool-db';
 
 import { KEY_PROTECTION_LOGN, OWNER_KEY, RELAYS } from '../constants';
 import { type Account, AccountContext } from './AccountContext';
-import { connectClient } from './connectClient';
 import type { Connection } from './connectionSummary';
-import { readSecretKey } from './readSecretKey';
 import { loadStoredIdentity, saveStoredIdentity, type StoredIdentity } from './storedIdentity';
 
 const online = RELAYS.length > 0 && OWNER_KEY !== '';
+
+// tool-db and the key code load after the first render, so readers get the page without them.
+const keys = () => import('tool-db');
+
+const connect: typeof import('./connectClient').connectClient = (...args) =>
+  import('./connectClient').then((m) => m.connectClient(...args));
+
+const readKey: typeof import('./readSecretKey').readSecretKey = (...args) =>
+  import('./readSecretKey').then((m) => m.readSecretKey(...args));
 
 type Signer = { extension: true } | { secret: string } | null;
 
@@ -22,7 +28,8 @@ function initialSecret(stored: StoredIdentity | null): string | null {
 export default function AccountProvider({ children }: { children: ReactNode }) {
   const [stored, setStored] = useState(() => (typeof window === 'undefined' ? null : loadStoredIdentity()));
   const [secret, setSecret] = useState(() => initialSecret(stored));
-  const [extensionKey, setExtensionKey] = useState<string | null>(null);
+  // The public key the client opened for a signer signs with; learned once connected.
+  const [me, setMe] = useState<{ id: string; pubkey: string } | null>(null);
   const [client, setClient] = useState<RulebookClient | null>(null);
   const signer: Signer = stored?.mode === 'extension' ? { extension: true } : secret ? { secret } : null;
   const signerId = signer ? ('secret' in signer ? signer.secret : 'extension') : 'anonymous';
@@ -35,7 +42,7 @@ export default function AccountProvider({ children }: { children: ReactNode }) {
 
     let closed = false;
     const report = (state: Connection) => !closed && setLink({ id: signerId, state });
-    const opened = connectClient(RELAYS, OWNER_KEY, signer, (up) => report(up ? 'connected' : 'reconnecting'));
+    const opened = connect(RELAYS, OWNER_KEY, signer, (up) => report(up ? 'connected' : 'reconnecting'));
 
     opened
       .then(({ client: c }) => {
@@ -43,7 +50,7 @@ export default function AccountProvider({ children }: { children: ReactNode }) {
 
         setClient(c);
         report('connected');
-        if (signer && 'extension' in signer) setExtensionKey(c.me || null);
+        if (c.me) setMe({ id: signerId, pubkey: c.me });
       })
       .catch(() => {
         if (closed) return;
@@ -67,7 +74,7 @@ export default function AccountProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const account = useMemo<Account>(() => {
-    const pubkey = secret ? getPublicKey(secret) : stored?.mode === 'extension' ? extensionKey : null;
+    const pubkey = signerId !== 'anonymous' && me?.id === signerId ? me.pubkey : null;
 
     return {
       online,
@@ -78,12 +85,13 @@ export default function AccountProvider({ children }: { children: ReactNode }) {
       locked: stored?.mode === 'protected' && !secret,
       ensureKey: async () => {
         if (!stored) {
-          const fresh = generateSecretKey();
+          const fresh = (await keys()).generateSecretKey();
 
           remember({ mode: 'browser', secret: fresh }, fresh);
-          const { client: c } = await connectClient(RELAYS, OWNER_KEY, { secret: fresh });
+          const { client: c } = await connect(RELAYS, OWNER_KEY, { secret: fresh });
 
           setClient(c);
+          setMe({ id: fresh, pubkey: c.me });
 
           return c;
         }
@@ -91,7 +99,7 @@ export default function AccountProvider({ children }: { children: ReactNode }) {
         return client;
       },
       importKey: async (text, password) => {
-        const result = await readSecretKey(text, password);
+        const result = await readKey(text, password);
 
         if ('error' in result) return result.error;
 
@@ -102,14 +110,17 @@ export default function AccountProvider({ children }: { children: ReactNode }) {
       protect: async (password) => {
         if (secret)
           remember(
-            { mode: 'protected', ncryptsec: await encryptSecretKey(secret, password, KEY_PROTECTION_LOGN) },
+            {
+              mode: 'protected',
+              ncryptsec: await (await keys()).encryptSecretKey(secret, password, KEY_PROTECTION_LOGN),
+            },
             secret,
           );
       },
       unlock: async (password) => {
         if (stored?.mode !== 'protected') return null;
 
-        const result = await readSecretKey(stored.ncryptsec, password);
+        const result = await readKey(stored.ncryptsec, password);
 
         if ('error' in result) return result.error;
 
@@ -125,10 +136,11 @@ export default function AccountProvider({ children }: { children: ReactNode }) {
         return null;
       },
       forget: () => remember(null, null),
-      exportNsec: () => (secret ? nsecEncode(secret) : null),
-      exportNcryptsec: async (password) => (secret ? encryptSecretKey(secret, password, KEY_PROTECTION_LOGN) : null),
+      exportNsec: async () => (secret ? (await keys()).nsecEncode(secret) : null),
+      exportNcryptsec: async (password) =>
+        secret ? (await keys()).encryptSecretKey(secret, password, KEY_PROTECTION_LOGN) : null,
     };
-  }, [client, connection, stored, secret, extensionKey, remember]);
+  }, [client, connection, stored, secret, signerId, me, remember]);
 
   return <AccountContext value={account}>{children}</AccountContext>;
 }

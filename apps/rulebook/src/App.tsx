@@ -1,10 +1,8 @@
+import { lazy, Suspense } from 'react';
 import { Link, Route, Routes, useLocation } from 'react-router';
 
-import AccountPage from './components/account/AccountPage';
 import ConnectionBadge from './components/common/ConnectionBadge';
 import SourceStatusLine from './components/common/SourceStatusLine';
-import FactionWorkspace from './components/editor/FactionWorkspace';
-import RecordEditor from './components/editor/RecordEditor';
 import DetachmentPage from './components/pages/DetachmentPage';
 import FactionPage from './components/pages/FactionPage';
 import HomePage from './components/pages/HomePage';
@@ -14,6 +12,11 @@ import { BUILDER_URL, ICON_CREDIT, SITE_NAME } from './constants';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
 import { useLibrary } from './hooks/useLibrary';
 import { titleForPath } from './library/titleForPath';
+
+// Pages for contributors load when opened, so readers never download the editor.
+const AccountPage = lazy(() => import('./components/account/AccountPage'));
+const FactionWorkspace = lazy(() => import('./components/editor/FactionWorkspace'));
+const RecordEditor = lazy(() => import('./components/editor/RecordEditor'));
 
 /** Page layout and routes. The router and library provider are set up by the client or server entry. */
 export default function App() {
@@ -39,16 +42,18 @@ export default function App() {
           </Link>
         </nav>
       </header>
-      <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/:faction" element={<FactionPage />} />
-        <Route path="/:faction/:unit" element={<UnitPage />} />
-        <Route path="/:faction/detachment/:detachment" element={<DetachmentPage />} />
-        <Route path="/account" element={<AccountPage />} />
-        <Route path="/:faction/edit" element={<FactionWorkspace />} />
-        <Route path="/:faction/edit/:kind/:id" element={<RecordEditor />} />
-        <Route path="*" element={<NotFoundPage />} />
-      </Routes>
+      <Suspense fallback={<p className="text-text/70">Loading…</p>}>
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/:faction" element={<FactionPage />} />
+          <Route path="/:faction/:unit" element={<UnitPage />} />
+          <Route path="/:faction/detachment/:detachment" element={<DetachmentPage />} />
+          <Route path="/account" element={<AccountPage />} />
+          <Route path="/:faction/edit" element={<FactionWorkspace />} />
+          <Route path="/:faction/edit/:kind/:id" element={<RecordEditor />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </Suspense>
       <footer className="mt-auto text-xs text-text/60">
         Icons:{' '}
         <a href={ICON_CREDIT.url} className="underline">

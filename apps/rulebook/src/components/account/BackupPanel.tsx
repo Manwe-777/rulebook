@@ -25,7 +25,7 @@ export default function BackupPanel() {
       {shown ? (
         <p className={`${NOTE} font-mono break-all`}>{shown}</p>
       ) : (
-        <button type="button" className={`${BUTTON_QUIET} self-start`} onClick={() => setShown(exportNsec())}>
+        <button type="button" className={`${BUTTON_QUIET} self-start`} onClick={() => exportNsec().then(setShown)}>
           Show my secret key (nsec)
         </button>
       )}

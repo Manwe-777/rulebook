@@ -2,6 +2,8 @@ import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import { defineConfig, type Plugin } from 'vite';
 
+import { vendorChunks } from '../../tooling/vendorChunks';
+
 /** The icon package lists five font formats; keep only woff2 so the others (one is 7 MB) aren't copied into dist. */
 function iconFontWoff2Only(): Plugin {
   return {
@@ -21,5 +23,6 @@ function iconFontWoff2Only(): Plugin {
 export default defineConfig({
   // Absolute so nested pages find their assets. Set BASE_PATH (e.g. /rulebook/) when hosting under a sub-path.
   base: process.env.BASE_PATH ?? '/',
+  build: { rolldownOptions: { output: { codeSplitting: vendorChunks } } },
   plugins: [iconFontWoff2Only(), tailwindcss(), react()],
 });

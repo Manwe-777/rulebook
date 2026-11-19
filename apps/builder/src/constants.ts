@@ -1,4 +1,4 @@
-import { ownerKeyHex } from '@rulebook/sharing';
+import { ownerKeyHex } from '@rulebook/sharing/keys';
 
 /** Name shown in the page header. */
 export const SITE_NAME = 'List Builder';

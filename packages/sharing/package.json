@@ -5,7 +5,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./relay": "./src/relay/RulebookRelay.ts"
+    "./relay": "./src/relay/RulebookRelay.ts",
+    "./keys": "./src/utils/ownerKeyHex.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
@@ -14,6 +15,7 @@
   },
   "dependencies": {
     "@rulebook/rules": "*",
+    "@scure/base": "^1.2.6",
     "@tool-db/nostr-relay": "1.0.0",
     "idb-keyval": "^6.3.0",
     "tool-db": "3.0.0",
@@ -23,5 +25,6 @@
     "@types/node": "^26.6.6",
     "fake-indexeddb": "^6.2.8",
     "vitest": "^5.1.1"
-  }
+  },
+  "sideEffects": false
 }

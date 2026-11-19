@@ -1,4 +1,4 @@
-import { ownerKeyHex } from '@rulebook/sharing';
+import { ownerKeyHex } from '@rulebook/sharing/keys';
 
 import type { FactionTheme } from './types';
 
