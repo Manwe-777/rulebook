@@ -1,3 +1,4 @@
+export { ReleaseCache } from './cache/ReleaseCache';
 export * from './constants';
 export { loadRemoteFiles } from './loadRemoteFiles';
 export { type ProposalEntry, RulebookClient } from './RulebookClient';
@@ -7,3 +8,4 @@ export * from './schemas';
 export { canonicalJson } from './utils/canonicalJson';
 export { ownerKeyHex } from './utils/ownerKeyHex';
 export { sha256Hex } from './utils/sha256Hex';
+export { type ReleaseSource, watchReleasedFiles } from './watchReleasedFiles';

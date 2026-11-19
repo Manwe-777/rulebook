@@ -2,6 +2,7 @@ import { existsSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { createInterface } from 'node:readline';
+import { Writable } from 'node:stream';
 
 import { encryptSecretKey, generateSecretKey, getPublicKey, npubEncode } from 'tool-db';
 
@@ -21,10 +22,12 @@ if (file.startsWith(resolve(import.meta.dirname, '../../..'))) {
   process.exit(1);
 }
 
-const prompt = createInterface({ input: process.stdin, output: process.stdout });
+// readline echoes what is typed through its output; this one drops the echo so passwords stay off the screen.
+const silent = new Writable({ write: (_chunk, _encoding, done) => done() });
+const prompt = createInterface({ input: process.stdin, output: silent, terminal: Boolean(process.stdin.isTTY) });
 const lines = prompt[Symbol.asyncIterator]();
 
-/** Asks a question and reads one line; works when typed or piped. */
+/** Asks a question and reads one line without showing it; works when typed or piped. */
 async function ask(question: string): Promise<string> {
   process.stdout.write(question);
 

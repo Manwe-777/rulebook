@@ -12,7 +12,7 @@ const configured = RELAYS.length > 0 && OWNER_KEY !== '';
 
 /**
  * Provides the library: the bundled demo content first (matching the prerendered pages), then, when relays are
- * configured, the newest releases from them on top.
+ * configured, the releases saved on this device and the newest from the relays on top.
  */
 export default function LibraryProvider({ children }: { children: ReactNode }) {
   const [library, setLibrary] = useState(bundledLibrary);
@@ -22,23 +22,31 @@ export default function LibraryProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!configured) return;
 
+    let stop: () => void = () => undefined;
     let cancelled = false;
 
-    import('@rulebook/sharing')
-      .then(({ loadRemoteFiles }) => loadRemoteFiles(RELAYS, OWNER_KEY))
-      .then((remote) => {
-        if (cancelled) return;
+    import('@rulebook/sharing').then(({ loadRemoteFiles, ReleaseCache, watchReleasedFiles }) => {
+      if (cancelled) return;
 
-        const merged = mergeFiles(loadBundledFiles(), remote);
+      stop = watchReleasedFiles({
+        load: () => loadRemoteFiles(RELAYS, OWNER_KEY),
+        cache: new ReleaseCache(OWNER_KEY),
+        onChange: (remote, source) => {
+          if (remote) {
+            const merged = mergeFiles(loadBundledFiles(), remote);
 
-        setFiles(merged);
-        setLibrary(Library.fromFiles(merged));
-        setStatus('relays');
-      })
-      .catch(() => !cancelled && setStatus('failed'));
+            setFiles(merged);
+            setLibrary(Library.fromFiles(merged));
+          }
+
+          setStatus(source);
+        },
+      });
+    });
 
     return () => {
       cancelled = true;
+      stop();
     };
   }, []);
 

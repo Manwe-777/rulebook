@@ -43,13 +43,13 @@
   relay key on update, checks downloads) and `SHA256SUMS`. Installer tested under systemd in Docker; the Pages build
   checked under a sub-path in the browser. Apps and relay take the owner key as npub or hex. The relay needs no
   options: the release builds the project owner into `install.sh`, and with no owner it runs as an open store. See `docs/hosting.md`.
+- Released rules are cached in IndexedDB (per owner key, shared by both apps on one site): shown at once on the next
+  visit, kept when the relays can't be reached. `owner-key` no longer echoes the password.
 - List builder (`apps/builder`, phase 8 done before the editor): pick faction, battle size and detachments, add units,
   set size, wargear, enhancements, upgrades, attachments and warlord; points and every problem update as you edit; the
   list is saved in the browser (unreadable saves are backed up). Loads relay releases like the rulebook.
 
 ## Known issues
-
-- `owner-key` shows the password as it is typed.
 
 - tool-db has no deletion (NIP-09 is described in its design doc but not implemented), so the relay can't delete hidden
   content it already stored; it refuses new writes and clients don't show it.
@@ -61,7 +61,6 @@
 
 - No relay server is chosen yet; `RULEBOOK_RELAYS` and `RULEBOOK_OWNER` must be set before the Pages build is useful.
 - `tests/installer.sh` for the relay runs by hand (Docker with systemd), not in CI.
-- Relay data is kept in memory only; caching it in IndexedDB is not done yet.
 - Prerendered pages only cover the demo content; relay-only pages render in the browser.
 - The JS bundle is ~610 kB (react-markdown, yaml, zod) and every page ships the whole library.
 

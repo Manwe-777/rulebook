@@ -25,3 +25,6 @@ export const KEYS = {
   request: (f: string) => `request/${f}`,
   list: (n: string) => `list/${n}`,
 } as const;
+
+/** IndexedDB database the browser apps keep released rules in. */
+export const CACHE_DB = 'rulebook-cache';

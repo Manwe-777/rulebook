@@ -6,13 +6,15 @@ import EntryList from './components/EntryList';
 import IssuesPanel from './components/IssuesPanel';
 import UnitPicker from './components/UnitPicker';
 import { RULEBOOK_URL, SITE_NAME } from './constants';
-import { useBuilderLibrary } from './hooks/useBuilderLibrary';
+import { type BuilderSource, useBuilderLibrary } from './hooks/useBuilderLibrary';
 import { useDraft } from './hooks/useDraft';
 
-const SOURCE = {
+const SOURCE: Record<BuilderSource, string> = {
   demo: 'Using the demo faction.',
   loading: 'Loading rules from the relays…',
+  cached: 'Using rules saved on this device; checking the relays for newer ones…',
   relays: 'Rules loaded from the relays.',
+  offline: 'Offline: using rules saved on this device.',
   failed: 'Could not reach the relays; using the demo faction.',
 };
 

@@ -5,7 +5,8 @@ import { SourceContext } from '../../library/SourceContext';
 
 /** Shown for unknown addresses; while rules are still loading from the relays, the page may just not be here yet. */
 export default function NotFoundPage() {
-  if (useContext(SourceContext) === 'loading') return <p className="text-text/70">Loading rules from the relays…</p>;
+  if (['loading', 'cached'].includes(useContext(SourceContext)))
+    return <p className="text-text/70">Loading rules from the relays…</p>;
 
   return (
     <div className="flex flex-col items-start gap-3">
