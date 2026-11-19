@@ -108,6 +108,7 @@ describe('datasheet text', () => {
       points: 10,
       target: 'model',
       keywords: ['CHARACTER'],
+      anyKeywords: [],
       excludeKeywords: [],
       excludeRoles: ['epic-hero'],
     };
@@ -116,6 +117,10 @@ describe('datasheet text', () => {
 
     expect(eligibilityText({ ...base, target: 'unit', keywords: ['VEHICLE'], excludeRoles: [] })).toBe(
       'VEHICLE unit only',
+    );
+
+    expect(eligibilityText({ ...base, keywords: [], anyKeywords: ['IRON-MASTER', 'MEMNYR STRATEGIST'] })).toBe(
+      'IRON-MASTER or MEMNYR STRATEGIST model only (not EPIC HERO)',
     );
   });
 });

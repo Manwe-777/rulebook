@@ -40,5 +40,10 @@ export const constraintSchema = z
 
 export const constraintsSchema = z.array(constraintSchema).default([]);
 
-/** Keywords a bearer needs, and keywords and roles that rule it out. */
-export const eligibility = { keywords, excludeKeywords: keywords, excludeRoles: z.array(role).default([]) };
+/** Keywords a bearer needs (all of `keywords`, one of `anyKeywords`), and keywords and roles that rule it out. */
+export const eligibility = {
+  keywords,
+  anyKeywords: keywords,
+  excludeKeywords: keywords,
+  excludeRoles: z.array(role).default([]),
+};

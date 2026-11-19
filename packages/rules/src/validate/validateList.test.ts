@@ -212,6 +212,13 @@ describe('validateList: enhancements and upgrades', () => {
     expect(codes(withUnits({ unit: 'marshal-venn', enhancement: 'old-campaigner' }))).toEqual(['enhancement-bearer']);
   });
 
+  it('an enhancement for one of several kinds of model names them all when the bearer is none of them', () => {
+    const list = withUnits({ unit: 'marshal-venn', enhancement: 'old-campaigner' });
+    const issue = validateList(list, demoLibrary).find((i) => i.code === 'enhancement-bearer');
+
+    expect(issue?.message).toBe("Marshal Venn can't take Old Campaigner: it needs FIELD CAPTAIN or STANDARD BEARER.");
+  });
+
   it('each enhancement is taken once', () => {
     expect(codes(replaceUnit('bearer', { enhancement: 'banner-of-resolve' }))).toEqual(
       expect.arrayContaining(['enhancement-twice']),

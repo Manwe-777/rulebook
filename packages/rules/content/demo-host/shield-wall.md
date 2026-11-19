@@ -6,7 +6,7 @@ dispositions: [take-and-hold]
 unique: [VANGUARD]
 enhancements:
   - { name: Banner of Resolve, points: 15, keywords: [FIELD CAPTAIN] }
-  - { name: Old Campaigner, points: 20, keywords: [CHARACTER] }
+  - { name: Old Campaigner, points: 20, anyKeywords: [FIELD CAPTAIN, STANDARD BEARER] }
   - { name: Reinforced Plating, points: 20, target: unit, keywords: [VEHICLE] }
 stratagems:
   - { name: Brace!, cp: 1, category: Battle Tactic }

@@ -136,6 +136,7 @@ enhancements:
     points: 15
     target: model # model: given to one CHARACTER model; unit: an upgrade for a whole unit
     keywords: [FIELD CAPTAIN] # the bearer needs all of these
+    anyKeywords: [] # and at least one of these, when given
     excludeKeywords: [EPIC HERO]
   - id: reinforced-plating
     name: Reinforced Plating

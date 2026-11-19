@@ -11,6 +11,10 @@ function ineligible(item: Enhancement, unit: Unit, roles: Role[], excludeRoles: 
   if (roles.length && !roles.some((r) => unit.roles.includes(r))) return `needs a ${roles.join(' or ')} unit`;
   if (!hasKeywords(unit, item.keywords)) return `needs ${item.keywords.join(', ')}`;
 
+  if (item.anyKeywords.length && !hasKeywords(unit, item.anyKeywords, true)) {
+    return `needs ${item.anyKeywords.join(' or ')}`;
+  }
+
   if (item.excludeKeywords.length && hasKeywords(unit, item.excludeKeywords, true)) {
     return `can't go on ${item.excludeKeywords.join(' or ')} units`;
   }
