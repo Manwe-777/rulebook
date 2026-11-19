@@ -51,6 +51,12 @@
   limits 2 / 4. `anyLoneDetachment` in the muster record covers the announced "any single detachment" rule. The builder
   shows each detachment's DP, disposition and tags, a DP counter and the disposition picker; the rulebook and the
   army sheet show DP and disposition. Local relay and browser data were reset (no migration: nothing was deployed).
+- Checked against a real faction: Leagues of Votann (22 datasheets, 10 detachments, rules summarised in our own
+  words) in a gitignored `local-content/` folder, published only to a local relay. A tournament list (two detachments,
+  attached leaders, repeated datasheets) rebuilt in the builder comes to the same 1995 points and is legal. What it
+  needed: several dispositions per detachment, datasheet copy surcharges ("2nd+ in your army: +20 pts"), wargear
+  without a weapon profile (crests, scanners) with its own rules, and enhancements for one of several kinds of model.
+  `publish` now reads each release back and fails when the relay refused records.
 - Printable army sheet: the builder's Print button opens the rulebook's `/print` page with the list after `#army=`
   (base64url, never sent to a server). Checkboxes (remembered per browser) for roster, army rules, detachment rules
   with the enhancements taken, stratagems and datasheets (each once). Roster brackets combined units with their total
@@ -95,6 +101,16 @@
 - The relay installer job in CI (systemd in Docker on GitHub's runners) hasn't run there yet; it passes locally.
 - First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
   the whole rules library.
+
+- A relay checks every record with the rules package it was built with, so an older relay silently refuses records
+  that use newer fields. Relays must be updated before content uses new fields; `publish` reports the refused ones.
+- Format gaps found with Leagues of Votann: one wargear option can't be taken by two models with different choices
+  (two special weapons from the same list); "no duplicates", "one of these per model" and "replace X or Y" option rules;
+  model types whose models carry different gear (E-COGs); passengers taking no transport space (by model type);
+  detachments granting keywords (Beserks gain BATTLELINE); enhancements that need a weapon; splitting a unit across
+  transports at deployment. These are written as notes in the records for now.
+- Datasheet wording: options on single-model units read "Any number of models", and repeated default wargear is
+  listed twice instead of "2 twin bolt cannons".
 
 ## Next
 
