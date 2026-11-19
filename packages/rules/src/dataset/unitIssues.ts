@@ -15,7 +15,7 @@ const warning = (code: string, message: string, ref: string): Issue => ({
 });
 
 function weaponIssues(unit: Unit, ref: string): Issue[] {
-  const weapons = new Set([...unit.ranged, ...unit.melee].map((w) => w.id));
+  const weapons = new Set([...unit.ranged, ...unit.melee, ...unit.equipment].map((w) => w.id));
 
   const used = [
     ...Object.values(unit.composition.wargear).flat(),

@@ -31,12 +31,13 @@ Run in this order; every check runs even when an earlier one fails.
 2. **Faction.** Every unit has the army's faction keyword, unless a constraint allows it.
 3. **Unit size.** The model count matches one of the unit's `points` sizes and each model type's `min`/`max`.
 4. **Wargear.** Each option is taken by no more models than its `per` allows, and chosen lists exist.
-5. **Points.** Units, wargear options, enhancements and upgrades are summed. Over the battle size's limit is an
-   error. Detachments don't cost points.
+5. **Points.** Units, wargear options, enhancements and upgrades are summed; a datasheet's later copies add its
+   `copies` surcharge, counted in list order. Over the battle size's limit is an error. Detachments don't cost
+   points.
 6. **Detachments.** At least `detachments.min` (and at most `max` when set), each once. Their `cost` adds up to no
    more than the battle size's `detachmentPoints`, unless `anyLoneDetachment` is on and there is only one. No two
-   share a `unique` tag. With detachments of different dispositions the list picks one of theirs (`disposition`);
-   a picked disposition must belong to a chosen detachment.
+   share a `unique` tag. When the chosen detachments offer more than one disposition, even a single detachment, the
+   list picks one of them (`disposition`); a picked disposition must be offered by a chosen detachment.
 7. **Datasheet limits.** Copies of each datasheet stay within the first `datasheetLimits` entry matching one of its
    roles.
 8. **Enhancements.** Each enhancement comes from a chosen detachment, is taken once, goes on a unit with one of
@@ -108,10 +109,11 @@ army sheet instead of checking them.
 
 Run by the editor on every change and by maintainers before a release. Errors block a release.
 
-- Every reference resolves: leader and support bodyguards, wargear ids in defaults and options, constraint selectors,
+- Every reference resolves: leader and support bodyguards, wargear ids (weapons and equipment) in defaults and
+  options, constraint selectors,
   `faction/id` references to other factions.
 - Every enhancement and stratagem has text (warning).
-- Every detachment has a force disposition the muster rules list (warning).
+- Every detachment has at least one force disposition, and only ones the muster rules list (warning).
 - Unit sizes in `points` fit the model type limits; sizes don't repeat.
 - Ids are unique within their kind; enhancement and stratagem ids are unique within their detachment.
 - Every unit carries the faction keyword (warning, since some factions include other units on purpose).

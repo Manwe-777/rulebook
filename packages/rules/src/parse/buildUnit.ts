@@ -14,7 +14,15 @@ const withId = <T extends { id?: string; name: string; group?: string }>(w: T) =
 /** A unit from its checked frontmatter and Markdown body. */
 export function buildUnit(data: z.output<typeof unitSchema>, body: string, id: string) {
   const { sections, errors } = splitSections(body, UNIT_SECTIONS);
-  const value: Unit = { ...data, id, ranged: data.ranged.map(withId), melee: data.melee.map(withId), sections };
+
+  const value: Unit = {
+    ...data,
+    id,
+    ranged: data.ranged.map(withId),
+    melee: data.melee.map(withId),
+    equipment: data.equipment.map(withId),
+    sections,
+  };
 
   return { value, errors };
 }

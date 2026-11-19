@@ -1,4 +1,4 @@
-import { type ListEntry, type Unit, wargearAllowance } from '@rulebook/rules';
+import { type ListEntry, type Unit, wargearAllowance, wargearName } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
 import { INPUT, LABEL } from './styles';
@@ -10,12 +10,6 @@ interface Props {
   onChange: (draft: ArmyDraft) => void;
 }
 
-const weaponName = (unit: Unit, id: string) => {
-  const weapon = [...unit.ranged, ...unit.melee].find((w) => w.id === id);
-
-  return weapon ? (weapon.group ?? weapon.name) : id;
-};
-
 /** One row per wargear option: how many models take it, and which choice when there are several. */
 export default function WargearFields({ draft, entry, unit, onChange }: Props) {
   return unit.wargearOptions.map((option) => {
@@ -23,7 +17,7 @@ export default function WargearFields({ draft, entry, unit, onChange }: Props) {
     const models = taken?.models ?? 0;
     const choice = taken?.choice ?? option.with[0];
     const max = wargearAllowance(unit, entry.models, option);
-    const names = (ids: string[]) => ids.map((id) => weaponName(unit, id)).join(' + ');
+    const names = (ids: string[]) => ids.map((id) => wargearName(unit, id)).join(' + ');
     const set = (n: number, c: string[]) => onChange(draft.setWargear(entry.id, option.id, n, c));
 
     return (

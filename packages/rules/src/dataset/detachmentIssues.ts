@@ -22,20 +22,20 @@ export function detachmentIssues(faction: Faction, detachment: Detachment, muste
 
   const entries = [...detachment.enhancements, ...detachment.stratagems];
   const dispositions = muster?.dispositions.map((d) => d.id) ?? [];
-  const disposition = detachment.disposition;
+  const unknown = detachment.dispositions.filter((id) => !dispositions.includes(id));
 
   const badDisposition =
-    dispositions.length > 0 && (!disposition || !dispositions.includes(disposition))
-      ? [
-          issue(
-            'unknown-disposition',
-            'warning',
-            disposition
-              ? `${detachment.name} has the disposition "${disposition}", which the muster rules don't list.`
-              : `${detachment.name} has no force disposition.`,
-          ),
-        ]
-      : [];
+    dispositions.length === 0
+      ? []
+      : detachment.dispositions.length === 0
+        ? [issue('unknown-disposition', 'warning', `${detachment.name} has no force disposition.`)]
+        : unknown.map((id) =>
+            issue(
+              'unknown-disposition',
+              'warning',
+              `${detachment.name} has the disposition "${id}", which the muster rules don't list.`,
+            ),
+          );
 
   return [
     ...duplicates(detachment.enhancements.map((e) => e.id)).map((id) =>

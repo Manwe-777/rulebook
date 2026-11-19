@@ -14,6 +14,7 @@ export const UNIT_SECTIONS = {
   support: 'support',
   transport: 'transport',
   'wargear options': 'wargearOptions',
+  'wargear abilities': 'wargearAbilities',
   'unit composition': 'unitComposition',
   description: 'description',
 } as const;

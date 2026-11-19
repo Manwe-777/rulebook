@@ -1,4 +1,4 @@
-import { type ArmyList, type Library, type ListEntry, listSchema } from '@rulebook/rules';
+import { type ArmyList, type Library, type ListEntry, listSchema, offeredDispositions } from '@rulebook/rules';
 
 import { DEFAULT_BATTLE_SIZE } from '../constants';
 
@@ -87,11 +87,9 @@ export class ArmyDraft {
     }));
 
     // The chosen disposition goes when no remaining detachment has it.
-    const dispositions = (faction?.detachments ?? [])
-      .filter((d) => detachments.includes(d.id))
-      .map((d) => d.disposition);
-
-    const disposition = dispositions.includes(this.list.disposition) ? this.list.disposition : undefined;
+    const dispositions = offeredDispositions((faction?.detachments ?? []).filter((d) => detachments.includes(d.id)));
+    const kept = this.list.disposition;
+    const disposition = kept && dispositions.includes(kept) ? kept : undefined;
 
     return this.with({ detachments, units, disposition });
   }

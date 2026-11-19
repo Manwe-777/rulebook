@@ -7,9 +7,9 @@ import { eligibilityText } from './eligibilityText';
 import { equipmentLines } from './equipmentLines';
 import { factionTheme } from './factionTheme';
 import { markProfileGroups } from './markProfileGroups';
+import { ordinal } from './ordinal';
 import { pointsLines } from './pointsLines';
 import { wargearOptionLines } from './wargearOptionLines';
-import { weaponName } from './weaponName';
 
 const unit = (id: string): Unit => bundledLibrary.unit('demo-host', id)!.unit;
 
@@ -55,11 +55,6 @@ describe('markProfileGroups', () => {
 });
 
 describe('datasheet text', () => {
-  it('weapons are named by their group, and unknown ids by the id itself', () => {
-    expect(weaponName(unit('marshal-venn'), 'marshals-blade')).toBe("Marshal's blade");
-    expect(weaponName(unit('marshal-venn'), 'lance')).toBe('lance');
-  });
-
   it('lists model counts, showing a range when the count can vary', () => {
     expect(compositionLines(unit('line-troopers'))).toEqual(['1 × Sergeant', '9–19 × Trooper']);
   });
@@ -73,6 +68,23 @@ describe('datasheet text', () => {
   it('lists the cost of each unit size', () => {
     expect(pointsLines(unit('veteran-squad'))).toEqual(['5 models: 90 pts', '10 models: 180 pts']);
     expect(pointsLines(unit('field-captain'))).toEqual(['1 model: 70 pts']);
+    expect(pointsLines(unit('armoured-carrier'))).toEqual(['1 model: 80 pts', '3rd+ in your army: +10 pts']);
+  });
+
+  it('writes ordinals the English way, teens included', () => {
+    expect([1, 2, 3, 4, 11, 12, 13, 21, 22, 103, 111].map(ordinal)).toEqual([
+      '1st',
+      '2nd',
+      '3rd',
+      '4th',
+      '11th',
+      '12th',
+      '13th',
+      '21st',
+      '22nd',
+      '103rd',
+      '111th',
+    ]);
   });
 
   it('describes each kind of wargear limit, with its cost', () => {

@@ -16,13 +16,21 @@ function NamedList({ label, items }: { label: string; items: string[] }) {
 export default function AbilitiesPanel({ unit }: { unit: Unit }) {
   const { coreAbilities, factionAbilities, sections } = unit;
 
-  if (!coreAbilities.length && !factionAbilities.length && !sections.abilities) return null;
+  if (!coreAbilities.length && !factionAbilities.length && !sections.abilities && !sections.wargearAbilities) {
+    return null;
+  }
 
   return (
     <SectionPanel title="Abilities">
       <NamedList label="CORE" items={coreAbilities} />
       <NamedList label="FACTION" items={factionAbilities} />
       {sections.abilities && <Markdown>{sections.abilities}</Markdown>}
+      {sections.wargearAbilities && (
+        <div className="dotted-rule mt-2 pt-2">
+          <p className="mb-1 font-bold uppercase">Wargear abilities</p>
+          <Markdown>{sections.wargearAbilities}</Markdown>
+        </div>
+      )}
     </SectionPanel>
   );
 }

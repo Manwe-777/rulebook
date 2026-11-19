@@ -26,11 +26,11 @@ describe('checkDataset', () => {
   });
 
   it('warns about a detachment whose force disposition the muster rules do not list, or that has none', () => {
-    expect(checkEdited('shield-wall.md', 'disposition: take-and-hold', 'disposition: hold-the-line')).toEqual([
+    expect(checkEdited('shield-wall.md', 'dispositions: [take-and-hold]', 'dispositions: [hold-the-line]')).toEqual([
       ['unknown-disposition', 'warning', 'demo-host/shield-wall'],
     ]);
 
-    expect(checkEdited('shield-wall.md', 'disposition: take-and-hold\n', '')).toEqual([
+    expect(checkEdited('shield-wall.md', 'dispositions: [take-and-hold]\n', '')).toEqual([
       ['unknown-disposition', 'warning', 'demo-host/shield-wall'],
     ]);
   });

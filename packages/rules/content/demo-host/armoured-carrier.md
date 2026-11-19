@@ -12,6 +12,7 @@ coreAbilities: [Deadly Demise D3]
 composition:
   models: [{ name: Armoured Carrier, min: 1, max: 1 }]
   points: [{ models: 1, points: 80 }]
+  copies: { from: 3, points: 10 }
   wargear: { Armoured Carrier: [heavy-stubber, armoured-hull] }
 transport:
   capacity: 12

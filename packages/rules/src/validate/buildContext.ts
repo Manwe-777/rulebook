@@ -16,6 +16,7 @@ function resolveDetachments(list: ArmyList, available: Detachment[], issues: Iss
 
 function resolveEntries(list: ArmyList, library: Library, issues: Issue[]): Resolved[] {
   const seen = new Set<string>();
+  const copies = new Map<string, number>();
 
   return list.units.flatMap((entry) => {
     const unit = resolveUnit(library, list.faction, entry.unit);
@@ -26,7 +27,13 @@ function resolveEntries(list: ArmyList, library: Library, issues: Issue[]): Reso
 
     if (!unit) issues.push(issue('unknown-unit', `There is no unit "${entry.unit}".`, [entry.id]));
 
-    return unit ? [{ entry, unit }] : [];
+    if (!unit) return [];
+
+    const copy = (copies.get(unit.id) ?? 0) + 1;
+
+    copies.set(unit.id, copy);
+
+    return [{ entry, unit, copy }];
   });
 }
 

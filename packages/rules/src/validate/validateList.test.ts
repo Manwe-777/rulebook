@@ -161,11 +161,22 @@ describe('validateList: detachments', () => {
     expect(codes(demoList({ detachments: ['shield-wall', 'shield-wall'] }))).toContain('detachment-twice');
   });
 
-  it('an army with several detachments picks one of their dispositions; one detachment gives its own', () => {
+  it('an army picks one of the dispositions its detachments offer; a single one offered is its own', () => {
     expect(codes(demoList({ ...two, disposition: undefined }))).toEqual(['disposition']);
     expect(codes(demoList({ ...two, disposition: 'disruption' }))).toEqual([]);
     expect(codes(demoList({ ...two, disposition: 'reconnaissance' }))).toEqual(['disposition']);
     expect(codes(base)).toEqual([]);
+  });
+
+  it('a lone detachment that offers two dispositions still needs one picked', () => {
+    // Without the Shield Wall enhancement the base list carries
+    const column = {
+      detachments: ['armoured-column'],
+      units: base.units.map((u) => ({ ...u, enhancement: undefined })),
+    };
+
+    expect(codes(demoList(column))).toEqual(['disposition']);
+    expect(codes(demoList({ ...column, disposition: 'purge-the-foe' }))).toEqual([]);
   });
 });
 
@@ -396,6 +407,19 @@ describe('listPoints', () => {
       total: 295,
       limit: 2000,
       entries: { captain: 85, troopers: 65, vets: 100, bearer: 45 },
+    });
+  });
+
+  it('later copies of a datasheet with a surcharge cost more, counted in list order', () => {
+    const carriers = demoList({
+      units: [1, 2, 3, 4].map((n) => ({ id: `carrier${n}`, unit: 'armoured-carrier', models: 1 }) as ListEntry),
+    });
+
+    expect(listPoints(carriers, demoLibrary).entries).toEqual({
+      carrier1: 80,
+      carrier2: 80,
+      carrier3: 90,
+      carrier4: 90,
     });
   });
 

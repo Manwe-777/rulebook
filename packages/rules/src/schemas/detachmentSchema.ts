@@ -26,8 +26,11 @@ export const detachmentSchema = z.strictObject({
   name: text,
   /** Cost in detachment points, paid from the battle size's budget (not from the army's points). */
   cost: z.int().min(0).default(1),
-  /** Force disposition (an id from the muster rules' `dispositions`); it sets the army's primary missions. */
-  disposition: slug.optional(),
+  /**
+   * Force dispositions it offers (ids from the muster rules' `dispositions`); the army's disposition sets its primary
+   * missions.
+   */
+  dispositions: z.array(slug).default([]),
   /** Tags: an army can't take two detachments that share one. */
   unique: z.array(text).default([]),
   enhancements: z.array(enhancement).default([]),

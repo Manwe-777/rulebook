@@ -2,7 +2,7 @@
 kind: detachment
 name: Armoured Column
 cost: 1 # detachment points
-disposition: disruption
+dispositions: [disruption, purge-the-foe]
 enhancements:
   - { name: Overcharged Engines, points: 15, target: unit, keywords: [TRANSPORT] }
 stratagems:

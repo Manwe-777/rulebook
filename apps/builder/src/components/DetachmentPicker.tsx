@@ -1,4 +1,4 @@
-import { detachmentPoints, detachmentTags, type Library } from '@rulebook/rules';
+import { detachmentPoints, detachmentTags, type Library, offeredDispositions } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
 import SelectField from './SelectField';
@@ -18,7 +18,7 @@ export default function DetachmentPicker({ draft, library, onChange }: Props) {
   const faction = library.faction(draft.list.faction);
   const { spent, budget } = detachmentPoints(draft.list, library);
   const chosen = (faction?.detachments ?? []).filter((d) => draft.list.detachments.includes(d.id));
-  const dispositions = [...new Set(chosen.flatMap((d) => (d.disposition ? [d.disposition] : [])))];
+  const dispositions = offeredDispositions(chosen);
   const over = budget !== null && spent > budget;
 
   return (

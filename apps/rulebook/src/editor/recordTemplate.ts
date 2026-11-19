@@ -14,7 +14,7 @@ kind: detachment
 id: ${slugify(name)}
 name: ${name}
 cost: 1 # detachment points
-disposition: take-and-hold
+dispositions: [take-and-hold]
 enhancements: []
 stratagems: []
 ---

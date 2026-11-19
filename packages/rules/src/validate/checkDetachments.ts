@@ -1,5 +1,6 @@
 import type { Issue } from '../types';
 import { keywordKey } from '../utils/keywordKey';
+import { offeredDispositions } from '../utils/offeredDispositions';
 import { issue } from './issue';
 import type { Check, ValidationContext } from './types';
 
@@ -38,9 +39,9 @@ function budgetIssues(ctx: ValidationContext): Issue[] {
   ];
 }
 
-/** With several detachments the army picks one of their force dispositions; with one, it has that one's. */
+/** When its detachments offer several force dispositions the army picks one of them; with one, it has that one. */
 function dispositionIssues(ctx: ValidationContext): Issue[] {
-  const offered = [...new Set(ctx.detachments.flatMap((d) => (d.disposition ? [d.disposition] : [])))];
+  const offered = offeredDispositions(ctx.detachments);
   const chosen = ctx.list.disposition;
   const name = (id: string) => ctx.muster.dispositions.find((d) => d.id === id)?.name ?? id;
 

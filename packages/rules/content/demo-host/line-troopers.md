@@ -19,10 +19,12 @@ composition:
     - { models: 10, points: 65 }
     - { models: 20, points: 130 }
   wargear:
-    Sergeant: [service-pistol, close-combat-weapon]
+    Sergeant: [service-pistol, close-combat-weapon, signal-flare]
     Trooper: [service-rifle, close-combat-weapon]
 wargearOptions:
   - { id: flamer, models: Trooper, per: { every: 10 }, replace: [service-rifle], with: [[flamer]] }
+equipment:
+  - { name: Signal flare }
 keywords: [INFANTRY, BATTLELINE, LINE TROOPERS]
 factionKeywords: [DEMO HOST]
 ---
@@ -30,3 +32,8 @@ factionKeywords: [DEMO HOST]
 ## Abilities
 
 **Dig In:** While this unit is within range of an objective you control, it has the Benefit of Cover.
+
+## Wargear abilities
+
+**Signal flare:** Once per battle, at the start of your Shooting phase, one friendly DEMO HOST VEHICLE unit within
+12" of the bearer can re-roll its hit rolls of 1 until the end of the phase.

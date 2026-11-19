@@ -2,7 +2,7 @@
 kind: detachment
 name: Shield Wall
 cost: 2 # detachment points
-disposition: take-and-hold
+dispositions: [take-and-hold]
 unique: [VANGUARD]
 enhancements:
   - { name: Banner of Resolve, points: 15, keywords: [FIELD CAPTAIN] }

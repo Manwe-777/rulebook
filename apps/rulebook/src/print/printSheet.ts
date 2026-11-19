@@ -1,4 +1,5 @@
 import {
+  armyDisposition,
   type ArmyList,
   type Detachment,
   type Enhancement,
@@ -10,6 +11,7 @@ import {
   listPoints,
   type Unit,
   validateList,
+  wargearName,
 } from '@rulebook/rules';
 
 /** One unit as the roster prints it. */
@@ -49,14 +51,7 @@ export interface PrintSheet {
   errors: Issue[];
 }
 
-const weaponNames = (unit: Unit, ids: string[]) =>
-  ids
-    .map((id) => {
-      const weapon = [...unit.ranged, ...unit.melee].find((w) => w.id === id);
-
-      return weapon ? (weapon.group ?? weapon.name) : id;
-    })
-    .join(' + ');
+const weaponNames = (unit: Unit, ids: string[]) => ids.map((id) => wargearName(unit, id)).join(' + ');
 
 function wargearText(unit: Unit | undefined, entry: ListEntry): string[] {
   if (!unit) return [];
@@ -71,7 +66,7 @@ function wargearText(unit: Unit | undefined, entry: ListEntry): string[] {
 
 /** The army's force disposition by name: the one picked, or its only detachment's. */
 function dispositionName(list: ArmyList, detachments: Detachment[], library: Library): string | undefined {
-  const id = list.disposition ?? (detachments.length === 1 ? detachments[0].disposition : undefined);
+  const id = armyDisposition(list, detachments);
 
   return id ? (library.muster?.dispositions.find((d) => d.id === id)?.name ?? id) : undefined;
 }

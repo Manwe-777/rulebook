@@ -77,14 +77,17 @@ composition:
     - { name: Field Captain, min: 1, max: 1 }
   points: # cost by unit size, total models
     - { models: 1, points: 70 }
+  copies: { from: 3, points: 10 } # optional: from the 3rd copy in an army, each costs 10 more
   wargear: # default wargear per model type
-    Field Captain: [service-pistol, sabre]
+    Field Captain: [service-pistol, sabre, signal-flare]
+equipment: # wargear without a weapon profile, referred to by id like weapons
+  - { name: Signal flare }
 wargearOptions:
   - id: launcher
     models: Field Captain # optional: which model type may take it; any model when left out
     per: 1 # up to this many models; { every: 5 } for one in every 5 models; all (the default) for any number
     replace: [service-pistol]
-    with: [[grenade-launcher]] # pick one list of weapon ids
+    with: [[grenade-launcher]] # pick one list of weapon or equipment ids
     points: 0 # optional cost per model taking it
 leader: # optional: Leader ability
   bodyguards: [line-troopers, veteran-squad] # unit ids this unit can lead
@@ -103,13 +106,16 @@ image: https://example.org/captain.webp # optional, hosted elsewhere
 
 - Weapon rows that share a `group` are profiles of one weapon; the datasheet marks them and one profile is picked per
   attack.
-- A weapon's id is its `id` field, or the slug of its group or name (`Sabre` → `sabre`). Wargear lists and options use
-  these ids, and every id they use must be a weapon on the datasheet.
+- A weapon's id is its `id` field, or the slug of its group or name (`Sabre` → `sabre`); equipment ids work the same
+  way. Wargear lists and options use these ids, and every id they use must be a weapon or equipment item on the
+  datasheet.
+- `copies` adds a surcharge to later copies of the datasheet in an army, counted in list order.
 - Weapon abilities are `tags`, written as on the datasheet (`ANTI-VEHICLE 3+`, `SUSTAINED HITS 1`).
 - `roles` drive muster limits. A unit can have several (`[character, epic-hero]`).
 - The datasheet's composition, wargear, wargear options, points, leader and support blocks are generated from this
   data.
-- Body sections: `Abilities` (unit abilities, one bold name or `###` per ability), and optional notes under `Leader`,
+- Body sections: `Abilities` (unit abilities, one bold name or `###` per ability), `Wargear abilities` (the rules of
+  each equipment item and of weapons that grant abilities, in the same form), and optional notes under `Leader`,
   `Support`, `Transport`, `Wargear options` and `Unit composition` for anything the structured fields can't express,
   and `Description`.
 
@@ -122,7 +128,7 @@ kind: detachment
 id: shield-wall
 name: Shield Wall
 cost: 2 # detachment points, paid from the battle size's budget (not from the army's points)
-disposition: take-and-hold # force disposition, an id from the muster rules' dispositions
+dispositions: [take-and-hold] # force dispositions it offers, ids from the muster rules' dispositions
 unique: [VANGUARD] # tags: an army can't take two detachments that share one
 enhancements:
   - id: banner-of-resolve
@@ -165,7 +171,7 @@ battleSizes:
 detachments: { min: 1 } # optional max; otherwise only detachment points limit them
 detachmentPoints: 3 # what an army can spend on detachments
 anyLoneDetachment: false # true: an army with one detachment may take it whatever its cost
-dispositions: # force dispositions; an army with several detachments picks one of theirs
+dispositions: # force dispositions; an army whose detachments offer several picks one of them
   - { id: purge-the-foe, name: Purge the Foe }
   - { id: take-and-hold, name: Take and Hold }
   - { id: priority-assets, name: Priority Assets }
@@ -211,7 +217,7 @@ file.
 ```yaml
 name: Shield Wall 2000
 release: <hash of the faction release the list was last edited with>
-disposition: take-and-hold # needed when the detachments have different dispositions
+disposition: take-and-hold # needed when the detachments offer more than one disposition
 core: <hash of the core release>
 battleSize: strike-force
 faction: demo-host

@@ -8,6 +8,8 @@ export type AllowKind = 'faction' | 'datasheet-limit' | 'attachments';
 export interface Resolved {
   entry: ListEntry;
   unit: Unit;
+  /** Which copy of its datasheet this entry is in the army, counting from 1 in list order. */
+  copy: number;
 }
 
 /** Muster limits after the battle size's overrides. */

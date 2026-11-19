@@ -21,11 +21,14 @@ export type Weapon = RangedWeapon | MeleeWeapon;
 export type WargearOption = UnitData['wargearOptions'][number];
 export type UnitSections = Sections<typeof UNIT_SECTIONS>;
 
-export interface Unit extends Omit<UnitData, 'id' | 'ranged' | 'melee'> {
+export type Equipment = UnitData['equipment'][number] & { id: string };
+
+export interface Unit extends Omit<UnitData, 'id' | 'ranged' | 'melee' | 'equipment'> {
   /** Unique within its faction, e.g. `boyz`. */
   id: string;
   ranged: RangedWeapon[];
   melee: MeleeWeapon[];
+  equipment: Equipment[];
   sections: UnitSections;
 }
 

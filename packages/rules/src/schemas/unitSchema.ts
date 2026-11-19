@@ -53,6 +53,8 @@ const composition = z.strictObject({
   models: z.array(z.strictObject({ name: text, min: count, max: z.int().min(1) })).min(1),
   /** Cost by unit size, counting every model. */
   points: z.array(z.strictObject({ models: z.int().min(1), points })).min(1),
+  /** From the `from`th copy of this datasheet in an army, each copy costs `points` more. */
+  copies: z.strictObject({ from: z.int().min(2), points }).optional(),
   /** Default weapon ids per model type. */
   wargear: z.record(z.string(), z.array(slug)).default({}),
 });
@@ -87,6 +89,11 @@ export const unitSchema = z.strictObject({
   factionAbilities: z.array(text).default([]),
   composition,
   wargearOptions: z.array(wargearOption).default([]),
+  /**
+   * Wargear without a weapon profile (crests, scanners, launchers). Referred to by id like weapons; each item's rules go
+   * under `## Wargear abilities` in the body.
+   */
+  equipment: z.array(z.strictObject({ id: slug.optional(), name: text })).default([]),
   leader: attaches.optional(),
   support: attaches.optional(),
   transport: transport.optional(),

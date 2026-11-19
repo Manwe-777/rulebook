@@ -1,9 +1,14 @@
 import { findEnhancement } from './findEnhancement';
 import type { Resolved, ValidationContext } from './types';
 
-/** What one list entry costs: its unit size, paid wargear, and its enhancement or upgrade. */
-export function entryPoints(ctx: ValidationContext, { entry, unit }: Resolved): number {
-  const size = unit.composition.points.find((p) => p.models === entry.models)?.points ?? 0;
+/**
+ * What one list entry costs: its unit size (plus the datasheet's surcharge when it is a later copy), paid wargear, and
+ * its enhancement or upgrade.
+ */
+export function entryPoints(ctx: ValidationContext, { entry, unit, copy }: Resolved): number {
+  const { points, copies } = unit.composition;
+  const surcharge = copies && copy >= copies.from ? copies.points : 0;
+  const size = (points.find((p) => p.models === entry.models)?.points ?? 0) + surcharge;
 
   const wargear = entry.wargear.reduce((sum, w) => {
     const option = unit.wargearOptions.find((o) => o.id === w.option);

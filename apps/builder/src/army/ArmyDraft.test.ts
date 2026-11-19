@@ -89,7 +89,7 @@ describe('ArmyDraft', () => {
     const troopers = draft.addUnit(library, 'line-troopers');
     const captain = troopers.draft.addUnit(library, 'field-captain');
 
-    draft = captain.draft.attach(captain.id, troopers.id).setWarlord(captain.id);
+    draft = captain.draft.attach(captain.id, troopers.id).setWarlord(captain.id).setDisposition('disruption');
 
     expect(errors(draft)).toEqual([]);
   });
