@@ -2,41 +2,47 @@ import { Library } from '@rulebook/rules';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import { ArmyDraft } from '../army/ArmyDraft';
-import { BACKUP_KEY, STORAGE_KEY } from '../constants';
+import { SavedArmies } from '../army/SavedArmies';
+import { ARMIES_BACKUP_KEY, ARMIES_KEY, LEGACY_LIST_KEY } from '../constants';
 import { loadBundledFiles } from '../sources/loadBundledFiles';
 import { attachTargets } from './attachTargets';
 import { itemOptions } from './itemOptions';
-import { loadSavedDraft } from './loadSavedDraft';
-import { saveDraft } from './saveDraft';
+import { loadSavedArmies } from './loadSavedArmies';
+import { saveArmies } from './saveArmies';
 
 const library = Library.fromFiles(loadBundledFiles());
 
-describe('saving and loading the list', () => {
+describe('saving and loading armies', () => {
   afterEach(() => localStorage.clear());
 
-  it('a saved list loads back the same', () => {
+  it('saved armies load back the same', () => {
     const draft = ArmyDraft.create(library, 'demo-host').addUnit(library, 'line-troopers').draft;
+    const saved = SavedArmies.empty().put('a', draft, 5);
 
-    saveDraft(draft);
+    saveArmies(saved);
 
-    expect(loadSavedDraft()?.list).toEqual(draft.list);
+    expect(loadSavedArmies().all).toEqual(saved.all);
   });
 
-  it('nothing saved gives no list', () => {
-    expect(loadSavedDraft()).toBeNull();
+  it('nothing saved gives no armies', () => {
+    expect(loadSavedArmies().size).toBe(0);
   });
 
-  it('a save that is not a list, or not even JSON, is backed up instead of crashing', () => {
-    localStorage.setItem(STORAGE_KEY, '{"units": 3}');
+  it('the single list an earlier version saved becomes the first army, once', () => {
+    const old = ArmyDraft.create(library, 'demo-host').rename('My old list');
 
-    expect(loadSavedDraft()).toBeNull();
-    expect(localStorage.getItem(BACKUP_KEY)).toBe('{"units": 3}');
-    expect(localStorage.getItem(STORAGE_KEY)).toBeNull();
+    localStorage.setItem(LEGACY_LIST_KEY, JSON.stringify(old));
 
-    localStorage.setItem(STORAGE_KEY, '{broken');
+    expect(loadSavedArmies().all.map((a) => a.list.name)).toEqual(['My old list']);
+    expect(localStorage.getItem(LEGACY_LIST_KEY)).toBeNull();
+    expect(loadSavedArmies().size).toBe(1);
+  });
 
-    expect(loadSavedDraft()).toBeNull();
-    expect(localStorage.getItem(BACKUP_KEY)).toBe('{broken');
+  it('saved data that is not armies, or not even JSON, is backed up instead of crashing', () => {
+    localStorage.setItem(ARMIES_KEY, '{broken');
+
+    expect(loadSavedArmies().size).toBe(0);
+    expect(localStorage.getItem(ARMIES_BACKUP_KEY)).toBe('{broken');
   });
 });
 

@@ -3,9 +3,12 @@ import { ownerKeyHex } from '@rulebook/sharing/keys';
 /** Name shown in the page header. */
 export const SITE_NAME = 'List Builder';
 
-/** localStorage key of the list being built, and where an unreadable one is moved. */
-export const STORAGE_KEY = 'rulebook-builder:list';
-export const BACKUP_KEY = 'rulebook-builder:list-unreadable';
+/** localStorage key of the saved armies, and where saved data that can't be read at all is moved. */
+export const ARMIES_KEY = 'rulebook-builder:armies';
+export const ARMIES_BACKUP_KEY = 'rulebook-builder:armies-unreadable';
+
+/** Key of the single list saved by earlier versions; moved into the saved armies on first load. */
+export const LEGACY_LIST_KEY = 'rulebook-builder:list';
 
 /** Battle size picked for a new list when the muster rules have it. */
 export const DEFAULT_BATTLE_SIZE = 'strike-force';

@@ -1,13 +1,13 @@
-import { listPoints, validateList } from '@rulebook/rules';
+import { useMemo } from 'react';
 
-import ArmyHeader from './components/ArmyHeader';
-import ArmySettings from './components/ArmySettings';
-import EntryList from './components/EntryList';
-import IssuesPanel from './components/IssuesPanel';
-import UnitPicker from './components/UnitPicker';
+import { ArmyDraft } from './army/ArmyDraft';
+import ArmiesPage from './components/armies/ArmiesPage';
+import BuilderPage from './components/BuilderPage';
 import { RULEBOOK_URL, SITE_NAME } from './constants';
+import { useArmyRoute } from './hooks/useArmyRoute';
 import { type BuilderSource, useBuilderLibrary } from './hooks/useBuilderLibrary';
-import { useDraft } from './hooks/useDraft';
+import { useSavedArmies } from './hooks/useSavedArmies';
+import { newArmyId } from './utils/newArmyId';
 
 const SOURCE: Record<BuilderSource, string> = {
   demo: 'Using the demo faction.',
@@ -18,34 +18,55 @@ const SOURCE: Record<BuilderSource, string> = {
   failed: 'Could not reach the relays; using the demo faction.',
 };
 
-/** The list builder: settings and unit picker on the left, the army and its problems on the right. */
+const LINK = 'text-sm font-semibold tracking-wide uppercase hover:underline';
+
+/** The list builder: the saved armies, or the army open in the address (`?army=<id>`). */
 export default function App() {
   const { library, status } = useBuilderLibrary();
-  const [draft, setDraft] = useDraft(library);
-  const issues = validateList(draft.list, library);
-  const points = listPoints(draft.list, library);
+  const [saved, change] = useSavedArmies();
+  const [armyId, open] = useArmyRoute();
+  const draft = useMemo(() => (armyId ? saved.draft(armyId) : null), [saved, armyId]);
+
+  const create = (faction: string) => {
+    const id = newArmyId();
+
+    change((s) => s.put(id, ArmyDraft.create(library, faction), Date.now()));
+    open(id);
+  };
 
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-4 px-4 py-6 font-sans text-text">
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <h1 className="text-3xl font-extrabold tracking-wide uppercase">{SITE_NAME}</h1>
-        {RULEBOOK_URL && (
-          <a href={RULEBOOK_URL} className="text-sm font-semibold tracking-wide uppercase hover:underline">
-            Rulebook
-          </a>
-        )}
+        <nav className="flex items-center gap-4">
+          {draft && (
+            <button type="button" className={LINK} onClick={() => open(null)}>
+              ← Armies
+            </button>
+          )}
+          {RULEBOOK_URL && (
+            <a href={RULEBOOK_URL} className={LINK}>
+              Rulebook
+            </a>
+          )}
+        </nav>
       </div>
-      <ArmyHeader draft={draft} points={points} issues={issues} onChange={setDraft} />
-      <div className="grid gap-4 md:grid-cols-[2fr_3fr]">
-        <div className="flex min-w-0 flex-col gap-4">
-          <ArmySettings draft={draft} library={library} onChange={setDraft} />
-          <UnitPicker draft={draft} library={library} onChange={setDraft} />
-        </div>
-        <div className="flex min-w-0 flex-col gap-4">
-          <IssuesPanel issues={issues} />
-          <EntryList draft={draft} library={library} points={points.entries} issues={issues} onChange={setDraft} />
-        </div>
-      </div>
+      {draft && armyId ? (
+        <BuilderPage
+          draft={draft}
+          library={library}
+          onChange={(next) => change((s) => s.put(armyId, next, Date.now()))}
+        />
+      ) : (
+        <ArmiesPage
+          saved={saved}
+          library={library}
+          onOpen={open}
+          onCreate={create}
+          onDuplicate={(id) => change((s) => s.duplicate(id, newArmyId(), Date.now()))}
+          onDelete={(id) => change((s) => s.remove(id))}
+        />
+      )}
       <footer className="mt-auto text-xs text-text/60">
         {SOURCE[status]} Rules are written by the community and are not official Games Workshop material.
       </footer>

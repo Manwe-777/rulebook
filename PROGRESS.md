@@ -45,6 +45,10 @@
   options: the release builds the project owner into `install.sh`, and with no owner it runs as an open store. See `docs/hosting.md`.
 - Released rules are cached in IndexedDB (per owner key, shared by both apps on one site): shown at once on the next
   visit, kept when the relays can't be reached. `owner-key` no longer echoes the password.
+- Saved armies in the builder: an armies screen (name, faction, battle size, detachments, points against the limit,
+  legal or problem count, unit count, last edit, unit photos) with new, open, duplicate and two-step delete. The open
+  army is in the address (`?army=<id>`), so back, reload and links work on static hosting. The single list saved by
+  earlier versions moves in on first load; unreadable armies are kept aside, not dropped. Checked in the browser.
 - Attachments in the builder: a leader or support unit picks "Attach to" on its card, then sits framed with the unit
   it joins (a "Combined unit" box with the total points, attached cards on top) and shows "Leading …" with a Detach
   button; with nothing to join it lists the units it could. Checked in the browser.
@@ -77,7 +81,7 @@
 
 - Push the repo, set the Pages variables, create the owner key and install a relay (`docs/hosting.md`). Editor follow-ups: form fields for the common frontmatter
   (stats, weapons, points) next to the text editor, a page for the core muster record and the hidden list, and merging
-  outdated proposals. Builder follow-ups: backing up photos with the lists, saved list library and export, sharing
+  outdated proposals. Builder follow-ups: exporting and importing armies (with their photos), sharing lists, sharing
   lists over tool-db, battle formation (reserves, transports) in the UI, only offering upgrades a unit can take.
 - Muster values (battle sizes, detachment count, datasheet and enhancement limits) must be filled in from the current
   muster guide; see the open questions in `docs/design.md`.

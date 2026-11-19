@@ -115,7 +115,8 @@ The project shares game data and players' own explanations of rules. It never sh
 - Faction data never contains code. Faction-specific army rules use the declarative constraints in
   [validation.md](validation.md).
 - Every problem found in a list or a dataset is reported with a message and the entry it concerns; nothing throws.
-- The list builder is an installable app (PWA) that works offline with the releases cached on the device.
+- The list builder is an installable app (PWA) that works offline with the releases cached on the device. It keeps any
+  number of armies on the device; the open army is part of the address (`?army=<id>`).
 - Players can give each unit a photo of their own models. The photo is cropped to a square on the device (drag or
   pinch to place, zoom, quarter turns; the photo always covers the square), saved as a 320 px WebP in IndexedDB, and
   shown on the unit's card and in the unit list. Photos are kept per faction and unit, never leave the device, and
