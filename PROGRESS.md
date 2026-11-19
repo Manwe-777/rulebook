@@ -56,7 +56,8 @@
   attached leaders, repeated datasheets) rebuilt in the builder comes to the same 1995 points and is legal. What it
   needed: several dispositions per detachment, datasheet copy surcharges ("2nd+ in your army: +20 pts"), wargear
   without a weapon profile (crests, scanners) with its own rules, and enhancements for one of several kinds of model.
-  `publish` now reads each release back and fails when the relay refused records.
+  `publish` now reads each release back and fails when the relay refused records. Relays only check that a record
+  text fits, matches its hash and declares a kind, so records with newer fields reach older relays.
 - Printable army sheet: the builder's Print button opens the rulebook's `/print` page with the list after `#army=`
   (base64url, never sent to a server). Checkboxes (remembered per browser) for roster, army rules, detachment rules
   with the enhancements taken, stratagems and datasheets (each once). Roster brackets combined units with their total
@@ -102,8 +103,6 @@
 - First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
   the whole rules library.
 
-- A relay checks every record with the rules package it was built with, so an older relay silently refuses records
-  that use newer fields. Relays must be updated before content uses new fields; `publish` reports the refused ones.
 - Format gaps found with Leagues of Votann: one wargear option can't be taken by two models with different choices
   (two special weapons from the same list); "no duplicates", "one of these per model" and "replace X or Y" option rules;
   model types whose models carry different gear (E-COGs); passengers taking no transport space (by model type);

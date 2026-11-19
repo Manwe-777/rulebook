@@ -5,6 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import type { Detachment, Muster, RulesRecord, Unit } from '../types';
 import { parseRecord } from './parseRecord';
+import { recordKind } from './recordKind';
 
 const CONTENT = join(import.meta.dirname, '../../content');
 
@@ -191,5 +192,19 @@ describe('parseRecord: muster and faction', () => {
 
     expect(faction).toMatchObject({ kind: 'faction', factionKeyword: 'DEMO HOST' });
     expect('body' in faction && faction.body.startsWith('## Description')).toBe(true);
+  });
+});
+
+describe('recordKind', () => {
+  it('reads the declared kind, even with fields or kinds this version does not know', () => {
+    expect(recordKind('---\nkind: unit\nname: X\n---\nText')).toBe('unit');
+    expect(recordKind('---\nkind: battle-plan\nnewField: [1, 2]\n---\n')).toBe('battle-plan');
+  });
+
+  it('anything that does not declare a kind is not a record', () => {
+    expect(recordKind('not a record')).toBeNull();
+    expect(recordKind('---\nname: X\n---\n')).toBeNull();
+    expect(recordKind('---\nkind: [unit\n---\n')).toBeNull();
+    expect(recordKind('---\nkind: Unit Record\n---\n')).toBeNull();
   });
 });

@@ -1,4 +1,4 @@
-import { parseRecord } from '@rulebook/rules';
+import { recordKind } from '@rulebook/rules';
 import type { z } from 'zod';
 
 import { MAX_BLOB_BYTES } from '../constants';
@@ -26,11 +26,15 @@ const SHARED_TYPES = ['maintainers', 'contributors', 'blob', 'head', 'release', 
 
 const fits = (schema: z.ZodType, value: unknown) => schema.safeParse(value).success;
 
+/**
+ * A record text: within the size limit, stored under its own hash, and declaring a kind. The apps check every field
+ * when they read it; relays don't, so a relay built before a new field or kind still stores records that use it.
+ */
 async function validBlob(hash: string | undefined, value: unknown): Promise<boolean> {
   if (typeof value !== 'string' || new TextEncoder().encode(value).length > MAX_BLOB_BYTES) return false;
   if ((await sha256Hex(value)) !== hash) return false;
 
-  return parseRecord(value, 'blob', 'blob').ok;
+  return recordKind(value) !== null;
 }
 
 async function validRelease(faction: string, hash: string | undefined, value: unknown): Promise<boolean> {

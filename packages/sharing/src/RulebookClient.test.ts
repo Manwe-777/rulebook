@@ -221,12 +221,24 @@ describe('proposals and reviews', () => {
     ).toBe(before);
   });
 
-  it('record texts are only accepted under their own hash, and only when they parse', async () => {
+  it('record texts are only accepted under their own hash, and only when they declare a kind', async () => {
     await intruderDb.putData(KEYS.blob('0'.repeat(64)), unit).catch(() => undefined);
     await intruderDb.putData(KEYS.blob('1'.repeat(64)), 'not a record').catch(() => undefined);
 
     expect(await maintainer.getBlob('0'.repeat(64))).toBeNull();
     expect(await raw.getData(KEYS.blob('0'.repeat(64)))).toBeNull();
+  });
+
+  it('a record with a field this version does not know is still stored, for newer apps to read', async () => {
+    const newer = unit.replace('kind: unit\n', 'kind: unit\nfutureField: 1\n');
+    const hash = await maintainer.putBlob(newer);
+
+    expect(
+      await eventually(
+        () => raw.getData(KEYS.blob(hash)),
+        (v) => v === newer,
+      ),
+    ).toBe(newer);
   });
 });
 

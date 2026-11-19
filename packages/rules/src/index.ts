@@ -2,6 +2,7 @@ export * from './constants';
 export { checkDataset } from './dataset/checkDataset';
 export { Library } from './library/Library';
 export { parseRecord } from './parse/parseRecord';
+export { recordKind } from './parse/recordKind';
 export { splitEntries } from './parse/splitEntries';
 export { constraintSchema } from './schemas/constraintSchema';
 export { detachmentSchema } from './schemas/detachmentSchema';

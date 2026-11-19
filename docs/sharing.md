@@ -48,11 +48,14 @@ Each rule is a tool-db custom verificator on the key prefix.
 - `maintainers/` and `hidden`: written by the owner.
 - `contributors/<f>`, `head/<f>/`, `release/<f>/`, `review/<f>/`: the author is in `maintainers/<f>`, or is the owner.
 - `blob/<h>` and `release/<f>/<h>`: the hash of the value equals `<h>`. Content-addressed values can't be changed, only
-  written again with the same content. A blob is at most 48 kB and must parse as a record.
+  written again with the same content. A blob is at most 48 kB and declares a record
+  `kind` in its frontmatter. Relays check nothing more in a record's fields, so a relay built before a new field or
+  kind still stores records that use it; the apps check every field when they read a record.
 - User namespaces only hold `proposal/`, `request/` and `list/` keys.
 - Proposals: the author is in `contributors/<f>` or `maintainers/<f>`. Proposals from anyone else are stored by public
   relays but ignored by the apps and the project relay.
-- Every value is parsed with the `@rulebook/rules` schemas; values that don't parse are rejected.
+- Every other value (heads, releases, reviews, role lists, proposals) is parsed with the sharing schemas; values that
+  don't parse are rejected.
 
 Roles are read when data is checked, so removing a maintainer also stops trusting their heads and releases. A record
 then falls back to the newest head written by a current maintainer. A release stays trusted as long as one current
