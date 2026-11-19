@@ -45,6 +45,9 @@
   options: the release builds the project owner into `install.sh`, and with no owner it runs as an open store. See `docs/hosting.md`.
 - Released rules are cached in IndexedDB (per owner key, shared by both apps on one site): shown at once on the next
   visit, kept when the relays can't be reached. `owner-key` no longer echoes the password.
+- Attachments in the builder: a leader or support unit picks "Attach to" on its card, then sits framed with the unit
+  it joins (a "Combined unit" box with the total points, attached cards on top) and shows "Leading …" with a Detach
+  button; with nothing to join it lists the units it could. Checked in the browser.
 - List builder as a PWA (installable, precached, works offline with cached releases).
 - Unit photos in the builder: players add a photo of their own models per unit, crop it to a square (drag or pinch,
   zoom around the centre, quarter turns, always covering the square; preview and saved image drawn by the same code),

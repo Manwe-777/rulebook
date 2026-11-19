@@ -1,8 +1,8 @@
 import type { Library, ListEntry, Unit } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
-import { attachTargets } from '../utils/attachTargets';
 import { itemOptions } from '../utils/itemOptions';
+import AttachControl from './AttachControl';
 import SelectField from './SelectField';
 
 interface Props {
@@ -13,10 +13,8 @@ interface Props {
   onChange: (draft: ArmyDraft) => void;
 }
 
-/** The dropdowns of a unit card: size, enhancement (characters), upgrade, and attachment (leaders and support). */
+/** The choices on a unit card: size, enhancement (characters), upgrade, and attachment (leaders and support). */
 export default function EntryChoices({ draft, library, entry, unit, onChange }: Props) {
-  const label = (e: ListEntry) => library.unit(draft.list.faction, e.unit)?.unit.name ?? e.unit;
-
   const items = (target: 'model' | 'unit') =>
     itemOptions(draft.list, library, target).map((e) => ({ value: e.id, label: `${e.name} (${e.points} pts)` }));
 
@@ -48,13 +46,7 @@ export default function EntryChoices({ draft, library, entry, unit, onChange }: 
         onChange={(v) => onChange(draft.setUpgrade(entry.id, v))}
       />
       {(unit.leader || unit.support) && (
-        <SelectField
-          label="Attached to"
-          value={entry.attachedTo ?? ''}
-          none="Nobody"
-          options={attachTargets(draft.list, library, entry).map((e) => ({ value: e.id, label: label(e) }))}
-          onChange={(v) => onChange(draft.attach(entry.id, v))}
-        />
+        <AttachControl draft={draft} library={library} entry={entry} unit={unit} onChange={onChange} />
       )}
     </div>
   );
