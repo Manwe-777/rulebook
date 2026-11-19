@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
+import { iconFontWoff2Only } from '../../tooling/iconFontWoff2Only';
 import { vendorChunks } from '../../tooling/vendorChunks';
 
 export default defineConfig({
@@ -10,6 +11,7 @@ export default defineConfig({
   base: process.env.BASE_PATH ?? '/',
   build: { rolldownOptions: { output: { codeSplitting: vendorChunks } } },
   plugins: [
+    iconFontWoff2Only(),
     tailwindcss(),
     react(),
     // Installable and offline: the app is precached; rules come from the IndexedDB cache when the relays are out of

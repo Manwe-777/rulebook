@@ -37,3 +37,9 @@ export const MAX_ZOOM = 4;
 
 /** Contrast that white text on a faction's colour must reach (WCAG AA for normal text). */
 export const MIN_TEXT_CONTRAST = 4.5;
+
+/** Credit line for the faction icon font. */
+export const ICON_CREDIT = {
+  label: 'wh40k-icon by Certseeds (OFL 1.1)',
+  url: 'https://github.com/Certseeds/wh40k-icon',
+};

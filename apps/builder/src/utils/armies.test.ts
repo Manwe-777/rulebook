@@ -16,6 +16,8 @@ describe('armySummary', () => {
     const summary = armySummary(draft.list, library);
 
     expect(summary).toMatchObject({ faction: 'Demo Host', units: 3, unitTypes: ['line-troopers', 'field-captain'] });
+    expect(summary.color).toBe(library.faction('demo-host')?.color);
+    expect(summary.icon).toBe(library.faction('demo-host')?.icon);
     expect(summary.detachments).toEqual(['Armoured Column']);
     expect(summary.points).toBeGreaterThan(0);
     expect(summary.errors).toBeGreaterThan(0); // no warlord picked yet
@@ -24,7 +26,12 @@ describe('armySummary', () => {
   it('shows ids for an army whose faction isn’t loaded, instead of failing', () => {
     const list = { ...ArmyDraft.create(library, 'demo-host').list, faction: 'unknown', detachments: ['mystery'] };
 
-    expect(armySummary(list, library)).toMatchObject({ faction: 'unknown', detachments: ['mystery'] });
+    expect(armySummary(list, library)).toMatchObject({
+      faction: 'unknown',
+      detachments: ['mystery'],
+      color: undefined,
+      icon: undefined,
+    });
   });
 });
 

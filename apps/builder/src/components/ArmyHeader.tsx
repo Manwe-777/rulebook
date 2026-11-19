@@ -1,22 +1,30 @@
 import type { Issue } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
+import FactionIcon from './FactionIcon';
 import { INPUT } from './styles';
 
 interface Props {
   draft: ArmyDraft;
   points: { total: number; limit: number | null };
   issues: Issue[];
+  /** The faction's icon from its data. */
+  icon: string | undefined;
   onChange: (draft: ArmyDraft) => void;
 }
 
 /** The list's name, its points against the limit, and whether it is legal. */
-export default function ArmyHeader({ draft, points, issues, onChange }: Props) {
+export default function ArmyHeader({ draft, points, issues, icon, onChange }: Props) {
   const errors = issues.filter((i) => i.severity === 'error').length;
   const legal = errors === 0;
 
   return (
     <header className="flex flex-wrap items-center gap-3">
+      {icon && (
+        <span className="flex size-11 items-center justify-center rounded bg-bar text-white">
+          <FactionIcon name={icon} className="text-3xl leading-none" />
+        </span>
+      )}
       <input
         aria-label="List name"
         className={`${INPUT} min-w-0 flex-1 text-xl font-bold`}

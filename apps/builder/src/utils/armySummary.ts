@@ -2,6 +2,9 @@ import { type ArmyList, type Library, listPoints, validateList } from '@rulebook
 
 export interface ArmySummary {
   faction: string;
+  /** The faction's colour and icon from its data, when it sets them. */
+  color: string | undefined;
+  icon: string | undefined;
   battleSize: string;
   detachments: string[];
   points: number;
@@ -20,6 +23,8 @@ export function armySummary(list: ArmyList, library: Library): ArmySummary {
 
   return {
     faction: faction?.name ?? list.faction,
+    color: faction?.color,
+    icon: faction?.icon,
     battleSize: size?.name ?? list.battleSize,
     detachments: list.detachments.map((id) => faction?.detachments.find((d) => d.id === id)?.name ?? id),
     points: points.total,

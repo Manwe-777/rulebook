@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { ArmyDraft } from './army/ArmyDraft';
 import ArmiesPage from './components/armies/ArmiesPage';
 import BuilderPage from './components/BuilderPage';
-import { RULEBOOK_URL, SITE_NAME } from './constants';
+import { ICON_CREDIT, RULEBOOK_URL, SITE_NAME } from './constants';
 import { useArmyRoute } from './hooks/useArmyRoute';
 import { type BuilderSource, useBuilderLibrary } from './hooks/useBuilderLibrary';
 import { useSavedArmies } from './hooks/useSavedArmies';
@@ -75,7 +75,11 @@ export default function App() {
         />
       )}
       <footer className="mt-auto text-xs text-text/60">
-        {SOURCE[status]} Rules are written by the community and are not official Games Workshop material.
+        {SOURCE[status]} Rules are written by the community and are not official Games Workshop material. Icons:{' '}
+        <a href={ICON_CREDIT.url} className="underline">
+          {ICON_CREDIT.label}
+        </a>
+        .
       </footer>
     </main>
   );

@@ -2,6 +2,7 @@
 kind: faction
 name: Demo Host
 color: '#4a5a3a'
+icon: sword-01
 factionKeyword: DEMO HOST
 resources:
   - { id: resolve, name: Resolve points, short: RP }

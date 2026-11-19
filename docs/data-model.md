@@ -40,7 +40,7 @@ kind: faction
 id: demo-host
 name: Demo Host
 color: '#3b4a22'
-icon: demo # optional icon name
+icon: sword-01 # optional glyph name from the wh40k-icon font
 factionKeyword: DEMO HOST # the keyword that makes a datasheet part of this faction
 resources: # optional: faction resources spent by rules, shown on the army sheet
   - { id: resolve, name: Resolve points, short: RP }
@@ -50,7 +50,8 @@ Body sections (`##`): `Description`, `Army rule` (one `###` per rule), and any f
 
 `color` is the faction's colour in both apps: banners and datasheets in the rulebook; bars, headers, buttons and army
 cards in the list builder. The builder darkens colours too light for white text until they reach 4.5:1 contrast, so
-any colour is safe to pick. A unit's own `color` overrides the faction's on its datasheet.
+any colour is safe to pick. `icon` is shown on rulebook banners and datasheets, and on the builder's army cards and
+army header. A unit's own `color` and `icon` override the faction's on its datasheet.
 
 ## Unit (`kind: unit`)
 
