@@ -19,7 +19,7 @@ Community-written Warhammer 40,000 rules: a datasheet reader and editor, a list 
 npm install
 npm run dev     # rulebook on http://localhost:5190
 npm run dev -w @rulebook/builder   # list builder on http://localhost:5191
-RULEBOOK_OWNER=<owner npub or hex> npm start -w @rulebook/relay   # relay on ws://localhost:8080
+npm start -w @rulebook/relay   # relay on ws://localhost:8080; RULEBOOK_OWNER=<npub> to check writes
 ```
 
 The rulebook shows the demo faction. To load releases from relays, set `VITE_RELAYS` (comma separated) and

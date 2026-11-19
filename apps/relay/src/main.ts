@@ -25,6 +25,12 @@ const relay = new RulebookRelay({
 await relay.start();
 console.log(`Rulebook relay listening on ${relay.url}, node key ${relay.pubkey}`);
 
+console.log(
+  config.owner
+    ? `Checking writes against owner ${config.owner}`
+    : 'No owner key: open store, keeping any signed data on the topic (apps still check it)',
+);
+
 const stop = async () => {
   await relay.close();
   process.exit(0);

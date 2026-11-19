@@ -6,14 +6,18 @@ import { readConfig } from './readConfig';
 const OWNER = 'a'.repeat(64);
 
 describe('readConfig', () => {
-  it('only the owner key is required; the rest have defaults', () => {
-    expect(readConfig({ RULEBOOK_OWNER: OWNER })).toEqual({
-      owner: OWNER,
+  it('needs no settings at all: without an owner key the relay is an open store', () => {
+    expect(readConfig({})).toEqual({
+      owner: null,
       port: 8080,
       host: '0.0.0.0',
       dataDir: './data',
       secretKey: undefined,
     });
+  });
+
+  it('an empty or blank owner key also means an open store', () => {
+    expect(readConfig({ RULEBOOK_OWNER: '  ' })).toMatchObject({ owner: null });
   });
 
   it('accepts the owner key as an npub and stores it as hex', () => {

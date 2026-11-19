@@ -82,3 +82,5 @@ jobs:
       - run: npx semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Built into install.sh as the default owner.
+          RULEBOOK_OWNER: ${{ vars.RULEBOOK_OWNER }}

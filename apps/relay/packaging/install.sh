@@ -3,11 +3,15 @@
 # checks it against SHA256SUMS, installs it in /opt/rulebook-relay and runs it
 # as the rulebook-relay service:
 #
-#   curl -fsSL https://github.com/OWNER/REPO/releases/latest/download/install.sh \
-#     | sh -s -- --owner npub1...
+#   curl -fsSL https://github.com/OWNER/REPO/releases/latest/download/install.sh | sudo sh
+#
+# No options are needed. The relay checks writes against the project owner's
+# key built into this script when the release was made; without one it is an
+# open store (it keeps any signed data and the apps do the checking).
 #
 # Options:
-#   --owner KEY   project owner public key (npub or hex); needed the first time
+#   --owner KEY   check writes against another owner public key (npub or hex)
+#   --open        don't check writes: keep any signed data on the topic
 #   --port N      port to listen on (default 8080)
 #   --host ADDR   address to listen on (default 0.0.0.0)
 #   --uninstall   stop and remove the service; keeps the data and settings
@@ -20,6 +24,10 @@
 # or a local directory, for testing).
 set -eu
 
+# The project owner, filled in when the release is built (empty when it wasn't set).
+PROJECT_OWNER='@PROJECT_OWNER@'
+case $PROJECT_OWNER in @*) PROJECT_OWNER= ;; esac
+
 BASE=${RULEBOOK_RELAY_DOWNLOAD:-https://github.com/OWNER/REPO/releases/latest/download}
 APP=/opt/rulebook-relay
 CONF_DIR=/etc/rulebook-relay
@@ -28,10 +36,11 @@ UNIT=/etc/systemd/system/rulebook-relay.service
 
 fail() { echo "rulebook-relay install: $*" >&2; exit 1; }
 
-OWNER= PORT= HOST= UNINSTALL= PURGE=
+OWNER= OPEN= PORT= HOST= UNINSTALL= PURGE=
 while [ $# -gt 0 ]; do
   case $1 in
     --owner) OWNER=${2:?--owner needs a key}; shift 2 ;;
+    --open) OPEN=1; shift ;;
     --port) PORT=${2:?--port needs a number}; shift 2 ;;
     --host) HOST=${2:?--host needs an address}; shift 2 ;;
     --uninstall) UNINSTALL=1; shift ;;
@@ -80,11 +89,15 @@ command -v sha256sum >/dev/null 2>&1 || fail "needs sha256sum"
 
 # Settings: kept from an earlier install, changed only by the options given.
 setting() { [ -f "$CONF" ] && sed -n "s/^$1=//p" "$CONF" | tail -1; true; }
-OWNER=${OWNER:-$(setting RULEBOOK_OWNER)}
+# Owner: --owner or --open, else the earlier install's (which may be open), else the project's.
+if [ -n "$OPEN" ]; then
+  OWNER=
+elif [ -z "$OWNER" ]; then
+  if [ -f "$CONF" ]; then OWNER=$(setting RULEBOOK_OWNER); else OWNER=$PROJECT_OWNER; fi
+fi
 PORT=${PORT:-$(setting PORT)}
 HOST=${HOST:-$(setting HOST)}
 SECRET=$(setting RELAY_SECRET_KEY)
-[ -n "$OWNER" ] || fail "--owner is needed the first time (the project owner's npub)"
 case $PORT in '' ) PORT=8080 ;; *[!0-9]*) fail "--port must be a number" ;; esac
 HOST=${HOST:-0.0.0.0}
 # Ports below 1024 need the one capability that allows binding them.
@@ -167,6 +180,11 @@ systemctl enable rulebook-relay >/dev/null 2>&1
 systemctl restart rulebook-relay
 
 echo "rulebook-relay $(cat "$APP/VERSION") is running on $HOST:$PORT"
+if [ -n "$OWNER" ]; then
+  echo "  checks writes against owner $OWNER"
+else
+  echo "  open store: keeps any signed data (apps do the checking); --owner KEY turns checks on"
+fi
 echo "  logs:     journalctl -u rulebook-relay -f"
 echo "  settings: $CONF"
 echo "Browsers on https pages need wss://: put a TLS proxy in front (see docs/hosting.md)."

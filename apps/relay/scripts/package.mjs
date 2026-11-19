@@ -1,7 +1,7 @@
 // Builds the relay release: one bundled script plus the LevelDB module (which ships prebuilt binaries for x64 and
 // arm64), packed as rulebook-relay.tar.gz next to install.sh and SHA256SUMS in release/.
 //
-//   node scripts/package.mjs 1.2.3
+//   RULEBOOK_OWNER=npub1... node scripts/package.mjs 1.2.3
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
@@ -11,6 +11,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { build } from 'esbuild';
+import { npubDecode } from 'tool-db';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const version = process.argv[2] ?? '0.0.0-dev';
@@ -55,12 +56,19 @@ execFileSync('npm', ['install', '--omit=dev', '--ignore-scripts', '--no-package-
 rmSync(out, { recursive: true, force: true });
 mkdirSync(out);
 execFileSync('tar', ['-czf', join(out, 'rulebook-relay.tar.gz'), '-C', stage, 'rulebook-relay']);
-// The download address points at this repository's releases.
+// The download address points at this repository's releases, and the project owner (RULEBOOK_OWNER, npub or hex)
+// becomes the installer's default so relays check writes without any options.
 const repo = process.env.GITHUB_REPOSITORY ?? 'OWNER/REPO';
+const ownerText = (process.env.RULEBOOK_OWNER ?? '').trim();
+const owner = /^[0-9a-f]{64}$/.test(ownerText) ? ownerText : ownerText.startsWith('npub1') ? npubDecode(ownerText) : '';
+
+if (ownerText && !owner) throw new Error('RULEBOOK_OWNER must be an npub or a hex public key');
 
 writeFileSync(
   join(out, 'install.sh'),
-  readFileSync(join(root, 'packaging/install.sh'), 'utf8').replaceAll('OWNER/REPO', repo),
+  readFileSync(join(root, 'packaging/install.sh'), 'utf8')
+    .replaceAll('OWNER/REPO', repo)
+    .replace("'@PROJECT_OWNER@'", owner ? `'${owner}'` : "''"),
   { mode: 0o755 },
 );
 writeFileSync(join(out, 'VERSION'), `${version}\n`);

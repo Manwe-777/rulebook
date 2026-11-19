@@ -32,7 +32,8 @@ by `/`, since tool-db keeps `.` for user namespaces (`:<p>.<key>`). The topic is
 | `:<p>.request/<f>`      | That user (namespace) | `{ message }`: asks to become a contributor                     |
 | `:<p>.list/<n>`         | That user (namespace) | A saved army list                                               |
 
-The owner's public key is not data: it is built into the apps and given to the relay at start.
+The owner's public key is not data: it is built into the apps and into the relay installer. A relay started without it
+is an open store that keeps any signed data on the topic; the apps still apply these rules on every read.
 
 A release manifest is `{ faction, version, date, core?, records: { 'kind/id': h }, notes }`, hashed as JSON with its
 keys sorted. Turned back into files, a record becomes `<f>/<id>.md` (`<f>/faction.md` for the faction record), ready for

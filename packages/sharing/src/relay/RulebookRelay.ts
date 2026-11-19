@@ -18,20 +18,23 @@ interface StoredEvent {
 const newest = (a: StoredEvent, b: StoredEvent) => b.created_at - a.created_at || a.id.localeCompare(b.id);
 
 /**
- * A ToolDB relay node for Rulebook: it keeps the topic's data and applies the same write rules as the apps, reading
- * the role lists from its own store.
+ * A ToolDB relay node for Rulebook: it keeps the topic's data. Given the owner key, it applies the same write rules as
+ * the apps, reading the role lists from its own store. Without one it is an open store: it keeps any correctly signed
+ * data on the topic and leaves the checks to the apps, which apply the write rules on every read.
  */
 export class RulebookRelay extends ToolDbRelay {
-  readonly roles: Roles;
+  readonly roles: Roles | null;
 
-  constructor(options: Omit<ToolDbRelayOptions, 'topic'> & { owner: string; roleCacheMs?: number }) {
+  constructor(options: Omit<ToolDbRelayOptions, 'topic'> & { owner: string | null; roleCacheMs?: number }) {
     super({ ...options, topic: TOPIC });
-    this.roles = new Roles(options.owner, (key) => this.lookup(key), options.roleCacheMs);
-    registerWriteRules(this, this.roles);
+    this.roles = options.owner ? new Roles(options.owner, (key) => this.lookup(key), options.roleCacheMs) : null;
+    if (this.roles) registerWriteRules(this, this.roles);
   }
 
   /** The newest stored value of a role or hidden list, written by someone allowed to write it. */
   private async lookup(key: string): Promise<unknown> {
+    if (!this.roles) return null;
+
     const fixed = key === KEYS.hidden || key.startsWith('maintainers/');
 
     const events = (await this.store.query([

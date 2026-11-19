@@ -4,7 +4,7 @@
 # key and the data, a tampered download is refused, uninstall keeps the data
 # and --purge removes it.
 #
-#   node scripts/package.mjs && RULEBOOK_SECRET=<hex> tests/installer.sh
+#   RULEBOOK_SECRET=<hex> tests/installer.sh
 #
 # RULEBOOK_SECRET is a throwaway owner key (hex) used to publish. Needs Docker,
 # unprivileged (see the docker run below).
@@ -16,6 +16,8 @@ OWNER=$(node -e 'import("tool-db").then(t => console.log(t.npubEncode(process.ar
 WORK=$(mktemp -d)
 trap 'docker rm -f $(docker ps -aq --filter label=rulebook-relay-test) >/dev/null 2>&1 || true; rm -rf "$WORK"' EXIT
 
+# A release with this owner built in, as CI makes it.
+RULEBOOK_OWNER=$OWNER node scripts/package.mjs 0.0.0-test >/dev/null
 cp -r release "$WORK/dl"
 cp -r release "$WORK/bad"
 echo tampered >> "$WORK/bad/rulebook-relay.tar.gz"
@@ -37,9 +39,22 @@ wait_up() {
   fail "relay not running"
 }
 
-echo "== install"
-docker exec "$c" sh -c 'sh /dl/install.sh --port 8080' >/dev/null 2>&1 && fail "installed without --owner"
-docker exec -e RULEBOOK_RELAY_DOWNLOAD=/dl "$c" sh /dl/install.sh --owner "$OWNER" || { docker exec "$c" sh -c "node --version; ls -la /dl"; fail "install.sh"; }
+journal() { docker exec "$c" journalctl -u rulebook-relay --no-pager -o cat; }
+# Runs install.sh and waits for the relay it (re)started to say how it checks writes.
+starts() { journal | grep -cE "Checking writes|open store" || true; }
+install() {
+  local before
+  before=$(starts)
+  docker exec -e RULEBOOK_RELAY_DOWNLOAD=/dl "$c" sh /dl/install.sh "$@" >/dev/null || fail "install.sh $*"
+  for _ in $(seq 30); do [ "$(starts)" -gt "$before" ] && return 0; sleep 1; done
+  fail "relay didn't start after install.sh $*"
+}
+checks_owner() { journal | tail -1 | grep -q "Checking writes against owner $OWNER_HEX"; }
+open_store() { journal | tail -1 | grep -q "open store"; }
+
+echo "== install with no options uses the built-in owner"
+install
+checks_owner || fail "built-in owner not used"
 wait_up
 KEY=$(node_key)
 [ "$(docker exec "$c" stat -c %a /etc/rulebook-relay/relay.env)" = 600 ] || fail "settings readable by others"
@@ -49,12 +64,19 @@ RULEBOOK_SECRET=$RULEBOOK_SECRET RULEBOOK_OWNER=$OWNER_HEX RELAYS="ws://$IP:8080
   timeout 60 npx tsx src/publish.ts ../../packages/rules/content 2026-test || fail "publish"
 
 echo "== update keeps the key and the data"
-docker exec -e RULEBOOK_RELAY_DOWNLOAD=/dl "$c" sh /dl/install.sh --port 8081 >/dev/null || fail "update"
-wait_up
+install --port 8081
+checks_owner || fail "owner lost on update"
 [ "$(node_key)" = "$KEY" ] || fail "relay key changed"
 docker exec "$c" grep -q "^PORT=8081" /etc/rulebook-relay/relay.env || fail "port not changed"
-docker exec "$c" grep -q "^RULEBOOK_OWNER=$OWNER" /etc/rulebook-relay/relay.env || fail "owner lost"
 [ -n "$(docker exec "$c" ls /var/lib/private/rulebook-relay)" ] || fail "no data stored"
+
+echo "== --open, kept on update, and --owner turns checks back on"
+install --open
+open_store || fail "--open still checks"
+install
+open_store || fail "update dropped --open"
+install --owner "$OWNER"
+checks_owner || fail "--owner not used"
 
 echo "== a tampered download is refused"
 out=$(docker exec -e RULEBOOK_RELAY_DOWNLOAD=/bad "$c" sh /bad/install.sh 2>&1 || true)

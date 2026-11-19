@@ -41,7 +41,8 @@
 - Hosting (phase 9): CI deploys both apps to GitHub Pages (builder under `builder/`, links between them) and
   semantic-release publishes relay releases: a bundled relay, `install.sh` (systemd service, keeps settings, data and
   relay key on update, checks downloads) and `SHA256SUMS`. Installer tested under systemd in Docker; the Pages build
-  checked under a sub-path in the browser. Apps and relay take the owner key as npub or hex. See `docs/hosting.md`.
+  checked under a sub-path in the browser. Apps and relay take the owner key as npub or hex. The relay needs no
+  options: the release builds the project owner into `install.sh`, and with no owner it runs as an open store. See `docs/hosting.md`.
 - List builder (`apps/builder`, phase 8 done before the editor): pick faction, battle size and detachments, add units,
   set size, wargear, enhancements, upgrades, attachments and warlord; points and every problem update as you edit; the
   list is saved in the browser (unreadable saves are backed up). Loads relay releases like the rulebook.

@@ -25,8 +25,14 @@ x64 and arm64), `install.sh` and `SHA256SUMS`. The installer needs Linux with sy
 installed system-wide.
 
 ```sh
-curl -fsSL https://github.com/Manwe-777/rulebook/releases/latest/download/install.sh | sudo sh -s -- --owner npub1...
+curl -fsSL https://github.com/Manwe-777/rulebook/releases/latest/download/install.sh | sudo sh
 ```
+
+No options are needed. The release build writes the `RULEBOOK_OWNER` repository variable into `install.sh`, so the relay
+checks every write against the project's roles (who may edit, propose and release). Without an owner key the relay is an
+open store: it keeps any correctly signed data on the topic, and the apps, which check every value against the owner key
+built into them, ignore what doesn't follow the rules. An open relay can't mislead readers, but it stores whatever is
+sent to it.
 
 | Option        | Meaning                                                      |
 | ------------- | ------------------------------------------------------------ |
@@ -40,11 +46,12 @@ What it sets up:
 
 - the relay in `/opt/rulebook-relay`, run by the `rulebook-relay` systemd service as a dynamic user with no
   capabilities (only `CAP_NET_BIND_SERVICE` when the port is below 1024) and a read-only system;
-- settings in `/etc/rulebook-relay/relay.env` (root only), including the relay's own key, made on the first install;
+- settings in `/etc/rulebook-relay/relay.env` (root only), including the relay's own key, a random key made on the
+  first install that only identifies the relay on the network;
 - data in `/var/lib/rulebook-relay`.
 
-Running the installer again updates the relay. Settings, data and the relay key are kept; only the options given
-change. The download is checked against `SHA256SUMS` and the settings against the new build before the running relay is
+Running the installer again updates the relay. Settings (including open mode), data and the relay key are kept; only
+the options given change. The download is checked against `SHA256SUMS` and the settings against the new build before the running relay is
 replaced.
 
 The apps are served over https, so browsers only connect to `wss://` relays. Put a TLS proxy in front of the relay,
