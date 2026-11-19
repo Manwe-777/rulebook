@@ -1,10 +1,13 @@
-import type { Faction } from '@rulebook/rules';
+import { detachmentTags, type Faction } from '@rulebook/rules';
 
+import { useLibrary } from '../../hooks/useLibrary';
 import LinkRow from '../common/LinkRow';
 import { LIST_HEADING } from '../common/styles';
 
 /** The faction's detachments, linking to each detachment page. */
 export default function DetachmentList({ faction }: { faction: Faction }) {
+  const { muster } = useLibrary();
+
   if (!faction.detachments.length) return null;
 
   return (
@@ -16,7 +19,7 @@ export default function DetachmentList({ faction }: { faction: Faction }) {
             key={d.id}
             to={`/${faction.id}/detachment/${d.id}`}
             name={d.name}
-            note={d.points ? `${d.points} pts` : undefined}
+            note={detachmentTags(d, muster).join(' · ')}
           />
         ))}
       </ul>

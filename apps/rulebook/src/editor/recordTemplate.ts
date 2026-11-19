@@ -13,7 +13,8 @@ export function recordTemplate(
 kind: detachment
 id: ${slugify(name)}
 name: ${name}
-points: 0
+cost: 1 # detachment points
+disposition: take-and-hold
 enhancements: []
 stratagems: []
 ---

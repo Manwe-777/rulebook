@@ -121,7 +121,8 @@ A detachment carries its own rules, enhancements, upgrades and stratagems, since
 kind: detachment
 id: shield-wall
 name: Shield Wall
-points: 0 # cost of taking this detachment
+cost: 2 # detachment points, paid from the battle size's budget (not from the army's points)
+disposition: take-and-hold # force disposition, an id from the muster rules' dispositions
 unique: [VANGUARD] # tags: an army can't take two detachments that share one
 enhancements:
   - id: banner-of-resolve
@@ -156,23 +157,36 @@ kind: muster
 id: matched-play
 name: Matched play
 battleSizes:
+  - id: incursion
+    name: Incursion
+    points: 1000
+    overrides: { detachmentPoints: 2, enhancements: { max: 2 } }
   - { id: strike-force, name: Strike Force, points: 2000 }
-detachments: { min: 1, max: 2 }
+detachments: { min: 1 } # optional max; otherwise only detachment points limit them
+detachmentPoints: 3 # what an army can spend on detachments
+anyLoneDetachment: false # true: an army with one detachment may take it whatever its cost
+dispositions: # force dispositions; an army with several detachments picks one of theirs
+  - { id: purge-the-foe, name: Purge the Foe }
+  - { id: take-and-hold, name: Take and Hold }
+  - { id: priority-assets, name: Priority Assets }
+  - { id: disruption, name: Disruption }
+  - { id: reconnaissance, name: Reconnaissance }
 datasheetLimits: # copies of the same datasheet, by role; the first matching role wins
   - { role: epic-hero, max: 1 }
   - { role: battleline, max: 6 }
   - { role: dedicated-transport, max: 6 }
   - { role: default, max: 3 }
-enhancements: { max: 3, perModel: 1, roles: [character], excludeRoles: [epic-hero] } # roles: who can take one
-upgrades: { max: 3, perUnit: 1 }
+enhancements: { max: 4, perModel: 1, roles: [character], excludeRoles: [epic-hero] } # roles: who can take one
+upgrades: { max: 3, perUnit: 1, enhancementSlots: 1 } # any upgrades together use this many enhancement slots
 warlord: { required: true, roles: [character] }
 attachments: { leadersPerBodyguard: 1, supportPerBodyguard: 1 }
 strategicReserves: { maxShare: 0.5 }
 constraints: [] # further army-wide rules, see validation.md
 ```
 
-The values above show the shape only; the real ones come from the current muster guide. Battle sizes may override any
-limit (`battleSizes[].overrides`).
+Detachment points, enhancement limits and dispositions above follow the 11th edition muster rules for Incursion and
+Strike Force; the other values show the shape only and come from the current muster guide. Battle sizes may override
+any limit (`battleSizes[].overrides`).
 
 ## Release
 
@@ -197,6 +211,7 @@ file.
 ```yaml
 name: Shield Wall 2000
 release: <hash of the faction release the list was last edited with>
+disposition: take-and-hold # needed when the detachments have different dispositions
 core: <hash of the core release>
 battleSize: strike-force
 faction: demo-host

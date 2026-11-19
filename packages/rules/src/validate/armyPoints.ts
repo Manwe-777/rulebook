@@ -1,9 +1,7 @@
 import { entryPoints } from './entryPoints';
 import type { ValidationContext } from './types';
 
-/** Total cost of the army: every entry plus its detachments. */
+/** Total cost of the army in points: every entry. Detachments cost detachment points, not points. */
 export function armyPoints(ctx: ValidationContext): number {
-  const units = ctx.entries.reduce((sum, r) => sum + entryPoints(ctx, r), 0);
-
-  return units + ctx.detachments.reduce((sum, d) => sum + d.points, 0);
+  return ctx.entries.reduce((sum, r) => sum + entryPoints(ctx, r), 0);
 }

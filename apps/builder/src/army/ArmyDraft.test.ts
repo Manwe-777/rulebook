@@ -54,6 +54,16 @@ describe('ArmyDraft', () => {
     expect(draft.entry(carrier.id)?.upgrade).toBe('overcharged-engines');
   });
 
+  it('dropping the detachment whose disposition the army picked drops that choice too', () => {
+    const both = ArmyDraft.create(library, FACTION)
+      .toggleDetachment(library, 'shield-wall')
+      .setDisposition('take-and-hold');
+
+    expect(both.list.disposition).toBe('take-and-hold');
+    expect(both.toggleDetachment(library, 'armoured-column').list.disposition).toBe('take-and-hold');
+    expect(both.toggleDetachment(library, 'shield-wall').list.disposition).toBeUndefined();
+  });
+
   it('setting wargear to 0 models removes the option, and changing it replaces the old row', () => {
     const vets = ArmyDraft.create(library, FACTION).addUnit(library, 'veteran-squad');
     const two = vets.draft.setWargear(vets.id, 'melta', 2, ['melta-gun']);

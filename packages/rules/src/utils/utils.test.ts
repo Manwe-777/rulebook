@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import { Library } from '../library/Library';
+import { loadDemoFiles } from '../testing/loadDemoFiles';
+import { detachmentTags } from './detachmentTags';
 import { keywordKey } from './keywordKey';
 import { recordPath } from './recordPath';
 import { slugify } from './slugify';
@@ -34,5 +37,19 @@ describe('keywordKey', () => {
   it('matches keywords whatever their case, accents or spacing', () => {
     expect(keywordKey('Kâhl')).toBe(keywordKey('KAHL'));
     expect(keywordKey(' epic  hero ')).toBe('EPIC HERO');
+  });
+});
+
+describe('detachmentTags', () => {
+  const library = Library.fromFiles(loadDemoFiles());
+  const detachment = (id: string) => library.detachment('demo-host', id)!.detachment;
+
+  it('gives the cost in detachment points, the disposition by name and the unique tags', () => {
+    expect(detachmentTags(detachment('shield-wall'), library.muster)).toEqual(['2 DP', 'Take and Hold', 'VANGUARD']);
+    expect(detachmentTags(detachment('armoured-column'), library.muster)).toEqual(['1 DP', 'Disruption']);
+  });
+
+  it('falls back to the disposition id when the muster rules are not loaded', () => {
+    expect(detachmentTags(detachment('armoured-column'), undefined)).toEqual(['1 DP', 'disruption']);
   });
 });

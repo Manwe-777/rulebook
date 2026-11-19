@@ -4,6 +4,7 @@ import type { z } from 'zod';
 import { constraintSchema } from '../schemas/constraintSchema';
 import { demoLibrary, demoList, withMuster } from '../testing/demoList';
 import type { ArmyList, ListEntry } from '../types';
+import { detachmentPoints } from './detachmentPoints';
 import { listPoints } from './listPoints';
 import { validateList } from './validateList';
 
@@ -104,42 +105,67 @@ describe('validateList: points', () => {
     expect(codes(base, at(294))).toEqual(['points-over-limit']);
   });
 
-  it("a detachment's own cost counts too", () => {
+  it('detachments cost detachment points, not points', () => {
     const list = demoList({
       detachments: ['rapid-response'],
       units: base.units.map((u) => ({ ...u, enhancement: undefined })),
     });
 
-    // 280 for the units without the enhancement, plus 30 for the detachment
-    expect(codes(list, at(310))).toEqual([]);
-    expect(codes(list, at(309))).toEqual(['points-over-limit']);
+    // 280 for the units without the enhancement; the detachment adds nothing
+    expect(codes(list, at(280))).toEqual([]);
+    expect(codes(list, at(279))).toEqual(['points-over-limit']);
   });
 });
 
 describe('validateList: detachments', () => {
-  it('needs between the minimum and maximum number of detachments', () => {
-    expect(codes(demoList({ detachments: ['shield-wall', 'armoured-column'] }))).toEqual([]);
-    expect(codes(demoList({ detachments: [] }))).toContain('detachment-count');
+  const two = { detachments: ['shield-wall', 'armoured-column'], disposition: 'take-and-hold' };
 
-    expect(codes(demoList({ detachments: ['shield-wall', 'armoured-column', 'rapid-response'] }))).toContain(
-      'detachment-count',
-    );
+  it('an army needs a detachment, and can take several while their detachment points fit the battle size', () => {
+    // Shield Wall (2) + Armoured Column (1) = 3, the Strike Force budget
+    expect(codes(demoList(two))).toEqual([]);
+    expect(codes(demoList({ detachments: [] }))).toContain('detachment-count');
   });
 
-  it('a battle size can lower the limit', () => {
-    const list = demoList({ battleSize: 'incursion', detachments: ['shield-wall', 'armoured-column'] });
+  it('detachments costing more than the battle size allows are reported', () => {
+    expect(codes(demoList({ ...two, battleSize: 'incursion' }))).toEqual(['detachment-points']);
 
-    expect(codes(list)).toEqual(['detachment-count']);
+    const message = validateList(demoList({ ...two, battleSize: 'incursion' }), demoLibrary)[0].message;
+
+    expect(message).toBe('The detachments cost 3 detachment points; Incursion allows 2.');
+  });
+
+  it('when the muster rules allow it, a lone detachment may be taken whatever its cost', () => {
+    const tight = (anyLoneDetachment: boolean) => withMuster({ detachmentPoints: 1, anyLoneDetachment });
+
+    expect(codes(base, tight(false))).toEqual(['detachment-points']);
+    expect(codes(base, tight(true))).toEqual([]);
+    expect(codes(demoList(two), tight(true))).toEqual(['detachment-points']);
   });
 
   it("two detachments that share a unique tag can't be taken together", () => {
-    const list = demoList({ detachments: ['shield-wall', 'rapid-response'] });
+    const list = demoList({ detachments: ['shield-wall', 'rapid-response'], disposition: 'take-and-hold' });
 
-    expect(codes(list)).toEqual(['detachment-unique']);
+    expect(codes(list, withMuster({ detachmentPoints: 4 }))).toEqual(['detachment-unique']);
+  });
+
+  it('tells the builder how many detachment points are spent and allowed', () => {
+    expect(detachmentPoints(demoList(two), demoLibrary)).toEqual({ spent: 3, budget: 3 });
+
+    expect(detachmentPoints(demoList({ ...two, battleSize: 'incursion' }), demoLibrary)).toEqual({
+      spent: 3,
+      budget: 2,
+    });
   });
 
   it('the same detachment twice is reported', () => {
     expect(codes(demoList({ detachments: ['shield-wall', 'shield-wall'] }))).toContain('detachment-twice');
+  });
+
+  it('an army with several detachments picks one of their dispositions; one detachment gives its own', () => {
+    expect(codes(demoList({ ...two, disposition: undefined }))).toEqual(['disposition']);
+    expect(codes(demoList({ ...two, disposition: 'disruption' }))).toEqual([]);
+    expect(codes(demoList({ ...two, disposition: 'reconnaissance' }))).toEqual(['disposition']);
+    expect(codes(base)).toEqual([]);
   });
 });
 
@@ -186,6 +212,22 @@ describe('validateList: enhancements and upgrades', () => {
 
     expect(codes(base, library)).toEqual([]);
     expect(codes(replaceUnit('bearer', { enhancement: 'old-campaigner' }), library)).toEqual(['enhancement-limit']);
+  });
+
+  it('taking any upgrades uses up an enhancement slot', () => {
+    const library = withMuster({
+      enhancements: { ...demoLibrary.muster!.enhancements, max: 1 },
+    });
+
+    const withUpgrade = demoList({
+      units: [
+        ...base.units,
+        { id: 'carrier', unit: 'armoured-carrier', models: 1, wargear: [], upgrade: 'reinforced-plating' },
+      ],
+    });
+
+    expect(codes(base, library)).toEqual([]);
+    expect(codes(withUpgrade, library)).toEqual(['enhancement-limit']);
   });
 
   it('an upgrade goes on a unit with its keywords, and is not an enhancement', () => {

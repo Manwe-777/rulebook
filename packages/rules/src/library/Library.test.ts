@@ -22,6 +22,7 @@ kind: muster
 name: M
 battleSizes: [{ id: s, name: S, points: 1000 }]
 detachments: { min: 1, max: 1 }
+detachmentPoints: 3
 datasheetLimits: [{ role: default, max: 3 }]
 enhancements: { max: 3 }
 upgrades: { max: 3 }

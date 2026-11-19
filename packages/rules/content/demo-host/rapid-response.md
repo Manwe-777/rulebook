@@ -1,7 +1,8 @@
 ---
 kind: detachment
 name: Rapid Response
-points: 30
+cost: 2 # detachment points
+disposition: reconnaissance
 unique: [VANGUARD]
 enhancements:
   - { name: Forward Observer, points: 10, keywords: [CHARACTER], excludeKeywords: [EPIC HERO] }

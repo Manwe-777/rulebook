@@ -37,7 +37,7 @@ export function checkDataset(library: Library): Issue[] {
     ...library.factions.flatMap((faction) => [
       ...constraintIssues(faction, faction.constraints, faction.id),
       ...faction.units.flatMap((unit) => unitIssues(faction, unit)),
-      ...faction.detachments.flatMap((detachment) => detachmentIssues(faction, detachment)),
+      ...faction.detachments.flatMap((detachment) => detachmentIssues(faction, detachment, library.muster)),
     ]),
   ];
 }

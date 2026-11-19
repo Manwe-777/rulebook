@@ -45,6 +45,12 @@
   options: the release builds the project owner into `install.sh`, and with no owner it runs as an open store. See `docs/hosting.md`.
 - Released rules are cached in IndexedDB (per owner key, shared by both apps on one site): shown at once on the next
   visit, kept when the relays can't be reached. `owner-key` no longer echoes the password.
+- 11th edition detachment rules: detachments cost detachment points (`cost`, 1–3) from the battle size's budget
+  (`detachmentPoints`: Incursion 2, Strike Force 3), not army points; each has a force `disposition` and an army with
+  several picks one of theirs; upgrades together use one enhancement slot (`upgrades.enhancementSlots`); enhancement
+  limits 2 / 4. `anyLoneDetachment` in the muster record covers the announced "any single detachment" rule. The builder
+  shows each detachment's DP, disposition and tags, a DP counter and the disposition picker; the rulebook and the
+  army sheet show DP and disposition. Local relay and browser data were reset (no migration: nothing was deployed).
 - Printable army sheet: the builder's Print button opens the rulebook's `/print` page with the list after `#army=`
   (base64url, never sent to a server). Checkboxes (remembered per browser) for roster, army rules, detachment rules
   with the enhancements taken, stratagems and datasheets (each once). Roster brackets combined units with their total

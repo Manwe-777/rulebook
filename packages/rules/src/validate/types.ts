@@ -11,7 +11,7 @@ export interface Resolved {
 }
 
 /** Muster limits after the battle size's overrides. */
-export type Limits = Pick<Muster, 'detachments' | 'datasheetLimits' | 'enhancements' | 'upgrades'>;
+export type Limits = Pick<Muster, 'detachments' | 'detachmentPoints' | 'datasheetLimits' | 'enhancements' | 'upgrades'>;
 
 /** Everything the checks need, with every reference already resolved. */
 export interface ValidationContext {

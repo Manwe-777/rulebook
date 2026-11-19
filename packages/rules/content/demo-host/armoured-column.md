@@ -1,7 +1,8 @@
 ---
 kind: detachment
 name: Armoured Column
-points: 0
+cost: 1 # detachment points
+disposition: disruption
 enhancements:
   - { name: Overcharged Engines, points: 15, target: unit, keywords: [TRANSPORT] }
 stratagems:

@@ -139,7 +139,7 @@ describe('parseRecord: detachments', () => {
     ]);
 
     expect(detachment.stratagems).toEqual([expect.objectContaining({ id: 'vanish', cp: 1, text: 'Text for vanish.' })]);
-    expect(detachment).toMatchObject({ points: 0, unique: [], constraints: [] });
+    expect(detachment).toMatchObject({ cost: 1, unique: [], constraints: [] });
   });
 
   it('matches headings to entries ignoring case and punctuation', () => {

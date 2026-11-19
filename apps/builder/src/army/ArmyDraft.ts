@@ -56,11 +56,19 @@ export class ArmyDraft {
     return this.with({ name });
   }
 
+  /** The army's force disposition, picked from its detachments' when it has several. */
+  setDisposition(disposition: string | undefined): ArmyDraft {
+    return this.with({ disposition });
+  }
+
   setBattleSize(battleSize: string): ArmyDraft {
     return this.with({ battleSize });
   }
 
-  /** Adds or removes a detachment. Enhancements and upgrades only a removed detachment offered are dropped. */
+  /**
+   * Adds or removes a detachment. Enhancements and upgrades only a removed detachment offered are dropped, and so is
+   * the army's disposition when no remaining detachment has it.
+   */
   toggleDetachment(library: Library, id: string): ArmyDraft {
     const taken = this.list.detachments.includes(id);
     const detachments = taken ? this.list.detachments.filter((d) => d !== id) : [...this.list.detachments, id];
@@ -78,7 +86,14 @@ export class ArmyDraft {
       upgrade: e.upgrade && offered.has(e.upgrade) ? e.upgrade : undefined,
     }));
 
-    return this.with({ detachments, units });
+    // The chosen disposition goes when no remaining detachment has it.
+    const dispositions = (faction?.detachments ?? [])
+      .filter((d) => detachments.includes(d.id))
+      .map((d) => d.disposition);
+
+    const disposition = dispositions.includes(this.list.disposition) ? this.list.disposition : undefined;
+
+    return this.with({ detachments, units, disposition });
   }
 
   /** Adds a unit at its smallest size. Returns the new draft and the new entry's id. */

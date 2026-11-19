@@ -129,9 +129,10 @@ The project shares game data and players' own explanations of rules. It never sh
 
 ## Open questions
 
-- **Muster values.** The core rules leave mustering to the Warhammer 40,000 app: battle sizes and their points limits,
-  how many detachments an army takes, how many copies of a datasheet are allowed per role, and enhancement and upgrade
-  limits. The `core` maintainers have to fill them in from the current muster guide; `data-model.md` defines the fields.
+- **Muster values.** The core rules leave mustering to the Warhammer 40,000 app. Detachment points (2 at Incursion, 3 at
+  Strike Force), enhancement limits (2 and 4) and the five force dispositions are known; Onslaught's values, datasheet
+  limits per role, and whether a lone detachment may always be taken whatever its cost (announced, not yet in the
+  rules) are not. The `core` maintainers have to fill them in from the current muster guide; `data-model.md` defines the fields.
 - **Allies.** How 11th edition handles allied units (e.g. agents of another faction), and whether that needs more than
   the constraint format.
 - **Wargear costs.** Whether any wargear option costs points in 11th edition. The schema allows a cost per option.

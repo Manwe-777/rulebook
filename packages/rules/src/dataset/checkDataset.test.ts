@@ -25,6 +25,16 @@ describe('checkDataset', () => {
     expect(checkDataset(Library.fromFiles(loadDemoFiles()))).toEqual([]);
   });
 
+  it('warns about a detachment whose force disposition the muster rules do not list, or that has none', () => {
+    expect(checkEdited('shield-wall.md', 'disposition: take-and-hold', 'disposition: hold-the-line')).toEqual([
+      ['unknown-disposition', 'warning', 'demo-host/shield-wall'],
+    ]);
+
+    expect(checkEdited('shield-wall.md', 'disposition: take-and-hold\n', '')).toEqual([
+      ['unknown-disposition', 'warning', 'demo-host/shield-wall'],
+    ]);
+  });
+
   it('reports wargear that names a weapon the datasheet does not have', () => {
     expect(checkEdited('veteran-squad.md', 'with: [[melta-gun]]', 'with: [[lascannon]]')).toEqual([
       ['unknown-weapon', 'error', 'demo-host/veteran-squad'],

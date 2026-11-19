@@ -1,3 +1,4 @@
+import { detachmentTags } from '@rulebook/rules';
 import { useParams } from 'react-router';
 
 import { useLibrary } from '../../hooks/useLibrary';
@@ -12,13 +13,14 @@ import NotFoundPage from './NotFoundPage';
 
 export default function DetachmentPage() {
   const { faction: factionId = '', detachment: detachmentId = '' } = useParams();
-  const found = useLibrary().detachment(factionId, detachmentId);
+  const library = useLibrary();
+  const found = library.detachment(factionId, detachmentId);
 
   if (!found) return <NotFoundPage />;
 
   const { faction, detachment } = found;
   const theme = factionTheme({}, faction);
-  const tags = [detachment.points ? `${detachment.points} pts` : null, ...detachment.unique.map((t) => `Unique: ${t}`)];
+  const tags = detachmentTags(detachment, library.muster);
 
   return (
     <div className="flex flex-col gap-3">
@@ -28,7 +30,7 @@ export default function DetachmentPage() {
           <h2 className="text-3xl leading-none font-extrabold tracking-wide uppercase drop-shadow sm:text-4xl">
             {detachment.name}
           </h2>
-          <p className="mt-2 text-sm font-semibold tracking-wide uppercase">{tags.filter(Boolean).join(' · ')}</p>
+          <p className="mt-2 text-sm font-semibold tracking-wide uppercase">{tags.join(' · ')}</p>
         </PageBanner>
         <div className="sheet-paper grid gap-6 px-3 py-5 sm:px-4 md:grid-cols-[3fr_2fr] md:px-10">
           <div className="flex min-w-0 flex-col gap-4">

@@ -45,6 +45,9 @@ export function itemIssues(ctx: ValidationContext, kind: Kind): Issue[] {
   const issues = bearers.flatMap(({ r, id }) => bearerIssues(ctx, kind, r, id));
   const max = kind === 'enhancement' ? ctx.limits.enhancements.max : ctx.limits.upgrades.max;
   const ids = bearers.map((b) => b.id);
+  // Upgrades, as soon as there are any, use up enhancement slots too.
+  const upgradeSlots = ctx.entries.some((r) => r.entry.upgrade) ? ctx.limits.upgrades.enhancementSlots : 0;
+  const used = kind === 'enhancement' ? ids.length + upgradeSlots : ids.length;
 
   for (const id of new Set(ids)) {
     const holders = bearers.filter((b) => b.id === id).map((b) => b.r.entry.id);
@@ -52,8 +55,10 @@ export function itemIssues(ctx: ValidationContext, kind: Kind): Issue[] {
     if (holders.length > 1) issues.push(issue(`${kind}-twice`, `"${id}" is taken more than once.`, holders));
   }
 
-  if (ids.length > max) {
-    issues.push(issue(`${kind}-limit`, `The army has ${ids.length} ${kind}s; at most ${max} are allowed.`));
+  if (used > max) {
+    const note = used > ids.length ? ` (upgrades use ${upgradeSlots} of them)` : '';
+
+    issues.push(issue(`${kind}-limit`, `The army uses ${used} ${kind} slots${note}; at most ${max} are allowed.`));
   }
 
   return issues;

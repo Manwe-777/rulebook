@@ -8,7 +8,8 @@ export default function ArmySummary({ sheet }: { sheet: PrintSheet }) {
     ['Faction', sheet.faction?.name ?? sheet.list.faction],
     ['Battle size', sheet.battleSize],
     ['Points', `${sheet.points}${sheet.limit !== null ? ` / ${sheet.limit}` : ''}`],
-    ['Detachments', sheet.detachments.map((d) => d.name).join(', ') || '—'],
+    ['Detachments', sheet.detachments.map((d) => `${d.name} (${d.cost} DP)`).join(', ') || '—'],
+    ['Disposition', sheet.disposition ?? '—'],
     ['Warlord', warlord?.name ?? '—'],
   ];
 

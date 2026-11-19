@@ -46,7 +46,11 @@ export function buildContext(list: ArmyList, library: Library): { ctx: Validatio
   if (!faction || !muster || !battleSize) return { ctx: null, issues };
 
   const entries = resolveEntries(list, library, issues);
-  const { detachments, datasheetLimits, enhancements, upgrades } = { ...muster, ...battleSize.overrides };
+
+  const { detachments, detachmentPoints, datasheetLimits, enhancements, upgrades } = {
+    ...muster,
+    ...battleSize.overrides,
+  };
 
   const ctx: ValidationContext = {
     list,
@@ -54,7 +58,7 @@ export function buildContext(list: ArmyList, library: Library): { ctx: Validatio
     faction,
     muster,
     battleSize,
-    limits: { detachments, datasheetLimits, enhancements, upgrades },
+    limits: { detachments, detachmentPoints, datasheetLimits, enhancements, upgrades },
     detachments: resolveDetachments(list, faction.detachments, issues),
     entries,
     byId: new Map(entries.map((r) => [r.entry.id, r])),

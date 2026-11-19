@@ -36,6 +36,8 @@ export interface PrintSheet {
   list: ArmyList;
   faction: Faction | undefined;
   battleSize: string;
+  /** The army's force disposition by name: the one picked, or its only detachment's. */
+  disposition: string | undefined;
   points: number;
   limit: number | null;
   detachments: Detachment[];
@@ -67,12 +69,21 @@ function wargearText(unit: Unit | undefined, entry: ListEntry): string[] {
   });
 }
 
+/** The army's force disposition by name: the one picked, or its only detachment's. */
+function dispositionName(list: ArmyList, detachments: Detachment[], library: Library): string | undefined {
+  const id = list.disposition ?? (detachments.length === 1 ? detachments[0].disposition : undefined);
+
+  return id ? (library.muster?.dispositions.find((d) => d.id === id)?.name ?? id) : undefined;
+}
+
 /** Everything the printable army sheet shows, worked out from the list and the rules. */
 export function printSheet(list: ArmyList, library: Library): PrintSheet {
   const faction = library.faction(list.faction);
   const points = listPoints(list, library);
   const unitOf = (entry: ListEntry) => library.unit(list.faction, entry.unit)?.unit;
   const detachments = (faction?.detachments ?? []).filter((d) => list.detachments.includes(d.id));
+  const disposition = dispositionName(list, detachments, library);
+
   const allItems = detachments.flatMap((d) => d.enhancements);
   const itemName = (id: string | undefined) => (id ? (allItems.find((e) => e.id === id)?.name ?? id) : undefined);
 
@@ -108,6 +119,7 @@ export function printSheet(list: ArmyList, library: Library): PrintSheet {
     list,
     faction,
     battleSize: library.muster?.battleSizes.find((b) => b.id === list.battleSize)?.name ?? list.battleSize,
+    disposition,
     points: points.total,
     limit: points.limit,
     detachments,

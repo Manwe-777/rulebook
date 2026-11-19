@@ -32,6 +32,7 @@ describe('printSheet', () => {
     expect(sheet.faction?.name).toBe('Demo Host');
     expect(sheet.battleSize).toBe('Strike Force');
     expect(sheet.detachments.map((d) => d.id)).toEqual(['shield-wall']);
+    expect(sheet.battleSize).toBe('Strike Force');
   });
 
   it('prints an attached character in its combined unit, before the unit it leads, with the group’s total', () => {
@@ -56,7 +57,16 @@ describe('printSheet', () => {
     expect(sheet.items.map((i) => [i.item.name, i.bearer])).toEqual([['Banner of Resolve', 'Field Captain']]);
   });
 
-  it('adds up to the same points as the builder', () => {
-    expect(sheet.points).toBe(sheet.groups.reduce((sum, g) => sum + g.points, 0) + (sheet.detachments[0].points ?? 0));
+  it('adds up to the same points as the builder: the units only, detachments cost detachment points', () => {
+    expect(sheet.points).toBe(sheet.groups.reduce((sum, g) => sum + g.points, 0));
+  });
+
+  it('gives the disposition of a lone detachment, or the one the army picked', () => {
+    expect(sheet.disposition).toBe('Take and Hold');
+
+    expect(
+      printSheet({ ...list, detachments: ['shield-wall', 'armoured-column'], disposition: 'disruption' }, library)
+        .disposition,
+    ).toBe('Disruption');
   });
 });

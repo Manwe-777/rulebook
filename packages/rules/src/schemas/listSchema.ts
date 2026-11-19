@@ -21,6 +21,8 @@ const entry = z.strictObject({
 export const listSchema = z.strictObject({
   name: text,
   release: text.optional(),
+  /** The army's force disposition, from its detachments; needed when it has several with different ones. */
+  disposition: slug.optional(),
   core: text.optional(),
   battleSize: slug,
   faction: slug,

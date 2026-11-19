@@ -2,6 +2,7 @@ import type { Library } from '@rulebook/rules';
 import type { ReleaseInfo } from '@rulebook/sharing';
 
 import { ArmyDraft } from '../army/ArmyDraft';
+import DetachmentPicker from './DetachmentPicker';
 import { INPUT, LABEL, PANEL, PANEL_TITLE } from './styles';
 
 interface Props {
@@ -11,7 +12,7 @@ interface Props {
   onChange: (draft: ArmyDraft) => void;
 }
 
-/** Faction, battle size and detachments. Changing the faction starts a new list. */
+/** Faction, battle size, detachments and disposition. Changing the faction starts a new list. */
 export default function ArmySettings({ draft, library, release, onChange }: Props) {
   const faction = library.faction(draft.list.faction);
 
@@ -53,22 +54,7 @@ export default function ArmySettings({ draft, library, release, onChange }: Prop
             ))}
           </select>
         </label>
-        <fieldset className="flex flex-col gap-1">
-          <legend className={`${LABEL} mb-1`}>Detachments</legend>
-          {faction?.detachments.map((d) => (
-            <label key={d.id} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={draft.list.detachments.includes(d.id)}
-                onChange={() => onChange(draft.toggleDetachment(library, d.id))}
-              />
-              <span className="font-semibold">{d.name}</span>
-              <span className="text-sm text-text/60">
-                {d.points ? `${d.points} pts` : ''} {d.unique.map((t) => `· ${t}`).join(' ')}
-              </span>
-            </label>
-          ))}
-        </fieldset>
+        <DetachmentPicker draft={draft} library={library} onChange={onChange} />
       </div>
     </section>
   );
