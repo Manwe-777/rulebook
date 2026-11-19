@@ -43,3 +43,7 @@ export const ICON_CREDIT = {
   label: 'wh40k-icon by Certseeds (OFL 1.1)',
   url: 'https://github.com/Certseeds/wh40k-icon',
 };
+
+/** Address parameters: the open army and the unit open in the play view. */
+export const ARMY_PARAM = 'army';
+export const UNIT_PARAM = 'unit';

@@ -25,7 +25,14 @@ export default function EntryCard({ draft, library, entry, points, issues, onCha
       id={`entry-${entry.id}`}
       className={`overflow-hidden rounded-lg bg-panel shadow-lg ${broken ? 'ring-2 ring-illegal' : ''}`}
     >
-      <EntryHeader faction={draft.list.faction} unit={unit} unitId={entry.unit} points={points} onRemove={remove} />
+      <EntryHeader
+        faction={draft.list.faction}
+        entryId={entry.id}
+        unit={unit}
+        unitId={entry.unit}
+        points={points}
+        onRemove={remove}
+      />
       <div className="flex flex-col gap-3 p-3">
         {unit && <EntryChoices draft={draft} library={library} entry={entry} unit={unit} onChange={onChange} />}
         {unit && <WargearFields draft={draft} entry={entry} unit={unit} onChange={onChange} />}

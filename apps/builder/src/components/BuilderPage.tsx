@@ -2,11 +2,13 @@ import { type Library, listPoints, validateList } from '@rulebook/rules';
 import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
+import { useUnitRoute } from '../hooks/useUnitRoute';
 import { factionTint } from '../utils/factionTint';
 import ArmyHeader from './ArmyHeader';
 import ArmySettings from './ArmySettings';
 import EntryList from './EntryList';
 import IssuesPanel from './IssuesPanel';
+import UnitSheet from './unit/UnitSheet';
 import UnitPicker from './UnitPicker';
 
 interface Props {
@@ -18,13 +20,28 @@ interface Props {
 }
 
 /**
- * One army being built: settings and unit picker on the left, the army and its problems on the right, in the colour
+ * One army being built, or one of its units in the play view (`?unit=`): settings and unit picker on the left, the army and its problems on the right, in the colour
  * the faction's data sets.
  */
 export default function BuilderPage({ draft, library, release, onChange }: Props) {
   const issues = validateList(draft.list, library);
   const points = listPoints(draft.list, library);
   const faction = library.faction(draft.list.faction);
+  const [unitId, openUnit] = useUnitRoute();
+
+  if (unitId && draft.entry(unitId)) {
+    return (
+      <div style={factionTint(faction?.color)}>
+        <UnitSheet
+          draft={draft}
+          library={library}
+          entryId={unitId}
+          points={points.entries}
+          onClose={() => openUnit(null)}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4" style={factionTint(faction?.color)}>

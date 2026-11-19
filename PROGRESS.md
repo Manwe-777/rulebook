@@ -51,6 +51,13 @@
   limits 2 / 4. `anyLoneDetachment` in the muster record covers the announced "any single detachment" rule. The builder
   shows each detachment's DP, disposition and tags, a DP counter and the disposition picker; the rulebook and the
   army sheet show DP and disposition. Local relay and browser data were reset (no migration: nothing was deployed).
+- Play view in the builder: tapping a unit's name opens it (`?unit=`, so back closes it) as it was built: stats with
+  invulnerable save and base size (models with the same stats share a row), what each model type carries, only the
+  weapons it carries with how many, its abilities, the rules of the wargear it carries, its enhancement or upgrade, and
+  the leaders and support units attached to it. "Show all wargear" lists every weapon (the ones not carried dimmed)
+  and every wargear rule. Checked against the tournament lists.
+- Wargear options: a count per choice, so two models can take different weapons from one option; headings name the
+  model type; datasheets say "This model" / "The Theyn" and count repeated default wargear. Profiles carry base sizes.
 - Checked against a real faction: Leagues of Votann (22 datasheets, 10 detachments, rules summarised in our own
   words) in a gitignored `local-content/` folder, published only to a local relay. A tournament list (two detachments,
   attached leaders, repeated datasheets) rebuilt in the builder comes to the same 1995 points and is legal. What it
@@ -103,13 +110,10 @@
 - First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
   the whole rules library.
 
-- Format gaps found with Leagues of Votann: one wargear option can't be taken by two models with different choices
-  (two special weapons from the same list); "no duplicates", "one of these per model" and "replace X or Y" option rules;
+- Format gaps found with Leagues of Votann: "no duplicates", "one of these per model" and "replace X or Y" option rules;
   model types whose models carry different gear (E-COGs); passengers taking no transport space (by model type);
   detachments granting keywords (Beserks gain BATTLELINE); enhancements that need a weapon; splitting a unit across
   transports at deployment. These are written as notes in the records for now.
-- Datasheet wording: options on single-model units read "Any number of models", and repeated default wargear is
-  listed twice instead of "2 twin bolt cannons".
 
 ## Next
 
