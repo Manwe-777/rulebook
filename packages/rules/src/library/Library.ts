@@ -1,6 +1,7 @@
 import { CORE_BUNDLE, FACTION_FILE } from '../constants';
 import { parseRecord } from '../parse/parseRecord';
-import type { Detachment, Faction, FileErrors, Muster, RulesFile, RulesRecord, Unit } from '../types';
+import type { Detachment, Faction, FileErrors, GlossaryEntry, Muster, RulesFile, RulesRecord, Unit } from '../types';
+import { glossaryKey } from '../utils/glossaryKey';
 import { recordPath } from '../utils/recordPath';
 
 const byName = (a: { name: string }, b: { name: string }) => a.name.localeCompare(b.name);
@@ -15,9 +16,10 @@ interface Parsed {
 function misplaced({ bundle, path, record }: Parsed): string | null {
   const isFactionFile = path.replace(/\\/g, '/').endsWith(`/${FACTION_FILE}`) || path === FACTION_FILE;
 
-  if (bundle === CORE_BUNDLE)
-    return record.kind === 'muster' ? null : `the ${CORE_BUNDLE} folder only holds muster records`;
-  if (record.kind === 'muster') return `muster records belong in the ${CORE_BUNDLE} folder`;
+  const core = record.kind === 'muster' || record.kind === 'glossary';
+
+  if (bundle === CORE_BUNDLE) return core ? null : `the ${CORE_BUNDLE} folder only holds muster and glossary records`;
+  if (core) return `${record.kind} records belong in the ${CORE_BUNDLE} folder`;
   if (isFactionFile !== (record.kind === 'faction'))
     return `${FACTION_FILE} holds the faction record, and only it does`;
 
@@ -33,11 +35,29 @@ export class Library {
   readonly factions: Faction[];
   readonly muster: Muster | undefined;
   readonly errors: FileErrors[];
+  /** Rule terms explained by the core glossary records, by `glossaryKey`. */
+  private readonly terms: Map<string, GlossaryEntry>;
 
-  private constructor(factions: Faction[], muster: Muster | undefined, errors: FileErrors[]) {
+  private constructor(
+    factions: Faction[],
+    muster: Muster | undefined,
+    glossary: GlossaryEntry[],
+    errors: FileErrors[],
+  ) {
     this.factions = factions;
     this.muster = muster;
+    this.terms = new Map(glossary.map((e) => [glossaryKey(e.term), e]));
     this.errors = errors;
+  }
+
+  /** Every explained rule term, sorted by term. */
+  get glossary(): GlossaryEntry[] {
+    return [...this.terms.values()].sort((a, b) => a.term.localeCompare(b.term));
+  }
+
+  /** What a rule term means (`SUSTAINED HITS 2`, `Feel No Pain 4+`), or undefined when no glossary explains it. */
+  explain(term: string): GlossaryEntry | undefined {
+    return this.terms.get(glossaryKey(term));
   }
 
   static fromFiles(files: RulesFile[]): Library {
@@ -73,7 +93,9 @@ export class Library {
 
     errors.sort((a, b) => a.path.localeCompare(b.path));
 
-    return new Library(factions, musters[0]?.record as Muster | undefined, errors);
+    const glossary = placed.flatMap((p) => (p.record.kind === 'glossary' ? p.record.entries : []));
+
+    return new Library(factions, musters[0]?.record as Muster | undefined, glossary, errors);
   }
 
   private static groupFactions(parsed: Parsed[], errors: FileErrors[]): Faction[] {

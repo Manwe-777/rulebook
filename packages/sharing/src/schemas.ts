@@ -4,7 +4,8 @@ import { z } from 'zod';
 const hash = z.string().regex(/^[0-9a-f]{64}$/, 'must be a SHA-256 hash in hex');
 const pubkey = z.string().regex(/^[0-9a-f]{64}$/, 'must be a public key in hex');
 const slug = z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/);
-const kind = z.enum(['faction', 'unit', 'detachment', 'muster']);
+/** A record kind; any name, so relays need no update when a new kind is added. */
+const kind = slug;
 
 /** `maintainers.<f>` and `contributors.<f>`. */
 export const roleListSchema = z.strictObject({ keys: z.array(pubkey) });
@@ -19,7 +20,7 @@ export const manifestSchema = z.strictObject({
   date: z.string().min(1),
   core: hash.optional(),
   /** `kind/id` to the hash of that record's text. */
-  records: z.record(z.string().regex(/^(faction|unit|detachment|muster)\/[a-z0-9-]+$/), hash),
+  records: z.record(z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*\/[a-z0-9-]+$/), hash),
   notes: z.string().default(''),
 });
 

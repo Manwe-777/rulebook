@@ -4,6 +4,7 @@ import type { DETACHMENT_SECTIONS, MUSTER_SECTIONS, UNIT_SECTIONS } from './cons
 import type { constraintSchema, selectorSchema } from './schemas/constraintSchema';
 import type { detachmentSchema } from './schemas/detachmentSchema';
 import type { factionSchema } from './schemas/factionSchema';
+import type { glossarySchema } from './schemas/glossarySchema';
 import type { listSchema } from './schemas/listSchema';
 import type { musterSchema } from './schemas/musterSchema';
 import type { unitSchema } from './schemas/unitSchema';
@@ -59,8 +60,19 @@ export interface FactionRecord extends Omit<z.output<typeof factionSchema>, 'id'
   body: string;
 }
 
+/** One explained rule term, e.g. `Sustained Hits X` and what it does. */
+export interface GlossaryEntry {
+  term: string;
+  text: string;
+}
+
+export interface Glossary extends Omit<z.output<typeof glossarySchema>, 'id'> {
+  id: string;
+  entries: GlossaryEntry[];
+}
+
 /** Any record, as parsed from one file. */
-export type RulesRecord = FactionRecord | Unit | Detachment | Muster;
+export type RulesRecord = FactionRecord | Unit | Detachment | Muster | Glossary;
 
 export interface Faction extends FactionRecord {
   /** Sorted by name. */

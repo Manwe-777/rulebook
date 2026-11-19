@@ -273,7 +273,7 @@ describe('releases', () => {
 
     const core = await eventually(
       () => stranger.releaseFiles('core', coreHash),
-      (f) => f.length === 1,
+      (f) => f.length === demo('core').length,
     );
 
     const library = Library.fromFiles([...files, ...core]);

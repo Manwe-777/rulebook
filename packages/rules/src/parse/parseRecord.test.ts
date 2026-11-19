@@ -208,3 +208,14 @@ describe('recordKind', () => {
     expect(recordKind('---\nkind: Unit Record\n---\n')).toBeNull();
   });
 });
+
+describe('glossary records', () => {
+  it('each ### heading is a term with its explanation', () => {
+    const result = parseRecord('---\nkind: glossary\nname: G\n---\n\nIntro.\n\n### Lethal Hits\n\nWounds.\n', 'g', 'g');
+
+    expect(result.ok && result.value).toMatchObject({
+      kind: 'glossary',
+      entries: [{ term: 'Lethal Hits', text: 'Wounds.' }],
+    });
+  });
+});

@@ -195,6 +195,30 @@ Detachment points, enhancement limits and dispositions above follow the 11th edi
 Strike Force; the other values show the shape only and come from the current muster guide. Battle sizes may override
 any limit (`battleSizes[].overrides`).
 
+## Glossary (`kind: glossary`, faction `core`)
+
+Rule terms explained in the community's own words: weapon abilities, core abilities, keywords. The apps open an entry
+when a weapon tag or ability is tapped.
+
+```markdown
+---
+kind: glossary
+name: Core rules glossary
+---
+
+### Sustained Hits X
+
+A Critical Hit scores X extra hits.
+
+### Anti-keyword X+
+
+An attack against a unit with that keyword scores a Critical Wound on an unmodified wound roll of X or more.
+```
+
+A term matches whatever value a datasheet gives it: a trailing number, dice, `X+` or distance is ignored (`SUSTAINED
+HITS 2` finds `Sustained Hits X`, `Scouts 9"` finds `Scouts`), and every `ANTI-…` tag finds the `Anti-…` entry. The
+core folder may hold several glossary records.
+
 ## Release
 
 A fixed snapshot of one faction, signed by a maintainer (see [sharing.md](sharing.md)).

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import { Library } from '../library/Library';
 import { loadDemoFiles } from '../testing/loadDemoFiles';
 import { detachmentTags } from './detachmentTags';
+import { glossaryKey } from './glossaryKey';
 import { keywordKey } from './keywordKey';
 import { recordPath } from './recordPath';
 import { slugify } from './slugify';
@@ -80,5 +81,26 @@ describe('tally', () => {
     ]);
 
     expect(tally([])).toEqual([]);
+  });
+});
+
+describe('glossaryKey and Library.explain', () => {
+  it('finds a term whatever value a weapon or ability gives it', () => {
+    expect(glossaryKey('SUSTAINED HITS 2')).toBe(glossaryKey('Sustained Hits X'));
+    expect(glossaryKey('RAPID FIRE 3')).toBe('RAPID FIRE');
+    expect(glossaryKey('Feel No Pain 4+')).toBe(glossaryKey('Feel No Pain X+'));
+    expect(glossaryKey('Deadly Demise D6')).toBe('DEADLY DEMISE');
+    expect(glossaryKey('Scouts 9"')).toBe('SCOUTS');
+    expect(glossaryKey('SUSTAINED HITS D3')).toBe('SUSTAINED HITS');
+    expect(glossaryKey('ANTI-VEHICLE 3+')).toBe(glossaryKey('Anti-keyword X+'));
+    expect(glossaryKey('[LETHAL HITS]')).toBe('LETHAL HITS');
+  });
+
+  it('the library explains terms from the core glossary, and nothing it does not know', () => {
+    const library = Library.fromFiles(loadDemoFiles());
+
+    expect(library.explain('ANTI-INFANTRY 4+')?.term).toBe('Anti-keyword X+');
+    expect(library.explain('Twin-linked')?.text).toContain('Re-roll');
+    expect(library.explain('Made-up rule')).toBeUndefined();
   });
 });

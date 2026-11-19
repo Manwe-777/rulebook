@@ -45,9 +45,10 @@ export default function UnitPanel({ library, list, entry, unit, showAll, role }:
           </li>
         ))}
       </ul>
-      <WeaponTable title="Ranged weapons" skill="BS" rows={ranged} />
-      <WeaponTable title="Melee weapons" skill="WS" rows={melee} />
+      <WeaponTable library={library} title="Ranged weapons" skill="BS" rows={ranged} />
+      <WeaponTable library={library} title="Melee weapons" skill="WS" rows={melee} />
       <UnitAbilities
+        library={library}
         unit={unit}
         wargearRules={carriedWargearRules(unit, carried, showAll)}
         items={entryItems(library, list, entry)}

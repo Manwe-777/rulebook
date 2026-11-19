@@ -4,6 +4,7 @@ import type { ParseResult, RulesRecord } from '../types';
 import { buildDetachment } from './buildDetachment';
 import { buildUnit } from './buildUnit';
 import { readFrontmatter } from './readFrontmatter';
+import { splitEntries } from './splitEntries';
 import { splitSections } from './splitSections';
 
 function build(data: ReturnType<typeof recordSchema.parse>, body: string, id: string) {
@@ -14,6 +15,12 @@ function build(data: ReturnType<typeof recordSchema.parse>, body: string, id: st
       return buildDetachment(data, body, id);
     case 'faction':
       return { value: { ...data, id, body: body.trim() }, errors: [] };
+
+    case 'glossary': {
+      const entries = splitEntries(body).entries.map(({ heading, text }) => ({ term: heading, text }));
+
+      return { value: { ...data, id, entries }, errors: [] };
+    }
 
     case 'muster': {
       const { sections, errors } = splitSections(body, MUSTER_SECTIONS);

@@ -1,6 +1,8 @@
 import type { Unit } from '@rulebook/rules';
+import { Fragment } from 'react';
 
 import Markdown from '../common/Markdown';
+import RuleTerm from '../common/RuleTerm';
 import SectionPanel from './SectionPanel';
 
 function NamedList({ label, items }: { label: string; items: string[] }) {
@@ -8,7 +10,15 @@ function NamedList({ label, items }: { label: string; items: string[] }) {
 
   return (
     <p className="dotted-rule mb-2 pb-2">
-      {label}: <strong className="font-bold">{items.join(', ')}</strong>
+      {label}:{' '}
+      <strong className="font-bold">
+        {items.map((item, i) => (
+          <Fragment key={item}>
+            {i > 0 && ', '}
+            <RuleTerm term={item} />
+          </Fragment>
+        ))}
+      </strong>
     </p>
   );
 }

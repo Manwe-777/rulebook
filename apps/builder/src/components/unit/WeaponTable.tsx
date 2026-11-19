@@ -1,8 +1,10 @@
-import type { MeleeWeapon, RangedWeapon } from '@rulebook/rules';
+import type { Library, MeleeWeapon, RangedWeapon } from '@rulebook/rules';
 
 import type { WeaponRow } from '../../utils/weaponRows';
+import RuleTerms from './RuleTerms';
 
 interface Props {
+  library: Library;
   title: string;
   skill: 'BS' | 'WS';
   rows: WeaponRow<RangedWeapon | MeleeWeapon>[];
@@ -12,7 +14,7 @@ const HEAD = 'px-1 py-1 text-center font-bold';
 const CELL = 'px-1 py-1 text-center align-top';
 
 /** Weapons with how many the unit carries; weapons it doesn't carry (shown with "show all") are dimmed. */
-export default function WeaponTable({ title, skill, rows }: Props) {
+export default function WeaponTable({ library, title, skill, rows }: Props) {
   if (!rows.length) return null;
 
   return (
@@ -40,7 +42,9 @@ export default function WeaponTable({ title, skill, rows }: Props) {
             <td className="py-1 pr-1 align-top">
               {weapon.name}
               {weapon.tags.length > 0 && (
-                <span className="block text-xs text-text/70 uppercase">[{weapon.tags.join(', ')}]</span>
+                <span className="block text-xs text-text/70 uppercase">
+                  [<RuleTerms library={library} terms={weapon.tags} />]
+                </span>
               )}
             </td>
             <td className={CELL}>{'range' in weapon ? weapon.range : 'Melee'}</td>

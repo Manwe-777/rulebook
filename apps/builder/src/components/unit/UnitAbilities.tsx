@@ -1,8 +1,10 @@
-import type { Enhancement, Unit } from '@rulebook/rules';
+import type { Enhancement, Library, Unit } from '@rulebook/rules';
 
 import RulesText from './RulesText';
+import RuleTerms from './RuleTerms';
 
 interface Props {
+  library: Library;
   unit: Unit;
   /** The unit's wargear abilities, already narrowed to what it carries. */
   wargearRules: string | undefined;
@@ -12,11 +14,11 @@ interface Props {
 const SUBHEAD = 'mt-2 font-bold uppercase first:mt-0';
 
 /** Core and faction abilities, the unit's own, its wargear's, and its enhancement or upgrade. */
-export default function UnitAbilities({ unit, wargearRules, items }: Props) {
+export default function UnitAbilities({ library, unit, wargearRules, items }: Props) {
   const named = (label: string, list: string[]) =>
     list.length > 0 && (
       <p>
-        <span className="font-bold">{label}:</span> {list.join(', ')}
+        <span className="font-bold">{label}:</span> <RuleTerms library={library} terms={list} />
       </p>
     );
 

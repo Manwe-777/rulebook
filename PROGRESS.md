@@ -51,6 +51,11 @@
   limits 2 / 4. `anyLoneDetachment` in the muster record covers the announced "any single detachment" rule. The builder
   shows each detachment's DP, disposition and tags, a DP counter and the disposition picker; the rulebook and the
   army sheet show DP and disposition. Local relay and browser data were reset (no migration: nothing was deployed).
+- Rule explanations: a `glossary` record in `core` (one `###` per term, in our own words) explains weapon abilities and
+  core abilities. Tapping a tag or core ability on a rulebook datasheet or in the builder's play view opens it (native
+  popover). The starter glossary covers the weapon abilities, Feel No Pain and Deadly Demise; core abilities that
+  changed in 11th edition (Deep Strike, Scouts, Stealth, Lone Operative, Infiltrators) wait for the core rules.
+  Relays and release manifests accept any record kind, so new kinds need no relay update.
 - Play view in the builder: tapping a unit's name opens it (`?unit=`, so back closes it) as it was built: stats with
   invulnerable save and base size (models with the same stats share a row), what each model type carries, only the
   weapons it carries with how many, its abilities, the rules of the wargear it carries, its enhancement or upgrade, and
@@ -114,6 +119,10 @@
   model types whose models carry different gear (E-COGs); passengers taking no transport space (by model type);
   detachments granting keywords (Beserks gain BATTLELINE); enhancements that need a weapon; splitting a unit across
   transports at deployment. These are written as notes in the records for now.
+
+- The glossary needs checking against the 11th edition core rules, and the 11th edition core abilities adding. The
+  editor can't create or edit glossary records yet.
+- The play view hasn't been checked at phone width in the browser (the window manager kept the browser full width).
 
 ## Next
 
