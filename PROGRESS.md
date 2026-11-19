@@ -60,7 +60,7 @@
   invulnerable save and base size (models with the same stats share a row), what each model type carries, only the
   weapons it carries with how many, its abilities, the rules of the wargear it carries, its enhancement or upgrade, and
   the leaders and support units attached to it. "Show all wargear" lists every weapon (the ones not carried dimmed)
-  and every wargear rule. Checked against the tournament lists.
+  and every wargear rule. Checked against the tournament lists and at 390 px width.
 - Wargear options: a count per choice, so two models can take different weapons from one option; headings name the
   model type; datasheets say "This model" / "The Theyn" and count repeated default wargear. Profiles carry base sizes.
 - Checked against a real faction: Leagues of Votann (22 datasheets, 10 detachments, rules summarised in our own
@@ -122,7 +122,6 @@
 
 - The glossary needs checking against the 11th edition core rules, and the 11th edition core abilities adding. The
   editor can't create or edit glossary records yet.
-- The play view hasn't been checked at phone width in the browser (the window manager kept the browser full width).
 
 ## Next
 
