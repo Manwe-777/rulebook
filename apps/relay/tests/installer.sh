@@ -4,13 +4,13 @@
 # key and the data, a tampered download is refused, uninstall keeps the data
 # and --purge removes it.
 #
-#   RULEBOOK_SECRET=<hex> tests/installer.sh
+#   tests/installer.sh
 #
-# RULEBOOK_SECRET is a throwaway owner key (hex) used to publish. Needs Docker,
-# unprivileged (see the docker run below).
+# Publishes with a throwaway owner key made for the run (or RULEBOOK_SECRET,
+# hex). Needs Docker, unprivileged (see the docker run below).
 set -euo pipefail
 cd "$(dirname "$0")/.."
-: "${RULEBOOK_SECRET:?set RULEBOOK_SECRET to a throwaway owner secret key (hex)}"
+RULEBOOK_SECRET=${RULEBOOK_SECRET:-$(node -e 'import("tool-db").then(t => console.log(t.generateSecretKey()))')}
 OWNER_HEX=$(node -e 'import("tool-db").then(t => console.log(t.getPublicKey(process.argv[1])))' "$RULEBOOK_SECRET")
 OWNER=$(node -e 'import("tool-db").then(t => console.log(t.npubEncode(process.argv[1])))' "$OWNER_HEX")
 WORK=$(mktemp -d)

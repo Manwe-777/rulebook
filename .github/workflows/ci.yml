@@ -23,6 +23,18 @@ jobs:
       - run: npm run format:check
       - run: npm test
 
+  # The relay installer under systemd in Docker: install, publish, update, tampered download, uninstall.
+  relay-installer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: apps/relay/tests/installer.sh
+
   # Both apps on GitHub Pages: the rulebook at the site root, the list builder under builder/.
   pages:
     needs: check
@@ -63,7 +75,7 @@ jobs:
 
   # Versions from commit types; each release carries the relay tarball, install.sh and SHA256SUMS.
   release:
-    needs: check
+    needs: [check, relay-installer]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:

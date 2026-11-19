@@ -62,7 +62,7 @@
   cleared. Hidden content is checked on every read.
 
 - No relay server is chosen yet; `RULEBOOK_RELAYS` and `RULEBOOK_OWNER` must be set before the Pages build is useful.
-- `tests/installer.sh` for the relay runs by hand (Docker with systemd), not in CI.
+- The relay installer job in CI (systemd in Docker on GitHub's runners) hasn't run there yet; it passes locally.
 - First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
   the whole rules library.
 

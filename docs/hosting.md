@@ -71,8 +71,9 @@ semantic-release runs on pushes to `main` after the check job. `feat` and `fix` 
 gets the relay files built by `apps/relay/scripts/package.mjs`.
 
 `apps/relay/tests/installer.sh` runs the installer in a Docker container with systemd: install, publish the demo
-faction, update, a tampered download, uninstall and purge. It needs Docker and a throwaway owner secret key:
+faction, update, a tampered download, uninstall and purge. CI runs it on every push, and releases wait for it. Locally
+it needs Docker:
 
 ```sh
-cd apps/relay && node scripts/package.mjs && RULEBOOK_SECRET=<hex> tests/installer.sh
+apps/relay/tests/installer.sh
 ```
