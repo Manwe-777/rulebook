@@ -1,6 +1,7 @@
 import { type ListEntry, type Unit, wargearAllowance, wargearName } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
+import { optionLabel } from '../utils/optionLabel';
 import { INPUT, LABEL } from './styles';
 
 interface Props {
@@ -10,50 +11,51 @@ interface Props {
   onChange: (draft: ArmyDraft) => void;
 }
 
-/** One row per wargear option: how many models take it, and which choice when there are several. */
+/**
+ * One block per wargear option, with a count for each of its choices. The choices share the option's limit, so two
+ * models can take different weapons from the same list.
+ */
 export default function WargearFields({ draft, entry, unit, onChange }: Props) {
+  const names = (ids: string[]) => ids.map((id) => wargearName(unit, id)).join(' + ');
+
   return unit.wargearOptions.map((option) => {
-    const taken = entry.wargear.find((w) => w.option === option.id);
-    const models = taken?.models ?? 0;
-    const choice = taken?.choice ?? option.with[0];
+    const rows = entry.wargear.filter((w) => w.option === option.id);
     const max = wargearAllowance(unit, entry.models, option);
-    const names = (ids: string[]) => ids.map((id) => wargearName(unit, id)).join(' + ');
-    const set = (n: number, c: string[]) => onChange(draft.setWargear(entry.id, option.id, n, c));
+    const used = rows.reduce((sum, w) => sum + w.models, 0);
+    const countOf = (choice: string[]) => rows.find((w) => w.choice.join(',') === choice.join(','))?.models ?? 0;
 
     return (
-      <div key={option.id} className="flex flex-wrap items-end gap-2">
-        <label className={LABEL}>
-          {option.replace.length ? `Swap ${names(option.replace)}` : 'Add'}
-          <input
-            type="number"
-            min={0}
-            max={max}
-            className={`${INPUT} w-20`}
-            value={models}
-            onChange={(e) => set(Math.max(0, Number(e.target.value) || 0), choice)}
-          />
-        </label>
-        {option.with.length > 1 ? (
-          <select
-            aria-label={`${option.id} choice`}
-            className={INPUT}
-            value={choice.join(',')}
-            onChange={(e) => set(models, e.target.value.split(','))}
-          >
-            {option.with.map((list) => (
-              <option key={list.join(',')} value={list.join(',')}>
-                {names(list)}
-              </option>
-            ))}
-          </select>
-        ) : (
-          <span className="pb-1">for {names(choice)}</span>
-        )}
-        <span className="pb-1 text-sm text-text/60">
-          up to {max}
-          {option.points ? `, +${option.points} pts each` : ''}
-        </span>
-      </div>
+      <fieldset key={option.id} className="flex flex-col gap-1">
+        <legend className={LABEL}>
+          {optionLabel(unit, option)}
+          <span className="ml-2 font-normal text-text/60 normal-case">
+            up to {max}
+            {option.points ? `, +${option.points} pts each` : ''}
+          </span>
+        </legend>
+        {option.with.map((choice) => {
+          const count = countOf(choice);
+          const room = max - used + count;
+
+          return (
+            <label key={choice.join(',')} className="flex items-center gap-2">
+              <input
+                type="number"
+                min={0}
+                max={room}
+                className={`${INPUT} w-16`}
+                value={count}
+                onChange={(e) => {
+                  const n = Math.min(room, Math.max(0, Number(e.target.value) || 0));
+
+                  onChange(draft.setWargear(entry.id, option.id, n, choice));
+                }}
+              />
+              <span>{names(choice)}</span>
+            </label>
+          );
+        })}
+      </fieldset>
     );
   });
 }

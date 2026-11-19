@@ -8,6 +8,7 @@ import { loadBundledFiles } from '../sources/loadBundledFiles';
 import { attachTargets } from './attachTargets';
 import { itemOptions } from './itemOptions';
 import { loadSavedArmies } from './loadSavedArmies';
+import { optionLabel } from './optionLabel';
 import { saveArmies } from './saveArmies';
 
 const library = Library.fromFiles(loadBundledFiles());
@@ -54,6 +55,16 @@ describe('form options', () => {
   const captain = carrier.draft.addUnit(library, 'field-captain');
 
   draft = captain.draft;
+
+  it('wargear options say what they swap, and for which model type when the unit has several', () => {
+    const unit = (id: string) => library.unit('demo-host', id)!.unit;
+
+    expect(optionLabel(unit('line-troopers'), unit('line-troopers').wargearOptions[0])).toBe(
+      'Trooper: swap Service rifle',
+    );
+
+    expect(optionLabel(unit('field-captain'), unit('field-captain').wargearOptions[0])).toBe('Swap Service pistol');
+  });
 
   it('a leader can join the bodyguards on its datasheet that are in the list', () => {
     const targets = attachTargets(draft.list, library, draft.entry(captain.id)!);

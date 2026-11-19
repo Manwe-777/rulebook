@@ -65,6 +65,17 @@ describe('datasheet text', () => {
     ]);
   });
 
+  it('counts wargear a model carries more than once', () => {
+    const carrier = unit('armoured-carrier');
+
+    const twin = {
+      ...carrier,
+      composition: { ...carrier.composition, wargear: { 'Armoured Carrier': ['heavy-stubber', 'heavy-stubber'] } },
+    };
+
+    expect(equipmentLines(twin)).toEqual([{ model: 'Armoured Carrier', items: '2 × Heavy stubber' }]);
+  });
+
   it('lists the cost of each unit size', () => {
     expect(pointsLines(unit('veteran-squad'))).toEqual(['5 models: 90 pts', '10 models: 180 pts']);
     expect(pointsLines(unit('field-captain'))).toEqual(['1 model: 70 pts']);
@@ -89,7 +100,7 @@ describe('datasheet text', () => {
 
   it('describes each kind of wargear limit, with its cost', () => {
     expect(wargearOptionLines(unit('field-captain'))).toEqual([
-      'Any number of models can replace Service pistol with Grenade launcher.',
+      'This model can replace Service pistol with Grenade launcher.',
     ]);
 
     expect(wargearOptionLines(unit('line-troopers'))).toEqual([

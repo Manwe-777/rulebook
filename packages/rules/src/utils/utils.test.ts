@@ -6,6 +6,7 @@ import { detachmentTags } from './detachmentTags';
 import { keywordKey } from './keywordKey';
 import { recordPath } from './recordPath';
 import { slugify } from './slugify';
+import { tally } from './tally';
 import { wargearName } from './wargearName';
 
 describe('recordPath', () => {
@@ -68,5 +69,16 @@ describe('wargearName', () => {
     expect(wargearName(unit('marshal-venn'), 'marshals-blade')).toBe("Marshal's blade");
     expect(wargearName(unit('line-troopers'), 'signal-flare')).toBe('Signal flare');
     expect(wargearName(unit('marshal-venn'), 'lance')).toBe('lance');
+  });
+});
+
+describe('tally', () => {
+  it('counts each id once, in order of first appearance', () => {
+    expect(tally(['a', 'b', 'a'])).toEqual([
+      { id: 'a', count: 2 },
+      { id: 'b', count: 1 },
+    ]);
+
+    expect(tally([])).toEqual([]);
   });
 });

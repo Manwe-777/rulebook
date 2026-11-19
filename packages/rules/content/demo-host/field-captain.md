@@ -3,7 +3,7 @@ kind: unit
 name: Field Captain
 roles: [character]
 profiles:
-  - { name: Field Captain, M: 6", T: 4, Sv: 3+, InSv: 5+, W: 5, Ld: 6+, OC: 1 }
+  - { name: Field Captain, M: 6", T: 4, Sv: 3+, InSv: 5+, W: 5, Ld: 6+, OC: 1, base: 40mm }
 ranged:
   - { name: Service pistol, tags: [PISTOL], range: 12", A: 1, BS: 2+, S: 4, AP: -1, D: 1 }
   - { name: Grenade launcher, tags: [BLAST], range: 24", A: D3, BS: 3+, S: 4, AP: 0, D: 1 }

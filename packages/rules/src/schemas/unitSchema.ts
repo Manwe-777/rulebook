@@ -13,6 +13,8 @@ const profile = z.strictObject({
   W: stat,
   Ld: stat,
   OC: stat,
+  /** Base size as printed on the box, e.g. `32mm` or `90 x 52mm oval`. */
+  base: text.optional(),
 });
 
 /**

@@ -121,9 +121,15 @@ export class ArmyDraft {
   }
 
   /** Sets how many models take a wargear option and which list they take; 0 models removes the option. */
+  /**
+   * How many models take one choice of a wargear option. Other choices of the same option keep their own counts, so
+   * two models can pick different weapons from one list; 0 removes that choice.
+   */
   setWargear(id: string, option: string, models: number, choice: string[]): ArmyDraft {
+    const same = (w: Wargear) => w.option === option && w.choice.join(',') === choice.join(',');
+
     return this.withEntry(id, (e) => {
-      const others = e.wargear.filter((w) => w.option !== option);
+      const others = e.wargear.filter((w) => !same(w));
       const row: Wargear = { option, models, choice };
 
       return { ...e, wargear: models > 0 ? [...others, row] : others };

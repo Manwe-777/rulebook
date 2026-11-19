@@ -64,7 +64,17 @@ describe('ArmyDraft', () => {
     expect(both.toggleDetachment(library, 'shield-wall').list.disposition).toBeUndefined();
   });
 
-  it('setting wargear to 0 models removes the option, and changing it replaces the old row', () => {
+  it('two models can take different choices of one option; each choice keeps its own count', () => {
+    const vets = ArmyDraft.create(library, FACTION).addUnit(library, 'veteran-squad');
+    const both = vets.draft.setWargear(vets.id, 'melta', 1, ['melta-gun']).setWargear(vets.id, 'melta', 1, ['x']);
+
+    expect(both.entry(vets.id)?.wargear).toEqual([
+      { option: 'melta', models: 1, choice: ['melta-gun'] },
+      { option: 'melta', models: 1, choice: ['x'] },
+    ]);
+  });
+
+  it('setting wargear to 0 models removes the choice, and changing it replaces the old row', () => {
     const vets = ArmyDraft.create(library, FACTION).addUnit(library, 'veteran-squad');
     const two = vets.draft.setWargear(vets.id, 'melta', 2, ['melta-gun']);
 

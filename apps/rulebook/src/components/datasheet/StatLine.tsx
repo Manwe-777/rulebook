@@ -6,7 +6,10 @@ import StatBox from './StatBox';
 
 const STATS = ['M', 'T', 'Sv', 'W', 'Ld', 'OC'] as const;
 
-/** Stat boxes for every model profile. Profile names are shown only when the unit has more than one. */
+/**
+ * Stat boxes for every model profile, with its base size when known. Profile names are shown only when the unit has
+ * more than one.
+ */
 export default function StatLine({ profiles }: { profiles: Profile[] }) {
   const named = profiles.length > 1;
 
@@ -23,7 +26,10 @@ export default function StatLine({ profiles }: { profiles: Profile[] }) {
           {STATS.map((s) => (
             <StatBox key={s} value={p[s]} />
           ))}
-          <div className="pl-1 text-sm font-bold uppercase">{named ? p.name : ''}</div>
+          <div className="pl-1 text-sm font-bold uppercase">
+            {named ? p.name : ''}
+            {p.base && <span className="block text-xs font-normal normal-case opacity-80">Base {p.base}</span>}
+          </div>
           {p.InSv && <InvulnRow value={p.InSv} />}
         </Fragment>
       ))}
