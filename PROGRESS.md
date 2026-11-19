@@ -45,6 +45,10 @@
   options: the release builds the project owner into `install.sh`, and with no owner it runs as an open store. See `docs/hosting.md`.
 - Released rules are cached in IndexedDB (per owner key, shared by both apps on one site): shown at once on the next
   visit, kept when the relays can't be reached. `owner-key` no longer echoes the password.
+- List builder as a PWA (installable, precached, works offline with cached releases).
+- Unit photos in the builder: players add a photo of their own models per unit, crop it to a square (drag or pinch,
+  zoom around the centre, quarter turns, always covering the square; preview and saved image drawn by the same code),
+  saved as a 320 px WebP in IndexedDB and shown on unit cards and in the unit list. Checked in the browser.
 - Smaller first load: tool-db, the editor and the account page load on demand, libraries are split into chunks that
   stay cached across deploys (rulebook 832 → ~620 kB, builder 643 → ~460 kB before gzip).
 - List builder (`apps/builder`, phase 8 done before the editor): pick faction, battle size and detachments, add units,
@@ -70,7 +74,7 @@
 
 - Push the repo, set the Pages variables, create the owner key and install a relay (`docs/hosting.md`). Editor follow-ups: form fields for the common frontmatter
   (stats, weapons, points) next to the text editor, a page for the core muster record and the hidden list, and merging
-  outdated proposals. Builder follow-ups: saved list library and export, sharing
+  outdated proposals. Builder follow-ups: backing up photos with the lists, saved list library and export, sharing
   lists over tool-db, battle formation (reserves, transports) in the UI, only offering upgrades a unit can take.
 - Muster values (battle sizes, detachment count, datasheet and enhancement limits) must be filled in from the current
   muster guide; see the open questions in `docs/design.md`.

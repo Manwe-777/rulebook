@@ -12,3 +12,7 @@ export const LABEL = 'flex flex-col gap-1 text-sm font-semibold tracking-wide te
 
 /** Plain text button. */
 export const BUTTON = 'rounded bg-bar px-3 py-1 font-bold tracking-wide text-white uppercase hover:bg-bar-dark';
+
+/** Secondary button on dark panels. */
+export const BUTTON_QUIET =
+  'rounded border border-white/25 px-3 py-1 font-bold tracking-wide text-text uppercase hover:bg-white/10';

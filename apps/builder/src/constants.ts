@@ -18,3 +18,16 @@ export const OWNER_KEY: string = ownerKeyHex(import.meta.env.VITE_RULEBOOK_OWNER
 
 /** Address of the rulebook, set with `VITE_RULEBOOK_URL`. Empty hides the link. */
 export const RULEBOOK_URL: string = import.meta.env.VITE_RULEBOOK_URL ?? '';
+
+/** IndexedDB database of players' photos of their own models (never uploaded anywhere). */
+export const PHOTO_DB = 'rulebook-photos';
+
+/** Saved photos are squares this many pixels wide. */
+export const PHOTO_SIZE = 320;
+
+/** WebP quality of saved photos (0–1). */
+export const PHOTO_QUALITY = 0.85;
+
+/** Zoom range of the photo crop: 1 just covers the square. */
+export const MIN_ZOOM = 1;
+export const MAX_ZOOM = 4;

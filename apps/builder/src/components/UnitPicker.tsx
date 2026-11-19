@@ -1,6 +1,7 @@
 import type { Library } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
+import UnitPhoto from './photos/UnitPhoto';
 import { PANEL, PANEL_TITLE } from './styles';
 
 interface Props {
@@ -19,6 +20,7 @@ export default function UnitPicker({ draft, library, onChange }: Props) {
       <ul>
         {units.map((unit) => (
           <li key={unit.id} className="flex items-center gap-2 border-b border-white/10 px-3 py-1.5 last:border-0">
+            <UnitPhoto faction={draft.list.faction} unit={unit.id} name={unit.name} size={28} placeholder={false} />
             <span className="flex-1">
               <span className="font-semibold">{unit.name}</span>
               <span className="ml-2 text-xs text-text/60 uppercase">{unit.roles.join(', ')}</span>
