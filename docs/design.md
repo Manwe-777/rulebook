@@ -54,6 +54,9 @@ the same way.
 - Roles are per faction. The core rules data (battle sizes, muster limits, core abilities) is the faction `core`, with
   its own maintainers.
 - Anyone signed in can ask to contribute to a faction; maintainers see the requests in the review queue.
+- The owner's public key is the only fixed fact. Every other permission is data signed along the chain owner →
+  maintainers → contributors, and anyone who checks a write (the apps on every read, relays that know the owner) works
+  it out from that one key.
 
 ## Identity
 
@@ -78,7 +81,9 @@ Identities are Nostr keys; a role belongs to a public key. The apps never send a
 - The owner key is made offline with `npm run owner-key -w @rulebook/relay`, which prints the public key and saves the
   secret key only as an `ncryptsec` file outside the repository. The owner keeps that file in a password manager and
   imports the key into an extension for owner actions. The public key is built into the apps (`VITE_RULEBOOK_OWNER`)
-  and given to the relay (`RULEBOOK_OWNER`).
+  and into the relay installer (`RULEBOOK_OWNER`).
+- The owner's secret key can't be replaced: without it nobody can appoint or remove maintainers or hide content. The
+  `ncryptsec` file needs at least one backup kept apart from the password manager.
 
 ## Content policy
 
