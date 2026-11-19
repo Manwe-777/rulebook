@@ -12,11 +12,14 @@ function pageName(library: Library, factionId: string, rest: string[]): string |
   return null;
 }
 
+/** Pages that aren't factions, by their path. */
+const FIXED_PAGES: Record<string, string> = { account: 'Account', print: 'Army sheet' };
+
 /** Browser tab title for a page path: `Boyz · Orks · Rulebook`, `Orks · Rulebook`, or the site name. */
 export function titleForPath(library: Library, path: string): string {
   const [factionId, ...rest] = path.split('/').filter(Boolean);
 
-  if (factionId === 'account' && rest.length === 0) return `Account · ${SITE_NAME}`;
+  if (rest.length === 0 && factionId in FIXED_PAGES) return `${FIXED_PAGES[factionId]} · ${SITE_NAME}`;
   const faction = factionId ? library.faction(factionId) : undefined;
   const page = faction ? pageName(library, faction.id, rest) : undefined;
 

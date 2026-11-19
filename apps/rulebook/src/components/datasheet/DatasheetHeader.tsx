@@ -12,7 +12,7 @@ export default function DatasheetHeader({ unit, theme }: { unit: Unit; theme: Fa
       {theme.icon && (
         <FactionIcon name={theme.icon} className="absolute -top-2 right-2 text-[10rem] leading-none text-white/15" />
       )}
-      <div className="relative flex flex-col gap-4 px-4 pt-6 pb-5 md:flex-row md:items-start md:px-10">
+      <div className="relative flex flex-col gap-4 px-4 pt-6 pb-5 wide:flex-row wide:items-start wide:px-10">
         <div className="shrink-0">
           <h2 className="mb-2 text-3xl leading-none font-extrabold tracking-wide uppercase drop-shadow sm:text-4xl">
             {unit.name}
@@ -25,10 +25,10 @@ export default function DatasheetHeader({ unit, theme }: { unit: Unit; theme: Fa
           <StatLine profiles={unit.profiles} />
         </div>
         {unit.image && (
-          <img src={unit.image} alt="" className="mx-auto max-h-48 object-contain drop-shadow-xl md:-my-4" />
+          <img src={unit.image} alt="" className="mx-auto max-h-48 object-contain drop-shadow-xl wide:-my-4" />
         )}
         {unit.sections.description && (
-          <div className="text-sm leading-snug font-medium italic drop-shadow md:ml-auto md:max-w-sm md:pt-10">
+          <div className="text-sm leading-snug font-medium italic drop-shadow wide:ml-auto wide:max-w-sm wide:pt-10">
             <Markdown>{unit.sections.description}</Markdown>
           </div>
         )}

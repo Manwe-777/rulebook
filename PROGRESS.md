@@ -45,6 +45,11 @@
   options: the release builds the project owner into `install.sh`, and with no owner it runs as an open store. See `docs/hosting.md`.
 - Released rules are cached in IndexedDB (per owner key, shared by both apps on one site): shown at once on the next
   visit, kept when the relays can't be reached. `owner-key` no longer echoes the password.
+- Printable army sheet: the builder's Print button opens the rulebook's `/print` page with the list after `#army=`
+  (base64url, never sent to a server). Checkboxes (remembered per browser) for roster, army rules, detachment rules
+  with the enhancements taken, stratagems and datasheets (each once). Roster brackets combined units with their total
+  and spells out wargear swaps. Print CSS keeps the sheet colours, drops the app chrome and starts each section on a
+  new page; datasheets keep their two-column layout on paper (`wide:` variant = md or print). Checked as a PDF.
 - Faction colours and icons in the builder: the faction record's `color` tints an open army's page and its card on the
   armies screen (darkened when needed so white text keeps 4.5:1 contrast); its `icon` is shown on the card's banner
   (with a faint large copy behind) and next to the army name. The demo faction uses the generic `sword-01` glyph.

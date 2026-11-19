@@ -1,7 +1,6 @@
-import type { Issue, Library, ListEntry } from '@rulebook/rules';
+import { groupEntries, type Issue, type Library, type ListEntry } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
-import { groupEntries } from '../utils/groupEntries';
 import CombinedUnit from './CombinedUnit';
 import EntryCard from './EntryCard';
 

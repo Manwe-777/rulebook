@@ -25,9 +25,9 @@ export default function Datasheet({ unit, faction }: { unit: Unit; faction: Fact
       style={{ '--faction': theme.color } as CSSProperties}
     >
       <DatasheetHeader unit={unit} theme={theme} />
-      <div className="sheet-paper px-3 pb-5 sm:px-4 md:px-10">
-        <div className="grid md:grid-cols-[3fr_2fr]">
-          <div className="flex min-w-0 flex-col gap-4 py-4 md:border-r-2 md:border-bar md:pr-4">
+      <div className="sheet-paper px-3 pb-5 sm:px-4 wide:px-10">
+        <div className="grid wide:grid-cols-[3fr_2fr]">
+          <div className="flex min-w-0 flex-col gap-4 py-4 wide:border-r-2 wide:border-bar wide:pr-4">
             <WeaponTable kind="ranged" weapons={unit.ranged} />
             <WeaponTable kind="melee" weapons={unit.melee} />
             {unit.leader && (
@@ -54,7 +54,7 @@ export default function Datasheet({ unit, faction }: { unit: Unit; faction: Fact
               </p>
             )}
           </div>
-          <div className="flex min-w-0 flex-col gap-4 py-4 md:pl-4">
+          <div className="flex min-w-0 flex-col gap-4 py-4 wide:pl-4">
             <AbilitiesPanel unit={unit} />
             <CompositionPanel unit={unit} />
             {sections.transport && (

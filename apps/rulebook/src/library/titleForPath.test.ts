@@ -21,6 +21,7 @@ describe('titleForPath', () => {
 
   it('names the account page and the editing pages', () => {
     expect(titleForPath(library, '/account')).toBe('Account · Rulebook');
+    expect(titleForPath(library, '/print')).toBe('Army sheet · Rulebook');
     expect(titleForPath(library, '/demo-host/edit')).toBe('Edit · Demo Host · Rulebook');
     expect(titleForPath(library, '/demo-host/edit/unit/field-captain')).toBe('Edit · Demo Host · Rulebook');
   });

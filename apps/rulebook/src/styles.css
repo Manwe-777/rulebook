@@ -7,6 +7,13 @@
 @import '@fontsource/barlow-semi-condensed/800.css' layer(base);
 @import '@fontsource/share-tech-mono/400.css' layer(base);
 
+/* Two-column layouts from medium screens up, and always on paper (a printed page is narrower than `md`). */
+@custom-variant wide {
+  @media (width >= 48rem), print {
+    @slot;
+  }
+}
+
 @theme {
   --color-bg: #1b1d1a;
   --color-text: #ecebe4;
@@ -84,5 +91,26 @@
   /* Dotted rule between table rows and ability paragraphs. */
   .dotted-rule {
     border-bottom: 1px dotted var(--color-rule);
+  }
+}
+
+/* Printing (the army sheet): white paper, the sheet's colours kept, no shadows, page margins. */
+@media print {
+  @page {
+    margin: 10mm;
+  }
+
+  body {
+    background: white;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  article,
+  section {
+    box-shadow: none !important;
   }
 }

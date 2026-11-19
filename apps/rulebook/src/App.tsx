@@ -17,6 +17,8 @@ import { titleForPath } from './library/titleForPath';
 const AccountPage = lazy(() => import('./components/account/AccountPage'));
 const FactionWorkspace = lazy(() => import('./components/editor/FactionWorkspace'));
 const RecordEditor = lazy(() => import('./components/editor/RecordEditor'));
+// The army sheet the list builder links to.
+const PrintPage = lazy(() => import('./components/print/PrintPage'));
 
 /** Page layout and routes. The router and library provider are set up by the client or server entry. */
 export default function App() {
@@ -25,8 +27,8 @@ export default function App() {
   useDocumentTitle(titleForPath(library, useLocation().pathname));
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-6 font-sans text-text">
-      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-6 font-sans text-text print:max-w-none print:p-0">
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 print:hidden">
         <Link to="/" className="text-3xl font-extrabold tracking-wide uppercase">
           {SITE_NAME}
         </Link>
@@ -49,12 +51,13 @@ export default function App() {
           <Route path="/:faction/:unit" element={<UnitPage />} />
           <Route path="/:faction/detachment/:detachment" element={<DetachmentPage />} />
           <Route path="/account" element={<AccountPage />} />
+          <Route path="/print" element={<PrintPage />} />
           <Route path="/:faction/edit" element={<FactionWorkspace />} />
           <Route path="/:faction/edit/:kind/:id" element={<RecordEditor />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
-      <footer className="mt-auto text-xs text-text/60">
+      <footer className="mt-auto text-xs text-text/60 print:hidden">
         Icons:{' '}
         <a href={ICON_CREDIT.url} className="underline">
           {ICON_CREDIT.label}

@@ -1,4 +1,4 @@
-import type { ArmyList, ListEntry } from '@rulebook/rules';
+import type { ArmyList, ListEntry } from '../types';
 
 /** A unit with the leaders and support units attached to it (empty for a unit on its own). */
 export interface EntryGroup {

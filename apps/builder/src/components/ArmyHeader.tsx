@@ -1,6 +1,7 @@
-import type { Issue } from '@rulebook/rules';
+import { encodeListLink, type Issue } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
+import { RULEBOOK_URL } from '../constants';
 import FactionIcon from './FactionIcon';
 import { INPUT } from './styles';
 
@@ -40,6 +41,17 @@ export default function ArmyHeader({ draft, points, issues, icon, onChange }: Pr
       >
         {legal ? 'Legal' : `${errors} problem${errors === 1 ? '' : 's'}`}
       </span>
+      {RULEBOOK_URL && (
+        // The list goes after `#`, so it stays in the browser and never reaches a server.
+        <a
+          href={`${RULEBOOK_URL}print#army=${encodeListLink(draft.list)}`}
+          target="_blank"
+          rel="noopener"
+          className="rounded bg-bar px-3 py-1 text-lg font-extrabold tracking-wide text-white uppercase hover:bg-bar-dark"
+        >
+          Print
+        </a>
+      )}
     </header>
   );
 }

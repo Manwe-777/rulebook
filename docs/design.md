@@ -119,6 +119,9 @@ The project shares game data and players' own explanations of rules. It never sh
 - Every problem found in a list or a dataset is reported with a message and the entry it concerns; nothing throws.
 - The list builder is an installable app (PWA) that works offline with the releases cached on the device. It keeps any
   number of armies on the device; the open army is part of the address (`?army=<id>`).
+- The builder prints an army through the rulebook's print page: the list travels in the URL fragment (`#army=`), so
+  it never reaches a server. The sheet has the roster and, as the player picks, army rules, detachment rules with the
+  enhancements taken, stratagems and the army's datasheets.
 - Players can give each unit a photo of their own models. The photo is cropped to a square on the device (drag or
   pinch to place, zoom, quarter turns; the photo always covers the square), saved as a 320 px WebP in IndexedDB, and
   shown on the unit's card and in the unit list. Photos are kept per faction and unit, never leave the device, and

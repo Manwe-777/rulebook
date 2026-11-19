@@ -1,9 +1,8 @@
-import { Library } from '@rulebook/rules';
+import { groupEntries, Library } from '@rulebook/rules';
 import { describe, expect, it } from 'vitest';
 
 import { ArmyDraft } from '../army/ArmyDraft';
 import { loadBundledFiles } from '../sources/loadBundledFiles';
-import { groupEntries } from './groupEntries';
 
 const library = Library.fromFiles(loadBundledFiles());
 
