@@ -34,3 +34,6 @@ export const PHOTO_QUALITY = 0.85;
 /** Zoom range of the photo crop: 1 just covers the square. */
 export const MIN_ZOOM = 1;
 export const MAX_ZOOM = 4;
+
+/** Contrast that white text on a faction's colour must reach (WCAG AA for normal text). */
+export const MIN_TEXT_CONTRAST = 4.5;

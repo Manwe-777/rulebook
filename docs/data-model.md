@@ -48,6 +48,10 @@ resources: # optional: faction resources spent by rules, shown on the army sheet
 
 Body sections (`##`): `Description`, `Army rule` (one `###` per rule), and any free sections.
 
+`color` is the faction's colour in both apps: banners and datasheets in the rulebook; bars, headers, buttons and army
+cards in the list builder. The builder darkens colours too light for white text until they reach 4.5:1 contrast, so
+any colour is safe to pick. A unit's own `color` overrides the faction's on its datasheet.
+
 ## Unit (`kind: unit`)
 
 One datasheet.

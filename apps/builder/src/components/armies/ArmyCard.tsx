@@ -3,6 +3,7 @@ import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { SavedArmy } from '../../army/SavedArmies';
 import { armySummary } from '../../utils/armySummary';
+import { factionTint } from '../../utils/factionTint';
 import { formatAgo } from '../../utils/formatAgo';
 import { BUTTON_QUIET } from '../styles';
 import ArmyRulesLine from './ArmyRulesLine';
@@ -26,7 +27,11 @@ export default function ArmyCard({ army, library, release, now, onOpen, onDuplic
   const legal = s.errors === 0;
 
   return (
-    <li className="flex flex-col overflow-hidden rounded-lg bg-panel shadow-lg">
+    <li
+      className="flex flex-col overflow-hidden rounded-lg bg-panel shadow-lg"
+      style={factionTint(library.faction(army.list.faction)?.color)}
+    >
+      <span aria-hidden className="h-2 bg-bar" />
       <button type="button" className="flex flex-1 flex-col gap-2 p-3 text-left hover:bg-white/5" onClick={onOpen}>
         <span className="flex items-start gap-2">
           <span className="flex-1 text-xl font-extrabold">{army.list.name}</span>
