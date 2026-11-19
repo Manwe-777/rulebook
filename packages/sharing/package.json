@@ -1,0 +1,25 @@
+{
+  "name": "@rulebook/sharing",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./relay": "./src/relay/RulebookRelay.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@rulebook/rules": "*",
+    "@tool-db/nostr-relay": "1.0.0",
+    "tool-db": "3.0.0",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "vitest": "^5.1.1"
+  }
+}

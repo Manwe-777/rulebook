@@ -1,0 +1,88 @@
+@import 'tailwindcss';
+/* Third-party CSS goes in the base layer so the app's components and utilities can size its icons. */
+@import '@fontsource/barlow-semi-condensed/400.css' layer(base);
+@import '@fontsource/barlow-semi-condensed/500.css' layer(base);
+@import '@fontsource/barlow-semi-condensed/500-italic.css' layer(base);
+@import '@fontsource/barlow-semi-condensed/700.css' layer(base);
+@import '@fontsource/barlow-semi-condensed/800.css' layer(base);
+@import '@fontsource/share-tech-mono/400.css' layer(base);
+
+@theme {
+  --color-bg: #1b1d1a;
+  --color-text: #ecebe4;
+  --color-parchment: #e6e5de;
+  --color-parchment-dark: #d6d5cc;
+  --color-ink: #1e1f1c;
+  --color-ink-muted: #4a4b45;
+  --color-bar: #3d4a26;
+  --color-bar-dark: #2c3619;
+  --color-rule: #8d8c84;
+  --color-stat-box: #f4f3ee;
+  --font-sans: 'Barlow Semi Condensed', system-ui, sans-serif;
+  --font-mono: 'Share Tech Mono', ui-monospace, monospace;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+  }
+}
+
+@layer components {
+  /* Faint graph-paper grid behind the datasheet body. */
+  .sheet-paper {
+    background-color: var(--color-parchment);
+    background-image:
+      linear-gradient(rgb(0 0 0 / 0.035) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(0 0 0 / 0.035) 1px, transparent 1px),
+      radial-gradient(ellipse at 20% 0%, rgb(255 255 255 / 0.5), transparent 60%);
+    background-size:
+      12px 12px,
+      12px 12px,
+      100% 100%;
+  }
+
+  /* Blurred camouflage behind the header, with film grain and darker edges. */
+  .sheet-camo {
+    background-color: #4a4f42;
+    background-image:
+      linear-gradient(90deg, rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.05) 40%, rgb(0 0 0 / 0.1) 60%, rgb(0 0 0 / 0.5)),
+      linear-gradient(rgb(0 0 0 / 0.15), rgb(0 0 0 / 0.35)), url('./assets/grain.svg'), url('./assets/camo.svg');
+    background-position:
+      0 0,
+      0 0,
+      0 0,
+      left center;
+    background-repeat: no-repeat, no-repeat, repeat, no-repeat;
+    background-size:
+      100% 100%,
+      100% 100%,
+      200px 200px,
+      max(100%, 1600px) auto;
+  }
+
+  /* Faction-coloured band behind the unit name, fading out to the right. */
+  .sheet-band {
+    background: linear-gradient(90deg, var(--faction) 0%, var(--faction) 55%, transparent 100%);
+  }
+
+  /* Shield outline for the invulnerable save. */
+  .shield {
+    clip-path: polygon(0 0, 100% 0, 100% 55%, 50% 100%, 0 55%);
+  }
+
+  /* Arrow marker in front of a weapon with several profiles. */
+  .profile-arrow {
+    clip-path: polygon(0 0, 65% 0, 100% 50%, 65% 100%, 0 100%);
+  }
+
+  /* Diamond frame around the faction icon in the footer. */
+  .diamond {
+    clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%);
+  }
+
+  /* Dotted rule between table rows and ability paragraphs. */
+  .dotted-rule {
+    border-bottom: 1px dotted var(--color-rule);
+  }
+}

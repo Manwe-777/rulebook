@@ -1,0 +1,27 @@
+/** The tool-db topic every Rulebook app and relay shares. */
+export const TOPIC = 'rulebook-40k';
+
+/** Faction id of the core data (muster rules). */
+export const CORE = 'core';
+
+/** Largest record text accepted, in bytes, to stay under public relays' message limits. */
+export const MAX_BLOB_BYTES = 48_000;
+
+/** How long role and hidden lists are cached by the write rules, in milliseconds. */
+export const ROLE_CACHE_MS = 30_000;
+
+/** Every key the project uses, with `/` between parts (tool-db keeps `.` for namespaces). `f` is a faction id, `h` a SHA-256 hash in hex, `p` a public key. */
+export const KEYS = {
+  maintainers: (f: string) => `maintainers/${f}`,
+  contributors: (f: string) => `contributors/${f}`,
+  blob: (h: string) => `blob/${h}`,
+  head: (f: string, kind: string, id: string) => `head/${f}/${kind}/${id}`,
+  headPrefix: (f: string) => `head/${f}/`,
+  release: (f: string, h: string) => `release/${f}/${h}`,
+  releasePrefix: (f: string) => `release/${f}/`,
+  review: (f: string, p: string, n: string) => `review/${f}/${p}/${n}`,
+  hidden: 'hidden',
+  proposal: (f: string, n: string) => `proposal/${f}/${n}`,
+  request: (f: string) => `request/${f}`,
+  list: (n: string) => `list/${n}`,
+} as const;

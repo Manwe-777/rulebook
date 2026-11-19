@@ -1,0 +1,19 @@
+{
+  "branches": ["main"],
+  "plugins": [
+    "@semantic-release/commit-analyzer",
+    "@semantic-release/release-notes-generator",
+    ["@semantic-release/exec", { "prepareCmd": "node apps/relay/scripts/package.mjs ${nextRelease.version}" }],
+    [
+      "@semantic-release/github",
+      {
+        "assets": [
+          "apps/relay/release/rulebook-relay.tar.gz",
+          "apps/relay/release/install.sh",
+          "apps/relay/release/SHA256SUMS",
+          "apps/relay/release/VERSION"
+        ]
+      }
+    ]
+  ]
+}

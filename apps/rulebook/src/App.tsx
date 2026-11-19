@@ -1,0 +1,61 @@
+import { Link, Route, Routes, useLocation } from 'react-router';
+
+import AccountPage from './components/account/AccountPage';
+import ConnectionBadge from './components/common/ConnectionBadge';
+import SourceStatusLine from './components/common/SourceStatusLine';
+import FactionWorkspace from './components/editor/FactionWorkspace';
+import RecordEditor from './components/editor/RecordEditor';
+import DetachmentPage from './components/pages/DetachmentPage';
+import FactionPage from './components/pages/FactionPage';
+import HomePage from './components/pages/HomePage';
+import NotFoundPage from './components/pages/NotFoundPage';
+import UnitPage from './components/pages/UnitPage';
+import { BUILDER_URL, ICON_CREDIT, SITE_NAME } from './constants';
+import { useDocumentTitle } from './hooks/useDocumentTitle';
+import { useLibrary } from './hooks/useLibrary';
+import { titleForPath } from './library/titleForPath';
+
+/** Page layout and routes. The router and library provider are set up by the client or server entry. */
+export default function App() {
+  const library = useLibrary();
+
+  useDocumentTitle(titleForPath(library, useLocation().pathname));
+
+  return (
+    <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-6 font-sans text-text">
+      <header className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <Link to="/" className="text-3xl font-extrabold tracking-wide uppercase">
+          {SITE_NAME}
+        </Link>
+        <nav className="flex items-center gap-4">
+          <ConnectionBadge />
+          {BUILDER_URL && (
+            <a href={BUILDER_URL} className="text-sm font-semibold tracking-wide uppercase hover:underline">
+              List builder
+            </a>
+          )}
+          <Link to="/account" className="text-sm font-semibold tracking-wide uppercase hover:underline">
+            Account
+          </Link>
+        </nav>
+      </header>
+      <Routes>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/:faction" element={<FactionPage />} />
+        <Route path="/:faction/:unit" element={<UnitPage />} />
+        <Route path="/:faction/detachment/:detachment" element={<DetachmentPage />} />
+        <Route path="/account" element={<AccountPage />} />
+        <Route path="/:faction/edit" element={<FactionWorkspace />} />
+        <Route path="/:faction/edit/:kind/:id" element={<RecordEditor />} />
+        <Route path="*" element={<NotFoundPage />} />
+      </Routes>
+      <footer className="mt-auto text-xs text-text/60">
+        Icons:{' '}
+        <a href={ICON_CREDIT.url} className="underline">
+          {ICON_CREDIT.label}
+        </a>
+        . Rules text is written by the community and is not official Games Workshop material. <SourceStatusLine />
+      </footer>
+    </main>
+  );
+}

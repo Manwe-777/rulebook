@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="420">
+  <filter id="camo" x="0" y="0" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.006 0.012" numOctaves="3" seed="11" stitchTiles="stitch" />
+    <feColorMatrix values="1 0 0 0 0  1 0 0 0 0  1 0 0 0 0  0 0 0 0 1" />
+    <feComponentTransfer>
+      <feFuncR type="linear" slope="3" intercept="-1" />
+      <feFuncG type="linear" slope="3" intercept="-1" />
+      <feFuncB type="linear" slope="3" intercept="-1" />
+    </feComponentTransfer>
+    <feComponentTransfer>
+      <feFuncR type="discrete" tableValues="0.17 0.27 0.40 0.52 0.64" />
+      <feFuncG type="discrete" tableValues="0.19 0.29 0.41 0.52 0.62" />
+      <feFuncB type="discrete" tableValues="0.15 0.23 0.33 0.42 0.51" />
+    </feComponentTransfer>
+    <feGaussianBlur stdDeviation="2.5" />
+  </filter>
+  <rect width="100%" height="100%" filter="url(#camo)" />
+</svg>

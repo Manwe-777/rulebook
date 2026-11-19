@@ -1,0 +1,68 @@
+import type { Library } from '@rulebook/rules';
+
+import { ArmyDraft } from '../army/ArmyDraft';
+import { INPUT, LABEL, PANEL, PANEL_TITLE } from './styles';
+
+interface Props {
+  draft: ArmyDraft;
+  library: Library;
+  onChange: (draft: ArmyDraft) => void;
+}
+
+/** Faction, battle size and detachments. Changing the faction starts a new list. */
+export default function ArmySettings({ draft, library, onChange }: Props) {
+  const faction = library.faction(draft.list.faction);
+
+  return (
+    <section className={PANEL}>
+      <h2 className={PANEL_TITLE}>Army</h2>
+      <div className="flex flex-col gap-3 p-3">
+        <label className={LABEL}>
+          Faction
+          <select
+            className={INPUT}
+            value={draft.list.faction}
+            onChange={(e) => onChange(ArmyDraft.create(library, e.target.value))}
+          >
+            {!faction && <option value={draft.list.faction}>{draft.list.faction} (not loaded)</option>}
+            {library.factions.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.name}
+              </option>
+            ))}
+          </select>
+        </label>
+        <label className={LABEL}>
+          Battle size
+          <select
+            className={INPUT}
+            value={draft.list.battleSize}
+            onChange={(e) => onChange(draft.setBattleSize(e.target.value))}
+          >
+            {library.muster?.battleSizes.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name} ({b.points} pts)
+              </option>
+            ))}
+          </select>
+        </label>
+        <fieldset className="flex flex-col gap-1">
+          <legend className={`${LABEL} mb-1`}>Detachments</legend>
+          {faction?.detachments.map((d) => (
+            <label key={d.id} className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={draft.list.detachments.includes(d.id)}
+                onChange={() => onChange(draft.toggleDetachment(library, d.id))}
+              />
+              <span className="font-semibold">{d.name}</span>
+              <span className="text-sm text-text/60">
+                {d.points ? `${d.points} pts` : ''} {d.unique.map((t) => `· ${t}`).join(' ')}
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      </div>
+    </section>
+  );
+}

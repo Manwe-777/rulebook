@@ -1,0 +1,84 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm test
+
+  # Both apps on GitHub Pages: the rulebook at the site root, the list builder under builder/.
+  pages:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    env:
+      # /<repo>/ on <user>.github.io; set PAGES_BASE_PATH to / for a custom domain.
+      BASE: ${{ vars.PAGES_BASE_PATH || format('/{0}/', github.event.repository.name) }}
+      VITE_RELAYS: ${{ vars.RULEBOOK_RELAYS }}
+      VITE_RULEBOOK_OWNER: ${{ vars.RULEBOOK_OWNER }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Build the rulebook
+        run: BASE_PATH=$BASE VITE_BUILDER_URL=${BASE}builder/ npm run build -w @rulebook/rulebook
+      - name: Build the list builder
+        run: BASE_PATH=${BASE}builder/ VITE_RULEBOOK_URL=$BASE npm run build -w @rulebook/builder
+      - name: Put both in one site
+        run: |
+          mkdir _site
+          cp -r apps/rulebook/dist/. _site/
+          cp -r apps/builder/dist _site/builder
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v4
+
+  # Versions from commit types; each release carries the relay tarball, install.sh and SHA256SUMS.
+  release:
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

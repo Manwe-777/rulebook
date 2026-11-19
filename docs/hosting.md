@@ -1,0 +1,71 @@
+# Hosting
+
+## Apps on GitHub Pages
+
+The CI workflow deploys both apps to GitHub Pages on every push to `main` after the check job passes: the rulebook at
+the site root, the list builder under `builder/`.
+
+Setup, once per repository:
+
+1. Settings → Pages → Source: **GitHub Actions**.
+2. Settings → Secrets and variables → Actions → **Variables**:
+
+| Variable          | Value                                                                       |
+| ----------------- | --------------------------------------------------------------------------- |
+| `RULEBOOK_OWNER`  | Owner public key (npub or hex), from `npm run owner-key -w @rulebook/relay` |
+| `RULEBOOK_RELAYS` | Relays the apps read from and write to, comma separated (`wss://…`)         |
+| `PAGES_BASE_PATH` | Optional. `/` for a custom domain; defaults to `/<repository name>/`        |
+
+These values are public: they end up in the built pages.
+
+## Relay
+
+A release carries `rulebook-relay.tar.gz` (the relay bundled into one script plus LevelDB with prebuilt binaries for
+x64 and arm64), `install.sh` and `SHA256SUMS`. The installer needs Linux with systemd and Node.js 22 or newer
+installed system-wide.
+
+```sh
+curl -fsSL https://github.com/Manwe-777/rulebook/releases/latest/download/install.sh | sudo sh -s -- --owner npub1...
+```
+
+| Option        | Meaning                                                      |
+| ------------- | ------------------------------------------------------------ |
+| `--owner KEY` | Owner public key (npub or hex). Needed on the first install. |
+| `--port N`    | Port to listen on. Default 8080.                             |
+| `--host ADDR` | Address to listen on. Default 0.0.0.0.                       |
+| `--uninstall` | Stop and remove the service. Data and settings stay.         |
+| `--purge`     | With `--uninstall`, also delete the data and settings.       |
+
+What it sets up:
+
+- the relay in `/opt/rulebook-relay`, run by the `rulebook-relay` systemd service as a dynamic user with no
+  capabilities (only `CAP_NET_BIND_SERVICE` when the port is below 1024) and a read-only system;
+- settings in `/etc/rulebook-relay/relay.env` (root only), including the relay's own key, made on the first install;
+- data in `/var/lib/rulebook-relay`.
+
+Running the installer again updates the relay. Settings, data and the relay key are kept; only the options given
+change. The download is checked against `SHA256SUMS` and the settings against the new build before the running relay is
+replaced.
+
+The apps are served over https, so browsers only connect to `wss://` relays. Put a TLS proxy in front of the relay,
+for example Caddy:
+
+```
+relay.example.org {
+  reverse_proxy 127.0.0.1:8080
+}
+```
+
+with the relay installed with `--host 127.0.0.1`. Then add `wss://relay.example.org` to `RULEBOOK_RELAYS`.
+
+## Releases
+
+semantic-release runs on pushes to `main` after the check job. `feat` and `fix` commits cut a version; the release
+gets the relay files built by `apps/relay/scripts/package.mjs`.
+
+`apps/relay/tests/installer.sh` runs the installer in a Docker container with systemd: install, publish the demo
+faction, update, a tampered download, uninstall and purge. It needs Docker and a throwaway owner secret key:
+
+```sh
+cd apps/relay && node scripts/package.mjs && RULEBOOK_SECRET=<hex> tests/installer.sh
+```

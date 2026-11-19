@@ -1,0 +1,28 @@
+@import 'tailwindcss';
+@import '@fontsource/barlow-semi-condensed/400.css' layer(base);
+@import '@fontsource/barlow-semi-condensed/500.css' layer(base);
+@import '@fontsource/barlow-semi-condensed/700.css' layer(base);
+@import '@fontsource/barlow-semi-condensed/800.css' layer(base);
+@import '@fontsource/share-tech-mono/400.css' layer(base);
+
+@theme {
+  --color-bg: #1b1d1a;
+  --color-panel: #252822;
+  --color-text: #ecebe4;
+  --color-parchment: #e6e5de;
+  --color-parchment-dark: #d6d5cc;
+  --color-ink: #1e1f1c;
+  --color-ink-muted: #4a4b45;
+  --color-bar: #3d4a26;
+  --color-bar-dark: #2c3619;
+  --color-legal: #4f7a2e;
+  --color-illegal: #9b2c22;
+  --font-sans: 'Barlow Semi Condensed', system-ui, sans-serif;
+  --font-mono: 'Share Tech Mono', ui-monospace, monospace;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-bg);
+  }
+}

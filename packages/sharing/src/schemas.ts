@@ -1,0 +1,52 @@
+import { z } from 'zod';
+
+const hash = z.string().regex(/^[0-9a-f]{64}$/, 'must be a SHA-256 hash in hex');
+const pubkey = z.string().regex(/^[0-9a-f]{64}$/, 'must be a public key in hex');
+const slug = z.string().regex(/^[a-z0-9]+(-[a-z0-9]+)*$/);
+const kind = z.enum(['faction', 'unit', 'detachment', 'muster']);
+
+/** `maintainers.<f>` and `contributors.<f>`. */
+export const roleListSchema = z.strictObject({ keys: z.array(pubkey) });
+
+/** `head.<f>.<kind>.<id>`: the accepted version of a record. */
+export const headSchema = z.strictObject({ blob: hash, proposal: z.string().optional() });
+
+/** `release.<f>.<h>`: a fixed snapshot of one faction. */
+export const manifestSchema = z.strictObject({
+  faction: slug,
+  version: z.string().min(1),
+  date: z.string().min(1),
+  core: hash.optional(),
+  /** `kind/id` to the hash of that record's text. */
+  records: z.record(z.string().regex(/^(faction|unit|detachment|muster)\/[a-z0-9-]+$/), hash),
+  notes: z.string().default(''),
+});
+
+/** `review.<f>.<proposal>`. */
+export const reviewSchema = z.strictObject({
+  status: z.enum(['accepted', 'rejected']),
+  comment: z.string().default(''),
+});
+
+/** `hidden`: content the owner took down. */
+export const hiddenSchema = z.strictObject({
+  keys: z.array(z.string()).default([]),
+  blobs: z.array(hash).default([]),
+  reason: z.string().default(''),
+});
+
+/** `:<p>.proposal.<f>.<n>`: a change a contributor asks for. */
+export const proposalSchema = z.strictObject({
+  kind,
+  id: slug,
+  base: hash.optional(),
+  blob: hash,
+  note: z.string().default(''),
+});
+
+/** `:<p>.request.<f>`: asks to become a contributor. */
+export const requestSchema = z.strictObject({ message: z.string().default('') });
+
+export type Manifest = z.output<typeof manifestSchema>;
+export type Proposal = z.output<typeof proposalSchema>;
+export type Hidden = z.output<typeof hiddenSchema>;

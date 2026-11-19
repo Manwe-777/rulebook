@@ -1,0 +1,24 @@
+{
+  "name": "@rulebook/relay",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/main.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run",
+    "publish": "tsx src/publish.ts",
+    "owner-key": "tsx src/ownerKey.ts"
+  },
+  "dependencies": {
+    "@rulebook/sharing": "*",
+    "@tool-db/leveldb-store": "2.0.0",
+    "tool-db": "3.0.0",
+    "tsx": "4.23.15"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "esbuild": "^0.28.2",
+    "vitest": "^5.1.1"
+  }
+}
