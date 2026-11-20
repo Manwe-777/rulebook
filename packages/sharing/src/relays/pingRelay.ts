@@ -1,3 +1,5 @@
+import { RELAY_PING_TIMEOUT_MS } from '../constants';
+
 /** The parts of WebSocket a ping needs; browsers and Node 22+ have it. */
 type Socket = { onopen: (() => void) | null; onerror: (() => void) | null; close: () => void };
 
@@ -7,7 +9,7 @@ type Socket = { onopen: (() => void) | null; onerror: (() => void) | null; close
  */
 export function pingRelay(
   url: string,
-  timeoutMs = 5000,
+  timeoutMs = RELAY_PING_TIMEOUT_MS,
   open: (url: string) => Socket = (u) => new WebSocket(u) as unknown as Socket,
 ): Promise<number | null> {
   const start = Date.now();

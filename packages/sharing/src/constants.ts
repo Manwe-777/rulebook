@@ -52,6 +52,12 @@ export const RELAY_STALE_MS = 2 * 24 * 60 * 60 * 1000;
 /** A known relay that fails this many checks in a row is dropped until it announces itself again. */
 export const RELAY_MAX_FAILURES = 3;
 
+/**
+ * How long a relay check waits for the connection to open, in milliseconds. Generous on purpose: a page busy loading
+ * rules, or a phone network, can take seconds to open a socket to a relay that works, and failed checks drop relays.
+ */
+export const RELAY_PING_TIMEOUT_MS = 10_000;
+
 /** localStorage key of the relays a browser has found, shared by both apps on one site. */
 export const KNOWN_RELAYS_KEY = 'rulebook:relays';
 
