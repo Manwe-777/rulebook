@@ -1,9 +1,26 @@
-import type { Issue } from '../types';
+import type { Issue, Unit } from '../types';
+import { conditionHolds } from './conditionHolds';
 import { issue } from './issue';
 import type { Check, Resolved, ValidationContext } from './types';
 
-/** Whether the entry joins its bodyguard as a leader or a support unit, or why it can't join. */
-function joinAs(ctx: ValidationContext, { entry, unit }: Resolved): 'leader' | 'support' | Issue {
+type Role = 'leader' | 'support';
+
+interface Slots {
+  leader: string[];
+  support: string[];
+}
+
+/** Whether a datasheet's leader or support block lists this bodyguard, its `when` holds and its `unless` doesn't. */
+function canJoin(ctx: ValidationContext, unit: Unit, role: Role, bodyguard: string): boolean {
+  const block = unit[role];
+
+  if (!block?.bodyguards.includes(bodyguard)) return false;
+
+  return (!block.when || conditionHolds(ctx, block.when)) && !(block.unless && conditionHolds(ctx, block.unless));
+}
+
+/** The roles the entry could join its bodyguard in, or why it can't join at all. */
+function joinRoles(ctx: ValidationContext, { entry, unit }: Resolved): Role[] | Issue {
   const bodyguard = ctx.byId.get(entry.attachedTo!);
 
   if (!bodyguard)
@@ -17,10 +34,9 @@ function joinAs(ctx: ValidationContext, { entry, unit }: Resolved): 'leader' | '
     ]);
   }
 
-  const id = bodyguard.unit.id;
+  const roles = (['leader', 'support'] as const).filter((role) => canJoin(ctx, unit, role, bodyguard.unit.id));
 
-  if (unit.leader?.bodyguards.includes(id)) return 'leader';
-  if (unit.support?.bodyguards.includes(id)) return 'support';
+  if (roles.length > 0) return roles;
 
   return issue('cannot-attach', `${unit.name} can't be attached to ${bodyguard.unit.name}.`, [
     entry.id,
@@ -28,23 +44,36 @@ function joinAs(ctx: ValidationContext, { entry, unit }: Resolved): 'leader' | '
   ]);
 }
 
+/**
+ * Puts each attached entry in its bodyguard's leader or support slots. Entries with one possible role go first; an
+ * entry that could be either leads while the bodyguard has room for a leader, and supports otherwise.
+ */
+function fillSlots(ctx: ValidationContext, issues: Issue[]): Map<string, Slots> {
+  const joined = new Map<string, Slots>();
+  const flexible: Resolved[] = [];
+  const slots = (id: string) => joined.get(id) ?? joined.set(id, { leader: [], support: [] }).get(id)!;
+
+  for (const r of ctx.entries.filter((e) => e.entry.attachedTo)) {
+    const roles = joinRoles(ctx, r);
+
+    if (!Array.isArray(roles)) issues.push(roles);
+    else if (roles.length === 1) slots(r.entry.attachedTo!)[roles[0]].push(r.entry.id);
+    else flexible.push(r);
+  }
+
+  for (const r of flexible) {
+    const slot = slots(r.entry.attachedTo!);
+
+    slot[slot.leader.length < ctx.muster.attachments.leadersPerBodyguard ? 'leader' : 'support'].push(r.entry.id);
+  }
+
+  return joined;
+}
+
 /** Leader and support units join only bodyguards on their datasheet, within the per-bodyguard limits. */
 export const checkAttachments: Check = (ctx) => {
   const issues: Issue[] = [];
-  const joined = new Map<string, { leader: string[]; support: string[] }>();
-
-  for (const r of ctx.entries.filter((e) => e.entry.attachedTo)) {
-    const as = joinAs(ctx, r);
-
-    if (typeof as !== 'string') issues.push(as);
-    else {
-      const slot = joined.get(r.entry.attachedTo!) ?? { leader: [], support: [] };
-
-      slot[as].push(r.entry.id);
-      joined.set(r.entry.attachedTo!, slot);
-    }
-  }
-
+  const joined = fillSlots(ctx, issues);
   const { leadersPerBodyguard, supportPerBodyguard } = ctx.muster.attachments;
 
   for (const [bodyguard, { leader, support }] of joined) {

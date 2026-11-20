@@ -104,6 +104,7 @@ leader: # optional: Leader ability
   bodyguards: [line-troopers, veteran-squad] # unit ids this unit can lead
 support: # optional: Support ability, same shape as leader
   bodyguards: []
+  when: { has: { units: { ids: [marshal-venn] } } } # optional: only while this holds (unless: not while it holds)
 transport: # optional
   capacity: 12
   allows: [INFANTRY] # keywords a model needs to embark
@@ -113,6 +114,7 @@ detectionRange: 15" # optional, when it differs from the core default
 keywords: [INFANTRY, CHARACTER, FIELD CAPTAIN]
 factionKeywords: [DEMO HOST]
 image: https://example.org/captain.webp # optional, hosted elsewhere
+constraints: [] # army rules this datasheet brings, checked whenever the army includes it, see validation.md
 ```
 
 - Weapon rows that share a `group` are profiles of one weapon; the datasheet marks them and one profile is picked per
@@ -120,6 +122,10 @@ image: https://example.org/captain.webp # optional, hosted elsewhere
 - A weapon's id is its `id` field, or the slug of its group or name (`Sabre` → `sabre`); equipment ids work the same
   way. Wargear lists and options use these ids, and every id they use must be a weapon or equipment item on the
   datasheet.
+- A unit whose leader and support blocks both list a bodyguard leads it while it has room for a leader, and supports
+  it otherwise.
+- Rules on one datasheet go in its `constraints`: "must be your Warlord" selects it with `warlord: false` and `max: 0`,
+  "can't be your Warlord" with `warlord: true`, "one per army" with `max: 1`.
 - `copies` adds a surcharge to later copies of the datasheet in an army, counted in list order.
 - Weapon abilities are `tags`, written as on the datasheet (`ANTI-VEHICLE 3+`, `SUSTAINED HITS 1`). Quote a tag with
   a colon in it, or YAML reads it as a key: `tags: ['LETHAL HITS: MONSTER/VEHICLE']`.

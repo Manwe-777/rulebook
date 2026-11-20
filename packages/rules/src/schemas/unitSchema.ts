@@ -1,5 +1,6 @@
 import { z } from 'zod';
 
+import { conditionSchema, constraintsSchema } from './constraintSchema';
 import { count, hexColor, iconName, keywords, points, role, slug, stat, text } from './fields';
 
 const tags = z.array(text).default([]);
@@ -70,7 +71,13 @@ const composition = z.strictObject({
   wargear: z.record(z.string(), z.array(slug)).default({}),
 });
 
-const attaches = z.strictObject({ bodyguards: z.array(slug).min(1) });
+const attaches = z.strictObject({
+  bodyguards: z.array(slug).min(1),
+  /** Only while this holds, e.g. `{ has: { units: { ids: [marneus-calgar] } } }`. */
+  when: conditionSchema.optional(),
+  /** Not while this holds. */
+  unless: conditionSchema.optional(),
+});
 
 const transport = z.strictObject({
   capacity: z.int().min(1),
@@ -111,4 +118,6 @@ export const unitSchema = z.strictObject({
   detectionRange: stat.optional(),
   keywords: z.array(text).min(1),
   factionKeywords: z.array(text).min(1),
+  /** Army rules this datasheet brings, checked whenever the army includes it ("can't be your Warlord"). */
+  constraints: constraintsSchema,
 });

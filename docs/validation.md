@@ -52,10 +52,12 @@ Run in this order; every check runs even when an earlier one fails.
 9. **Upgrades.** The same rules for unit upgrades, with `upgrades.perUnit` and `upgrades.max`; the same upgrade can go
    on several units unless `upgrades.once` is on.
 10. **Warlord.** Present when required, and has one of the warlord roles.
-11. **Attachments.** A leader or support unit is attached only to a bodyguard listed on its datasheet; each bodyguard
+11. **Attachments.** A leader or support unit is attached only to a bodyguard listed on its datasheet, in a block whose
+    `when` holds and whose `unless` doesn't; each bodyguard
     has at most `leadersPerBodyguard` leader units and `supportPerBodyguard` support units, unless a constraint allows
     more.
-12. **Constraints.** Every constraint from the core muster record, the faction record and the chosen detachments.
+12. **Constraints.** Every constraint from the core muster record, the faction record, the chosen detachments and the
+    datasheets in the army.
 13. **Formation** (only when the list has a `formation` section). Reserve units cost at most `strategicReserves.maxShare`
     of the points limit, counting units embarked in reserve transports. Embarked units fit their transport's capacity,
     allowed and excluded keywords and space rules.
@@ -86,8 +88,9 @@ constraints:
     message: Up to 500 points of AGENT units can join the army.
 ```
 
-**`when`** (all given conditions must hold): `detachment: id`, `battleSize: id`, `has: <selector>` (at least one
-match).
+**`when`** (all given conditions must hold): `detachment: id`, `battleSize: id`, `faction: id` (the army's faction),
+`has: <selector>` (at least one match). **`unless`** takes the same conditions and switches the constraint off while
+they all hold.
 
 **Selectors** pick list entries:
 
@@ -100,6 +103,7 @@ match).
 | `units: { … , not: true }`                   | don't match the rest of the selector               |
 | `enhancements: { ids: [...] }` / `upgrades:` | carry one of these                                 |
 | `attached: { … }`                            | are attached units whose leader matches the filter |
+| `warlord: true` / `warlord: false`           | are / aren't the warlord                           |
 
 **Measures:** `count` (entries), `models` (models in them), `points` (their total cost).
 

@@ -1,7 +1,7 @@
 import type { z } from 'zod';
 
 import type { DETACHMENT_SECTIONS, MUSTER_SECTIONS, UNIT_SECTIONS } from './constants';
-import type { constraintSchema, selectorSchema } from './schemas/constraintSchema';
+import type { conditionSchema, constraintSchema, selectorSchema } from './schemas/constraintSchema';
 import type { detachmentSchema } from './schemas/detachmentSchema';
 import type { factionSchema } from './schemas/factionSchema';
 import type { glossarySchema } from './schemas/glossarySchema';
@@ -53,6 +53,7 @@ export interface Muster extends Omit<z.output<typeof musterSchema>, 'id'> {
 export type BattleSize = Muster['battleSizes'][number];
 export type Constraint = z.output<typeof constraintSchema>;
 export type Selector = z.output<typeof selectorSchema>;
+export type Condition = z.output<typeof conditionSchema>;
 
 export interface FactionRecord extends Omit<z.output<typeof factionSchema>, 'id'> {
   id: string;

@@ -374,6 +374,13 @@ describe('validateList: constraints', () => {
     expect(codes(base, library({ when: { has: { units: { ids: ['veteran-squad'] } } }, max: 0 }))).toEqual(['c']);
   });
 
+  it("unless switches a constraint off while its condition holds, and faction tests the army's faction", () => {
+    expect(codes(base, library({ max: 0, unless: { detachment: 'shield-wall' } }))).toEqual([]);
+    expect(codes(base, library({ max: 0, unless: { faction: 'other-host' } }))).toEqual(['c']);
+    expect(codes(base, library({ max: 0, when: { faction: 'demo-host' } }))).toEqual(['c']);
+    expect(codes(base, library({ max: 0, when: { faction: 'other-host' } }))).toEqual([]);
+  });
+
   it('an allow constraint lifts a core check for the units it selects, within its limit', () => {
     const allowVets = (max: number) =>
       library({ allow: 'datasheet-limit', select: { units: { ids: ['veteran-squad'] } }, max });

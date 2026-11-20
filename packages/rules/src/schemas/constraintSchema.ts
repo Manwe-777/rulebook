@@ -16,15 +16,25 @@ export const selectorSchema = z.strictObject({
   enhancements: z.strictObject({ ids: z.array(slug) }).optional(),
   upgrades: z.strictObject({ ids: z.array(slug) }).optional(),
   attached: unitFilter.optional(),
+  /** `true` picks only the warlord's entry, `false` every other entry. */
+  warlord: z.boolean().optional(),
+});
+
+/** Holds when every given field does: a chosen detachment, the battle size, the army's faction, a selected entry. */
+export const conditionSchema = z.strictObject({
+  detachment: slug.optional(),
+  battleSize: slug.optional(),
+  faction: slug.optional(),
+  has: selectorSchema.optional(),
 });
 
 /** An army rule written as data: select entries, measure them and compare the result. See docs/validation.md. */
 export const constraintSchema = z
   .strictObject({
     id: slug,
-    when: z
-      .strictObject({ detachment: slug.optional(), battleSize: slug.optional(), has: selectorSchema.optional() })
-      .optional(),
+    when: conditionSchema.optional(),
+    /** The constraint doesn't apply while this holds. */
+    unless: conditionSchema.optional(),
     allow: z.enum(['faction', 'datasheet-limit', 'attachments']).optional(),
     select: selectorSchema,
     measure: z.enum(['count', 'models', 'points']).default('count'),

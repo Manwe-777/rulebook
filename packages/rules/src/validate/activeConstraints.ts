@@ -1,24 +1,26 @@
 import type { Constraint } from '../types';
-import { selectEntries } from './selectEntries';
+import { conditionHolds } from './conditionHolds';
 import type { ValidationContext } from './types';
 
-function applies(ctx: ValidationContext, when: Constraint['when']): boolean {
-  if (!when) return true;
+const applies = (ctx: ValidationContext, { when, unless }: Constraint) =>
+  (!when || conditionHolds(ctx, when)) && !(unless && conditionHolds(ctx, unless));
 
-  return (
-    (!when.detachment || ctx.detachments.some((d) => d.id === when.detachment)) &&
-    (!when.battleSize || ctx.battleSize.id === when.battleSize) &&
-    (!when.has || selectEntries(ctx, when.has).length > 0)
-  );
+/** Each datasheet in the army once, for the rules it brings. */
+function armyDatasheets(ctx: ValidationContext) {
+  return [...new Map(ctx.entries.map((r) => [r.entry.unit, r.unit])).values()];
 }
 
-/** Every constraint from the muster rules, the faction and the chosen detachments whose `when` holds. */
+/**
+ * Every constraint from the muster rules, the faction, the chosen detachments and the datasheets in the army whose
+ * `when` holds and `unless` doesn't.
+ */
 export function activeConstraints(ctx: ValidationContext): { constraint: Constraint; source: string }[] {
   const all = [
     ...ctx.muster.constraints.map((constraint) => ({ constraint, source: 'core' })),
     ...ctx.faction.constraints.map((constraint) => ({ constraint, source: ctx.faction.id })),
     ...ctx.detachments.flatMap((d) => d.constraints.map((constraint) => ({ constraint, source: d.id }))),
+    ...armyDatasheets(ctx).flatMap((u) => u.constraints.map((constraint) => ({ constraint, source: u.id }))),
   ];
 
-  return all.filter(({ constraint }) => applies(ctx, constraint.when));
+  return all.filter(({ constraint }) => applies(ctx, constraint));
 }

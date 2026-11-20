@@ -1,5 +1,6 @@
-import type { Faction, Issue, Unit } from '../types';
+import type { Constraint, Faction, Issue, Unit } from '../types';
 import { keywordKey } from '../utils/keywordKey';
+import { constraintIssues } from './constraintIssues';
 
 const error = (code: string, message: string, ref: string): Issue => ({
   code,
@@ -87,6 +88,17 @@ function attachIssues(faction: Faction, unit: Unit, ref: string): Issue[] {
 }
 
 /** Problems in one unit's data: unknown weapons and model types, impossible sizes, and attachment mistakes. */
+/** A leader or support condition, checked for unknown references like a constraint named after its role. */
+function attachConditions(unit: Unit): Constraint[] {
+  return (['leader', 'support'] as const).flatMap((role) => {
+    const block = unit[role];
+
+    return [block?.when?.has, block?.unless?.has].flatMap((has) =>
+      has ? [{ id: role, select: has, measure: 'count' as const, min: 1, message: role }] : [],
+    );
+  });
+}
+
 export function unitIssues(faction: Faction, unit: Unit): Issue[] {
   const ref = `${faction.id}/${unit.id}`;
   const keyword = unit.factionKeywords.some((k) => keywordKey(k) === keywordKey(faction.factionKeyword));
@@ -95,6 +107,7 @@ export function unitIssues(faction: Faction, unit: Unit): Issue[] {
     ...weaponIssues(unit, ref),
     ...compositionIssues(unit, ref),
     ...attachIssues(faction, unit, ref),
+    ...constraintIssues(faction, [...unit.constraints, ...attachConditions(unit)], ref),
     ...(keyword
       ? []
       : [warning('missing-faction-keyword', `${unit.name} doesn't have the ${faction.factionKeyword} keyword.`, ref)]),

@@ -15,6 +15,7 @@ export function selectEntries(ctx: ValidationContext, selector: Selector): Resol
       !selector.enhancements || selector.enhancements.ids.includes(r.entry.enhancement ?? ''),
       !selector.upgrades || selector.upgrades.ids.includes(r.entry.upgrade ?? ''),
       !selector.attached || hasAttached(ctx, r, selector.attached),
+      selector.warlord === undefined || (ctx.list.warlord === r.entry.id) === selector.warlord,
     ];
 
     return tests.every(Boolean);

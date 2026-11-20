@@ -95,6 +95,23 @@ describe('checkDataset', () => {
     ).toEqual([['unknown-reference', 'error', 'demo-host/rapid-response']]);
   });
 
+  it("reports a datasheet's own rules and leader conditions that refer to units the faction does not have", () => {
+    const rule =
+      'factionKeywords: [DEMO HOST]\nconstraints:\n  - { id: one, select: { units: { ids: [nobody] } }, max: 1, message: x }';
+
+    expect(checkEdited('field-captain.md', 'factionKeywords: [DEMO HOST]', rule)).toEqual([
+      ['unknown-reference', 'error', 'demo-host/field-captain'],
+    ]);
+
+    expect(
+      checkEdited(
+        'standard-bearer.md',
+        'bodyguards: [line-troopers, veteran-squad]',
+        'bodyguards: [line-troopers, veteran-squad]\n  when: { has: { units: { ids: [nobody] } } }',
+      ),
+    ).toEqual([['unknown-reference', 'error', 'demo-host/standard-bearer']]);
+  });
+
   it('reports missing muster rules, and warns when no datasheet limit applies by default', () => {
     expect(checkDataset(Library.fromFiles(loadDemoFiles().filter((f) => !f.path.includes('core/'))))).toEqual([
       expect.objectContaining({ code: 'no-muster-rules', severity: 'error' }),
