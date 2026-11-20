@@ -49,3 +49,6 @@ export const PRINT_OPTIONS_KEY = 'rulebook:print-options';
  * relays without signing, so a missing or stuck extension never blocks reading.
  */
 export const EXTENSION_TIMEOUT_MS = 15_000;
+
+/** Where the community's datasheets, stratagems and codex rules are sourced from. */
+export const DATA_SOURCE = { label: '40k.app', url: 'https://40k.app' };

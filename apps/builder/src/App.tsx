@@ -5,7 +5,7 @@ import { ArmyDraft } from './army/ArmyDraft';
 import ArmiesPage from './components/armies/ArmiesPage';
 import BuilderPage from './components/BuilderPage';
 import AcceptLinkDialog from './components/sync/AcceptLinkDialog';
-import { ICON_CREDIT, RULEBOOK_URL, SITE_NAME } from './constants';
+import { DATA_SOURCE, ICON_CREDIT, RULEBOOK_URL, SITE_NAME } from './constants';
 import { useArmyRoute } from './hooks/useArmyRoute';
 import { useArmySync } from './hooks/useArmySync';
 import { type BuilderSource, useBuilderLibrary } from './hooks/useBuilderLibrary';
@@ -109,7 +109,12 @@ export default function App() {
         />
       )}
       <footer className="mt-auto text-xs text-text/60">
-        {SOURCE[status]} Rules are written by the community and are not official Games Workshop material. Icons:{' '}
+        {SOURCE[status]} Datasheets, stratagems and codex rules are sourced from{' '}
+        <a href={DATA_SOURCE.url} className="underline">
+          {DATA_SOURCE.label}
+        </a>{' '}
+        and maintained by the community on the relays; none of them are hosted in the code repository. Not official
+        Games Workshop material. Icons:{' '}
         <a href={ICON_CREDIT.url} className="underline">
           {ICON_CREDIT.label}
         </a>

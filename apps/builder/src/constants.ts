@@ -97,3 +97,6 @@ export const ADDED_TICK_MS = 600;
 
 /** localStorage key of the unit cards folded down to their title, by army id. */
 export const COLLAPSED_KEY = 'rulebook-builder:collapsed';
+
+/** Where the community's datasheets, stratagems and codex rules are sourced from. */
+export const DATA_SOURCE = { label: '40k.app', url: 'https://40k.app' };

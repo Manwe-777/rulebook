@@ -9,7 +9,7 @@ import FactionPage from './components/pages/FactionPage';
 import HomePage from './components/pages/HomePage';
 import NotFoundPage from './components/pages/NotFoundPage';
 import UnitPage from './components/pages/UnitPage';
-import { BUILDER_URL, ICON_CREDIT, SITE_NAME } from './constants';
+import { BUILDER_URL, DATA_SOURCE, ICON_CREDIT, SITE_NAME } from './constants';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
 import { useLibrary } from './hooks/useLibrary';
 import { titleForPath } from './library/titleForPath';
@@ -81,7 +81,12 @@ export default function App() {
         <a href={ICON_CREDIT.url} className="underline">
           {ICON_CREDIT.label}
         </a>
-        . Rules text is written by the community and is not official Games Workshop material. <SourceStatusLine />
+        . Datasheets, stratagems and codex rules are sourced from{' '}
+        <a href={DATA_SOURCE.url} className="underline">
+          {DATA_SOURCE.label}
+        </a>{' '}
+        and maintained by the community on the relays; none of them are hosted in the code repository. Not official
+        Games Workshop material. <SourceStatusLine />
       </footer>
     </main>
   );
