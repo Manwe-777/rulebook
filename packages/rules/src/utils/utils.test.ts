@@ -94,6 +94,8 @@ describe('glossaryKey and Library.explain', () => {
     expect(glossaryKey('SUSTAINED HITS D3')).toBe('SUSTAINED HITS');
     expect(glossaryKey('ANTI-VEHICLE 3+')).toBe(glossaryKey('Anti-keyword X+'));
     expect(glossaryKey('[LETHAL HITS]')).toBe('LETHAL HITS');
+    expect(glossaryKey('SUSTAINED HITS 1: NON-MONSTER/VEHICLE')).toBe('SUSTAINED HITS');
+    expect(glossaryKey('LETHAL HITS: MONSTER/VEHICLE')).toBe('LETHAL HITS');
   });
 
   it('the library explains terms from the core glossary, and nothing it does not know', () => {

@@ -121,7 +121,8 @@ image: https://example.org/captain.webp # optional, hosted elsewhere
   way. Wargear lists and options use these ids, and every id they use must be a weapon or equipment item on the
   datasheet.
 - `copies` adds a surcharge to later copies of the datasheet in an army, counted in list order.
-- Weapon abilities are `tags`, written as on the datasheet (`ANTI-VEHICLE 3+`, `SUSTAINED HITS 1`).
+- Weapon abilities are `tags`, written as on the datasheet (`ANTI-VEHICLE 3+`, `SUSTAINED HITS 1`). Quote a tag with
+  a colon in it, or YAML reads it as a key: `tags: ['LETHAL HITS: MONSTER/VEHICLE']`.
 - `roles` drive muster limits. A unit can have several (`[character, epic-hero]`).
 - The datasheet's composition, wargear, wargear options, points, leader and support blocks are generated from this
   data.

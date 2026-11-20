@@ -4,12 +4,14 @@ const VALUE = /\s+(?:\d*D\d+(?:\+\d+)?|\d+\+?"?|X\+?)$/i;
 /**
  * The key a rule term is looked up by, so a weapon tag or ability finds its glossary entry whatever its value:
  * `SUSTAINED HITS 2` and `Sustained Hits X` → `SUSTAINED HITS`, `Scouts 9"` → `SCOUTS`, and every `ANTI-…` tag
- * → `ANTI`.
+ * → `ANTI`. What the ability is limited to after a colon is ignored too (`LETHAL HITS: MONSTER/VEHICLE`).
  */
 export function glossaryKey(term: string): string {
   const name = term
     .trim()
     .replace(/^\[|\]$/g, '')
+    .replace(/:.*$/, '')
+    .trim()
     .replace(VALUE, '')
     .trim()
     .toUpperCase();
