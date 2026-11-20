@@ -3,6 +3,7 @@ import { projectSettings } from '@rulebook/sharing/project';
 import { getPublicKey } from 'tool-db';
 
 import { connectProject } from './connectProject';
+import { fromInvocation } from './fromInvocation';
 import { parseAppointArgs } from './parseAppointArgs';
 import { readSecret } from './readSecret';
 
@@ -17,7 +18,7 @@ if ('error' in request) {
   process.exit(1);
 }
 
-const secret = await readSecret(request.keyFile, {});
+const secret = await readSecret(fromInvocation(request.keyFile), {});
 
 if (!secret) {
   console.error('Wrong password, or not an owner key file.');

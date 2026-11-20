@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { RulebookClient } from '@rulebook/sharing';
@@ -6,6 +6,7 @@ import { projectSettings } from '@rulebook/sharing/project';
 import { getPublicKey } from 'tool-db';
 
 import { connectProject } from './connectProject';
+import { fromInvocation } from './fromInvocation';
 import { parsePublishArgs } from './parsePublishArgs';
 import { readSecret } from './readSecret';
 
@@ -22,8 +23,15 @@ if ('error' in request) {
   process.exit(1);
 }
 
+const folder = fromInvocation(request.folder);
+
+if (!existsSync(folder)) {
+  console.error(`No content folder at ${folder}.`);
+  process.exit(1);
+}
+
 const owner = projectSettings({ owner: process.env.RULEBOOK_OWNER }).owner;
-const secret = await readSecret(request.keyFile, process.env);
+const secret = await readSecret(request.keyFile && fromInvocation(request.keyFile), process.env);
 
 if (!owner || !secret) {
   console.error(
@@ -41,10 +49,10 @@ const client = new RulebookClient(db, owner);
 
 console.log(`Publishing as ${getPublicKey(secret)} to ${db.relays.connected} of ${relays.length} relays`);
 
-for (const faction of readdirSync(request.folder, { withFileTypes: true }).filter((d) => d.isDirectory())) {
-  const files = readdirSync(join(request.folder, faction.name))
+for (const faction of readdirSync(folder, { withFileTypes: true }).filter((d) => d.isDirectory())) {
+  const files = readdirSync(join(folder, faction.name))
     .filter((name) => name.endsWith('.md'))
-    .map((name) => ({ name, source: readFileSync(join(request.folder, faction.name, name), 'utf8') }));
+    .map((name) => ({ name, source: readFileSync(join(folder, faction.name, name), 'utf8') }));
 
   const hash = await client.publishFolder(faction.name, files, request.version, request.notes);
   // A relay refuses records its own rules can't read (for example an older relay and a newer field), without telling

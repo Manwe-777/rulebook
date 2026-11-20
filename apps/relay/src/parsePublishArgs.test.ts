@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
+import { fromInvocation } from './fromInvocation';
 import { parsePublishArgs } from './parsePublishArgs';
 
 describe('parsePublishArgs', () => {
@@ -17,5 +18,12 @@ describe('parsePublishArgs', () => {
   it('says what is missing', () => {
     expect(parsePublishArgs(['content'])).toHaveProperty('error');
     expect(parsePublishArgs(['content', '2026-11', '--key'])).toHaveProperty('error');
+  });
+});
+
+describe('fromInvocation', () => {
+  it('resolves paths from the folder the command was run in, not the workspace npm runs it from', () => {
+    expect(fromInvocation('packages/rules/content', { INIT_CWD: '/repo' })).toBe('/repo/packages/rules/content');
+    expect(fromInvocation('/abs/key.ncryptsec', { INIT_CWD: '/repo' })).toBe('/abs/key.ncryptsec');
   });
 });
