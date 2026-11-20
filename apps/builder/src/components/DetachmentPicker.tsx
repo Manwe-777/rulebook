@@ -15,9 +15,9 @@ interface Props {
  * battle size's budget; and, with several detachments of different dispositions, which one the army uses.
  */
 export default function DetachmentPicker({ draft, library, onChange }: Props) {
-  const faction = library.faction(draft.list.faction);
   const { spent, budget } = detachmentPoints(draft.list, library);
-  const chosen = (faction?.detachments ?? []).filter((d) => draft.list.detachments.includes(d.id));
+  const all = library.armyDetachments(draft.list.faction);
+  const chosen = all.filter((d) => draft.list.detachments.includes(d.id));
   const dispositions = offeredDispositions(chosen);
   const over = budget !== null && spent > budget;
 
@@ -31,7 +31,7 @@ export default function DetachmentPicker({ draft, library, onChange }: Props) {
           </span>
         )}
       </legend>
-      {faction?.detachments.map((d) => (
+      {all.map((d) => (
         <label key={d.id} className="flex items-center gap-2">
           <input
             type="checkbox"

@@ -24,7 +24,10 @@ export class ArmyDraft {
         name,
         battleSize,
         faction: factionId,
-        detachments: faction?.detachments.slice(0, 1).map((d) => d.id),
+        detachments: library
+          .armyDetachments(factionId)
+          .slice(0, 1)
+          .map((d) => d.id),
       }),
     );
   }
@@ -72,12 +75,10 @@ export class ArmyDraft {
   toggleDetachment(library: Library, id: string): ArmyDraft {
     const taken = this.list.detachments.includes(id);
     const detachments = taken ? this.list.detachments.filter((d) => d !== id) : [...this.list.detachments, id];
-    const faction = library.faction(this.list.faction);
+    const chosen = library.armyDetachments(this.list.faction).filter((d) => detachments.includes(d.id));
 
     const offered = new Set(
-      (faction?.detachments ?? [])
-        .filter((d) => detachments.includes(d.id))
-        .flatMap((d) => d.enhancements.map((e) => e.id)),
+      chosen.filter((d) => detachments.includes(d.id)).flatMap((d) => d.enhancements.map((e) => e.id)),
     );
 
     const units = this.list.units.map((e) => ({
@@ -87,7 +88,7 @@ export class ArmyDraft {
     }));
 
     // The chosen disposition goes when no remaining detachment has it.
-    const dispositions = offeredDispositions((faction?.detachments ?? []).filter((d) => detachments.includes(d.id)));
+    const dispositions = offeredDispositions(chosen);
     const kept = this.list.disposition;
     const disposition = kept && dispositions.includes(kept) ? kept : undefined;
 

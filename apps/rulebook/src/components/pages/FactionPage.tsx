@@ -5,6 +5,7 @@ import { factionTheme } from '../../utils/factionTheme';
 import Markdown from '../common/Markdown';
 import PageBanner from '../common/PageBanner';
 import DetachmentList from './DetachmentList';
+import IncludedFactions from './IncludedFactions';
 import NotFoundPage from './NotFoundPage';
 import UnitList from './UnitList';
 
@@ -31,6 +32,7 @@ export default function FactionPage() {
           <Markdown>{faction.body}</Markdown>
         </div>
         <div className="flex min-w-0 flex-col gap-6">
+          <IncludedFactions faction={faction} />
           <DetachmentList faction={faction} />
           <UnitList faction={faction} />
         </div>

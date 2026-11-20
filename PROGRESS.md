@@ -51,6 +51,11 @@
   limits 2 / 4. `anyLoneDetachment` in the muster record covers the announced "any single detachment" rule. The builder
   shows each detachment's DP, disposition and tags, a DP counter and the disposition picker; the rulebook and the
   army sheet show DP and disposition. Local relay and browser data were reset (no migration: nothing was deployed).
+- Shared datasheets: a faction can `include` others (a chapter including `space-marines`), with `excludes` for
+  shared records it can't use. Lists, validation, the builder's unit and detachment pickers and the army sheet use
+  the faction's own records plus the included ones; the dataset checks accept a shared leader naming a chapter unit;
+  the rulebook keeps each datasheet under its own faction, links a shared leader's chapter bodyguards, and says on a
+  chapter's page which factions it includes.
 - Play mode in the builder (`?mode=play`, a Play button on each army card and a Play / Edit list switch in the army
   header): no forms, pickers, remove buttons or photo editing, so nothing changes mid-game. Each unit or combined unit
   is a compact card (photo, name, role, warlord, enhancement, points, stats in one line per distinct profile, what it

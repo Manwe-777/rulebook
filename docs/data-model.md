@@ -44,9 +44,19 @@ icon: sword-01 # optional glyph name from the wh40k-icon font
 factionKeyword: DEMO HOST # the keyword that makes a datasheet part of this faction
 resources: # optional: faction resources spent by rules, shown on the army sheet
   - { id: resolve, name: Resolve points, short: RP }
+includes: [] # optional: factions whose datasheets and detachments this one's armies also use
+excludes: [] # optional: ids of included datasheets and detachments its armies can't use
 ```
 
 Body sections (`##`): `Description`, `Army rule` (one `###` per rule), and any free sections.
+
+`includes` covers factions built on a shared one: a chapter such as `blood-angels` includes `space-marines`, whose
+bundle holds the datasheets and detachments every chapter uses, kept and released once by its own maintainers. An army
+of the chapter can take its own records and the included ones; its own record wins when both have the same id, and
+`excludes` leaves out shared ones it can't take. Includes chain (a faction included by an included faction counts too).
+A shared datasheet may name units of the factions that include its bundle, e.g. a shared leader that can lead a
+chapter's own unit; the dataset checks accept such names. The rulebook shows each datasheet once, under the faction it
+belongs to.
 
 `color` is the faction's colour in both apps: banners and datasheets in the rulebook; bars, headers, buttons and army
 cards in the list builder. The builder darkens colours too light for white text until they reach 4.5:1 contrast, so

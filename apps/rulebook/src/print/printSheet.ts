@@ -76,7 +76,7 @@ export function printSheet(list: ArmyList, library: Library): PrintSheet {
   const faction = library.faction(list.faction);
   const points = listPoints(list, library);
   const unitOf = (entry: ListEntry) => library.unit(list.faction, entry.unit)?.unit;
-  const detachments = (faction?.detachments ?? []).filter((d) => list.detachments.includes(d.id));
+  const detachments = library.armyDetachments(list.faction).filter((d) => list.detachments.includes(d.id));
   const disposition = dispositionName(list, detachments, library);
 
   const allItems = detachments.flatMap((d) => d.enhancements);

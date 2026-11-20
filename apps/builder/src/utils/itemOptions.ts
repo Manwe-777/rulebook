@@ -12,7 +12,7 @@ export function itemOptions(
   unit: Unit,
   current?: string,
 ): Enhancement[] {
-  const detachments = library.faction(list.faction)?.detachments ?? [];
+  const detachments = library.armyDetachments(list.faction);
 
   return detachments
     .filter((d) => list.detachments.includes(d.id))

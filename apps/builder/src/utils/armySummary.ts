@@ -26,7 +26,7 @@ export function armySummary(list: ArmyList, library: Library): ArmySummary {
     color: faction?.color,
     icon: faction?.icon,
     battleSize: size?.name ?? list.battleSize,
-    detachments: list.detachments.map((id) => faction?.detachments.find((d) => d.id === id)?.name ?? id),
+    detachments: list.detachments.map((id) => library.detachment(list.faction, id)?.detachment.name ?? id),
     points: points.total,
     limit: points.limit,
     errors: validateList(list, library).filter((i) => i.severity === 'error').length,

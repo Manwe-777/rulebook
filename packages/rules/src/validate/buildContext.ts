@@ -66,7 +66,7 @@ export function buildContext(list: ArmyList, library: Library): { ctx: Validatio
     muster,
     battleSize,
     limits: { detachments, detachmentPoints, datasheetLimits, enhancements, upgrades },
-    detachments: resolveDetachments(list, faction.detachments, issues),
+    detachments: resolveDetachments(list, library.armyDetachments(faction.id), issues),
     entries,
     byId: new Map(entries.map((r) => [r.entry.id, r])),
     allowed: { faction: new Set(), 'datasheet-limit': new Set(), attachments: new Set() },

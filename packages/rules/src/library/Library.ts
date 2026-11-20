@@ -138,17 +138,84 @@ export class Library {
     return this.factions.find((f) => f.id === id);
   }
 
-  unit(factionId: string, unitId: string): { faction: Faction; unit: Unit } | undefined {
-    const faction = this.faction(factionId);
-    const unit = faction?.units.find((u) => u.id === unitId);
+  /**
+   * A faction followed by every faction it includes, directly or through another, each once, with the ids each
+   * including faction excludes.
+   */
+  private lineage(factionId: string): { faction: Faction; excluded: Set<string> }[] {
+    const found: { faction: Faction; excluded: Set<string> }[] = [];
 
-    return faction && unit ? { faction, unit } : undefined;
+    const visit = (id: string, excluded: Set<string>) => {
+      const faction = this.faction(id);
+
+      if (!faction || found.some((f) => f.faction.id === id)) return;
+
+      found.push({ faction, excluded });
+
+      const next = new Set([...excluded, ...faction.excludes]);
+
+      for (const parent of faction.includes) visit(parent, next);
+    };
+
+    visit(factionId, new Set());
+
+    return found;
   }
 
-  detachment(factionId: string, detachmentId: string): { faction: Faction; detachment: Detachment } | undefined {
-    const faction = this.faction(factionId);
-    const detachment = faction?.detachments.find((d) => d.id === detachmentId);
+  /** Records an army of this faction can use: its own, then those of the factions it includes, sorted by name. */
+  private armyRecords<T extends { id: string; name: string }>(factionId: string, pick: (f: Faction) => T[]): T[] {
+    const byId = new Map<string, T>();
 
-    return faction && detachment ? { faction, detachment } : undefined;
+    for (const { faction, excluded } of this.lineage(factionId)) {
+      for (const record of pick(faction)) {
+        if (!byId.has(record.id) && !excluded.has(record.id)) byId.set(record.id, record);
+      }
+    }
+
+    return [...byId.values()].sort(byName);
+  }
+
+  /** Datasheets an army of this faction can take: its own and those of the factions it includes. */
+  armyUnits(factionId: string): Unit[] {
+    return this.armyRecords(factionId, (f) => f.units);
+  }
+
+  /** Detachments an army of this faction can take: its own and those of the factions it includes. */
+  armyDetachments(factionId: string): Detachment[] {
+    return this.armyRecords(factionId, (f) => f.detachments);
+  }
+
+  /**
+   * A datasheet an army of this faction can take, with the faction it belongs to (an included one for shared
+   * datasheets).
+   */
+  unit(factionId: string, unitId: string): { faction: Faction; unit: Unit } | undefined {
+    for (const { faction, excluded } of this.lineage(factionId)) {
+      const unit = excluded.has(unitId) ? undefined : faction.units.find((u) => u.id === unitId);
+
+      if (unit) return { faction, unit };
+    }
+
+    return undefined;
+  }
+
+  /** A detachment an army of this faction can take, with the faction it belongs to. */
+  detachment(factionId: string, detachmentId: string): { faction: Faction; detachment: Detachment } | undefined {
+    for (const { faction, excluded } of this.lineage(factionId)) {
+      const detachment = excluded.has(detachmentId)
+        ? undefined
+        : faction.detachments.find((d) => d.id === detachmentId);
+
+      if (detachment) return { faction, detachment };
+    }
+
+    return undefined;
+  }
+
+  /** Factions that include this one, directly or through another. */
+  includedBy(factionId: string): Faction[] {
+    return this.factions.filter(
+      (f) => f.id !== factionId && this.lineage(f.id).some((l) => l.faction.id === factionId),
+    );
   }
 }

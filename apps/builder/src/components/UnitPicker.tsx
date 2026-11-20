@@ -12,7 +12,7 @@ interface Props {
 
 /** The faction's datasheets, each with its cheapest cost and an Add button. */
 export default function UnitPicker({ draft, library, onChange }: Props) {
-  const units = library.faction(draft.list.faction)?.units ?? [];
+  const units = library.armyUnits(draft.list.faction);
 
   return (
     <section className={PANEL}>

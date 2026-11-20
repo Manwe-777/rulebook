@@ -1,5 +1,5 @@
 import type { Library } from '../library/Library';
-import type { Issue } from '../types';
+import type { Faction, Issue } from '../types';
 import { constraintIssues } from './constraintIssues';
 import { detachmentIssues } from './detachmentIssues';
 import { unitIssues } from './unitIssues';
@@ -34,10 +34,34 @@ function musterIssues(library: Library): Issue[] {
 export function checkDataset(library: Library): Issue[] {
   return [
     ...musterIssues(library),
-    ...library.factions.flatMap((faction) => [
-      ...constraintIssues(faction, faction.constraints, faction.id),
-      ...faction.units.flatMap((unit) => unitIssues(faction, unit)),
-      ...faction.detachments.flatMap((detachment) => detachmentIssues(faction, detachment, library.muster)),
-    ]),
+    ...library.factions.flatMap((faction) => {
+      // References may name records of included factions, and of the factions that include this one (a shared
+      // datasheet can name the chapter units it leads).
+      const reach: Faction = {
+        ...faction,
+        units: [...library.armyUnits(faction.id), ...library.includedBy(faction.id).flatMap((f) => f.units)],
+        detachments: library.armyDetachments(faction.id),
+      };
+
+      return [
+        ...includeIssues(library, faction),
+        ...constraintIssues(reach, faction.constraints, faction.id),
+        ...faction.units.flatMap((unit) => unitIssues(reach, unit)),
+        ...faction.detachments.flatMap((detachment) => detachmentIssues(reach, detachment, library.muster)),
+      ];
+    }),
   ];
+}
+
+/** Included factions that don't exist. */
+function includeIssues(library: Library, faction: Faction): Issue[] {
+  return faction.includes
+    .filter((id) => !library.faction(id))
+    .map((id) => ({
+      code: 'unknown-include',
+      severity: 'error' as const,
+      message: `${faction.name} includes "${id}", which is not a faction.`,
+      entries: [faction.id],
+      source: faction.id,
+    }));
 }
