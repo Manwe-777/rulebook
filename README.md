@@ -24,7 +24,9 @@ npm start -w @rulebook/relay   # relay on ws://localhost:8080, checking writes a
 ```
 
 The apps read the owner key and relays from `project.json`; with none set they show the demo faction. `VITE_RELAYS`
-(comma separated) and `VITE_RULEBOOK_OWNER` override them for a local run. To publish a content folder (one folder per faction, plus `core`) as a maintainer, with the key file saved from the
+(comma separated) and `VITE_RULEBOOK_OWNER` override them for a local run.
+
+To publish a content folder (one folder per faction, plus `core`) as a maintainer, with the key file saved from the
 rulebook's Account page:
 
 ```sh
