@@ -56,11 +56,24 @@ for (const event of events) {
 console.log(`Read ${values.length} values from ${db.relays.connected} of ${relays.length} relays.`);
 
 const client = new RulebookClient(db, owner, 0);
-const maps = await legacyIndexes(values, (faction, pubkey) => client.roles.isMaintainer(faction, pubkey));
+// Each faction's maintainers are read once, not once per value.
+const maintainers = new Map<string, Promise<string[]>>();
 
-for (const [key, entries] of Object.entries(maps)) {
-  await client.setEntries(key, entries);
-  console.log(`${key}: ${Object.keys(entries).length} entries`);
-}
+const isMaintainer = async (faction: string, pubkey: string) => {
+  if (pubkey === owner) return true;
+  if (!maintainers.has(faction)) maintainers.set(faction, client.roles.maintainers(faction));
+
+  return (await maintainers.get(faction)!).includes(pubkey);
+};
+
+const maps = await legacyIndexes(values, isMaintainer);
+
+// Every map at once: a relay that never answers makes each read wait its full timeout.
+await Promise.all(
+  Object.entries(maps).map(async ([key, entries]) => {
+    await client.setEntries(key, entries);
+    console.log(`${key}: ${Object.keys(entries).length} entries`);
+  }),
+);
 
 await db.close();
