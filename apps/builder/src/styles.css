@@ -7,6 +7,10 @@
 
 @theme {
   --color-bg: #1b1d1a;
+  /* Stratagem colours, as codices print them: used in your turn, your opponent's turn, or either. */
+  --color-turn-your: #2a4f82;
+  --color-turn-opponent: #9b2c22;
+  --color-turn-either: #2e6b3d;
   --color-panel: #252822;
   --color-text: #ecebe4;
   --color-parchment: #e6e5de;

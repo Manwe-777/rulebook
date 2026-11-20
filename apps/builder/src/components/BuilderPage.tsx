@@ -3,6 +3,7 @@ import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
 import { usePlayMode } from '../hooks/usePlayMode';
+import { useShowStratagems } from '../hooks/useShowStratagems';
 import { useUnitRoute } from '../hooks/useUnitRoute';
 import { factionTint } from '../utils/factionTint';
 import ArmyHeader from './ArmyHeader';
@@ -10,6 +11,8 @@ import ArmySettings from './ArmySettings';
 import EntryList from './EntryList';
 import IssuesPanel from './IssuesPanel';
 import PlayList from './play/PlayList';
+import PlayStratagems from './play/PlayStratagems';
+import { BUTTON, BUTTON_QUIET } from './styles';
 import UnitSheet from './unit/UnitSheet';
 import UnitPicker from './UnitPicker';
 
@@ -32,6 +35,7 @@ export default function BuilderPage({ draft, library, release, onChange }: Props
   const faction = library.faction(draft.list.faction);
   const [unitId, openUnit] = useUnitRoute();
   const [playing, setPlaying] = usePlayMode();
+  const [showStratagems, setShowStratagems] = useShowStratagems();
 
   if (unitId && draft.entry(unitId)) {
     return (
@@ -60,7 +64,18 @@ export default function BuilderPage({ draft, library, release, onChange }: Props
         onChange={onChange}
       />
       {playing ? (
-        <PlayList draft={draft} library={library} points={points.entries} />
+        <>
+          <button
+            type="button"
+            aria-pressed={showStratagems}
+            className={`${showStratagems ? BUTTON : BUTTON_QUIET} self-start`}
+            onClick={() => setShowStratagems(!showStratagems)}
+          >
+            {showStratagems ? 'Hide stratagems' : 'Show stratagems'}
+          </button>
+          {showStratagems && <PlayStratagems list={draft.list} library={library} />}
+          <PlayList draft={draft} library={library} points={points.entries} />
+        </>
       ) : (
         <div className="grid gap-4 md:grid-cols-[2fr_3fr]">
           <div className="flex min-w-0 flex-col gap-4">

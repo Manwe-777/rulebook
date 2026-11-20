@@ -45,8 +45,9 @@ export interface Detachment extends Omit<DetachmentData, 'id' | 'enhancements' |
   sections: Sections<typeof DETACHMENT_SECTIONS>;
 }
 
-export interface Muster extends Omit<z.output<typeof musterSchema>, 'id'> {
+export interface Muster extends Omit<z.output<typeof musterSchema>, 'id' | 'stratagems'> {
   id: string;
+  stratagems: Stratagem[];
   sections: Sections<typeof MUSTER_SECTIONS>;
 }
 

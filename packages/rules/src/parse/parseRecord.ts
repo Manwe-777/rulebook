@@ -1,11 +1,10 @@
-import { MUSTER_SECTIONS } from '../constants';
 import { recordSchema } from '../schemas/recordSchema';
 import type { ParseResult, RulesRecord } from '../types';
 import { buildDetachment } from './buildDetachment';
+import { buildMuster } from './buildMuster';
 import { buildUnit } from './buildUnit';
 import { readFrontmatter } from './readFrontmatter';
 import { splitEntries } from './splitEntries';
-import { splitSections } from './splitSections';
 
 function build(data: ReturnType<typeof recordSchema.parse>, body: string, id: string) {
   switch (data.kind) {
@@ -22,11 +21,8 @@ function build(data: ReturnType<typeof recordSchema.parse>, body: string, id: st
       return { value: { ...data, id, entries }, errors: [] };
     }
 
-    case 'muster': {
-      const { sections, errors } = splitSections(body, MUSTER_SECTIONS);
-
-      return { value: { ...data, id, sections }, errors };
-    }
+    case 'muster':
+      return buildMuster(data, body, id);
   }
 }
 

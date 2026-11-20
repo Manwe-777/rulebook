@@ -29,4 +29,4 @@ export const DETACHMENT_SECTIONS = {
 } as const;
 
 /** The `## ` headings a muster file may use. */
-export const MUSTER_SECTIONS = { description: 'description' } as const;
+export const MUSTER_SECTIONS = { description: 'description', stratagems: 'stratagems' } as const;

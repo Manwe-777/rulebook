@@ -4,6 +4,7 @@ import type { Library } from '@rulebook/rules';
 export function pagePaths(library: Library): string[] {
   return [
     '/',
+    '/stratagems',
     ...library.factions.flatMap((f) => [
       `/${f.id}`,
       ...f.units.map((u) => `/${f.id}/${u.id}`),

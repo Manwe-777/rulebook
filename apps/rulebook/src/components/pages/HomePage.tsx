@@ -1,4 +1,5 @@
 import { checkDataset } from '@rulebook/rules';
+import { Link } from 'react-router';
 
 import { useLibrary } from '../../hooks/useLibrary';
 import ErrorsPanel from '../common/ErrorsPanel';
@@ -10,6 +11,12 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col gap-6">
+      <Link
+        to="/stratagems"
+        className="self-start rounded bg-bar px-3 py-1 font-bold tracking-wide text-white uppercase hover:bg-bar-dark"
+      >
+        Core stratagems
+      </Link>
       <h2 className="text-xl font-bold tracking-wide uppercase">Factions</h2>
       {library.factions.length ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

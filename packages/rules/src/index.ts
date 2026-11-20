@@ -29,6 +29,7 @@ export { offeredDispositions } from './utils/offeredDispositions';
 export { recordPath } from './utils/recordPath';
 export { sizeLabel } from './utils/sizeLabel';
 export { slugify } from './utils/slugify';
+export { type StratagemTurn, stratagemTurn } from './utils/stratagemTurn';
 export { tally } from './utils/tally';
 export { type UnitSize, unitSizes } from './utils/unitSizes';
 export { wargearName } from './utils/wargearName';

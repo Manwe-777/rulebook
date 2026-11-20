@@ -172,6 +172,7 @@ stratagems:
     name: Brace!
     cp: 1
     category: Battle Tactic # optional
+    turn: your # optional: your | opponent | either, the colour it is printed in; read from its When: line when left out
 constraints: [] # army rules this detachment adds, see validation.md
 ```
 
@@ -213,6 +214,7 @@ warlord: { required: true, roles: [character] }
 attachments: { leadersPerBodyguard: 1, supportPerBodyguard: 1 }
 strategicReserves: { maxShare: 0.5 }
 constraints: [] # further army-wide rules, see validation.md
+stratagems: [] # core stratagems every army can use, same shape as a detachment's; text under `## Stratagems`
 ```
 
 Detachment points, enhancement limits and dispositions above follow the 11th edition muster rules for Incursion and

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { constraintsSchema, eligibility, unitFilter } from './constraintSchema';
 import { count, keywords, points, role, slug, text } from './fields';
+import { stratagemSchema } from './stratagemSchema';
 
 const enhancement = z.strictObject({
   id: slug.optional(),
@@ -23,13 +24,6 @@ const grant = z.strictObject({
   max: count.optional(),
 });
 
-const stratagem = z.strictObject({
-  id: slug.optional(),
-  name: text,
-  cp: z.int().min(0),
-  category: text.optional(),
-});
-
 /** The frontmatter of a detachment record. Rules text for each entry lives in the body under its `###` heading. */
 export const detachmentSchema = z.strictObject({
   kind: z.literal('detachment'),
@@ -45,7 +39,7 @@ export const detachmentSchema = z.strictObject({
   /** Tags: an army can't take two detachments that share one. */
   unique: z.array(text).default([]),
   enhancements: z.array(enhancement).default([]),
-  stratagems: z.array(stratagem).default([]),
+  stratagems: z.array(stratagemSchema).default([]),
   grants: z.array(grant).default([]),
   constraints: constraintsSchema,
 });

@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 import { constraintsSchema } from './constraintSchema';
 import { count, role, share, slug, text } from './fields';
+import { stratagemSchema } from './stratagemSchema';
 
 const limits = {
   /** How many detachments an army takes; `max` left out means only the detachment points limit them. */
@@ -50,4 +51,6 @@ export const musterSchema = z.strictObject({
   attachments: z.strictObject({ leadersPerBodyguard: count.default(1), supportPerBodyguard: count.default(1) }),
   strategicReserves: z.strictObject({ maxShare: share }),
   constraints: constraintsSchema,
+  /** Core stratagems every army can use; their text goes under `## Stratagems` in the body. */
+  stratagems: z.array(stratagemSchema).default([]),
 });

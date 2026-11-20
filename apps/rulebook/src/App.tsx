@@ -3,6 +3,7 @@ import { Link, NavLink, Route, Routes, useLocation } from 'react-router';
 
 import ConnectionBadge from './components/common/ConnectionBadge';
 import SourceStatusLine from './components/common/SourceStatusLine';
+import CoreStratagemsPage from './components/pages/CoreStratagemsPage';
 import DetachmentPage from './components/pages/DetachmentPage';
 import FactionPage from './components/pages/FactionPage';
 import HomePage from './components/pages/HomePage';
@@ -63,6 +64,7 @@ export default function App() {
       <Suspense fallback={<p className="text-text/70">Loading…</p>}>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/stratagems" element={<CoreStratagemsPage />} />
           <Route path="/:faction" element={<FactionPage />} />
           <Route path="/:faction/:unit" element={<UnitPage />} />
           <Route path="/:faction/detachment/:detachment" element={<DetachmentPage />} />

@@ -62,3 +62,6 @@ export const UNIT_PARAM = 'unit';
 /** Address parameter for the army page's mode; `?mode=play` hides every control that changes the list. */
 export const MODE_PARAM = 'mode';
 export const PLAY_MODE = 'play';
+
+/** Query parameter that shows the stratagems in play mode (`?stratagems=1`). */
+export const STRATAGEMS_PARAM = 'stratagems';
