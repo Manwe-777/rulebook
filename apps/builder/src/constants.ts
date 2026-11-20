@@ -65,3 +65,6 @@ export const PLAY_MODE = 'play';
 
 /** Query parameter that shows the stratagems in play mode (`?stratagems=1`). */
 export const STRATAGEMS_PARAM = 'stratagems';
+
+/** Query parameter that also shows the core stratagems among them (`?core=1`); hidden by default. */
+export const CORE_STRATAGEMS_PARAM = 'core';
