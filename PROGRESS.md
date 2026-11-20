@@ -80,6 +80,11 @@
   and every wargear rule. Checked against the tournament lists and at 390 px width.
 - Wargear options: a count per choice, so two models can take different weapons from one option; headings name the
   model type; datasheets say "This model" / "The Theyn" and count repeated default wargear. Profiles carry base sizes.
+- Checked against Blood Angels: a `space-marines` bundle (18 shared datasheets, 5 detachments) and a `blood-angels`
+  bundle including it (6 datasheets, Encarmine Speartip), local only, rules in our own words. Three tournament lists
+  (GW app and New Recruit exports; three detachments each, repeated upgrades, paid wargear, copy surcharges, leaders
+  from the shared bundle on chapter units) come to their exported 1995, 2000 and 2000 points and are legal, unit by
+  unit.
 - Checked against a real faction: Leagues of Votann (22 datasheets, 10 detachments, rules summarised in our own
   words) in a gitignored `local-content/` folder, published only to a local relay. A tournament list (two detachments,
   attached leaders, repeated datasheets) rebuilt in the builder comes to the same 1995 points and is legal. What it
@@ -132,6 +137,9 @@
 - First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
   the whole rules library.
 
+- Format gaps found with Blood Angels: detachment restrictions on other Chapters' units (Encarmine Speartip) aren't
+  checked; leaders that can only lead units missing from the data drop their Leader ability (Techmarine); 11th edition
+  core terms (CLOSE-QUARTERS, CLEAVE, HUNTER, Damaged X, psychic levels, combat doctrines) have no glossary entries yet.
 - Format gaps found with Leagues of Votann: "no duplicates", "one of these per model" and "replace X or Y" option rules;
   model types whose models carry different gear (E-COGs); passengers taking no transport space (by model type);
   detachments granting keywords (Beserks gain BATTLELINE); enhancements that need a weapon; splitting a unit across
