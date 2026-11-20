@@ -1,4 +1,5 @@
 import { ownerKeyHex } from '@rulebook/sharing';
+import { PROJECT } from '@rulebook/sharing/project';
 
 /** Settings of a relay node, read from environment variables. */
 export interface RelayConfig {
@@ -17,16 +18,22 @@ export interface RelayConfig {
 
 const HEX_KEY = /^[0-9a-f]{64}$/;
 
-/** The owner key as hex, null when not set, or empty when it isn't a key. */
-function readOwner(value: string | undefined): string | null {
-  const text = (value ?? '').trim();
+/** The owner key as hex, null when set empty (an open store), or empty when it isn't a key. */
+function readOwner(value: string | undefined, projectOwner: string): string | null {
+  const text = (value ?? projectOwner).trim();
 
   return text ? ownerKeyHex(text) : null;
 }
 
-/** Reads `RULEBOOK_OWNER` (optional), `PORT`, `HOST`, `DATA_DIR` and `RELAY_SECRET_KEY`, or says what is wrong with them. */
-export function readConfig(env: Record<string, string | undefined>): RelayConfig | { errors: string[] } {
-  const owner = readOwner(env.RULEBOOK_OWNER);
+/**
+ * Reads `RULEBOOK_OWNER` (left out: the project's owner from `project.json`; empty: an open store), `PORT`, `HOST`,
+ * `DATA_DIR` and `RELAY_SECRET_KEY`, or says what is wrong with them.
+ */
+export function readConfig(
+  env: Record<string, string | undefined>,
+  projectOwner = PROJECT.owner,
+): RelayConfig | { errors: string[] } {
+  const owner = readOwner(env.RULEBOOK_OWNER, projectOwner);
   const port = Number(env.PORT ?? 8080);
   const secretKey = env.RELAY_SECRET_KEY || undefined;
 

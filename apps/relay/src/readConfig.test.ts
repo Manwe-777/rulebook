@@ -6,8 +6,12 @@ import { readConfig } from './readConfig';
 const OWNER = 'a'.repeat(64);
 
 describe('readConfig', () => {
-  it('needs no settings at all: without an owner key the relay is an open store', () => {
-    expect(readConfig({})).toEqual({
+  it("needs no settings at all: it checks writes against project.json's owner", () => {
+    expect(readConfig({}, OWNER)).toMatchObject({ owner: OWNER });
+  });
+
+  it('with no owner key anywhere the relay is an open store', () => {
+    expect(readConfig({}, '')).toEqual({
       owner: null,
       port: 8080,
       host: '0.0.0.0',
@@ -16,8 +20,8 @@ describe('readConfig', () => {
     });
   });
 
-  it('an empty or blank owner key also means an open store', () => {
-    expect(readConfig({ RULEBOOK_OWNER: '  ' })).toMatchObject({ owner: null });
+  it('an empty or blank owner key setting means an open store, whatever project.json says', () => {
+    expect(readConfig({ RULEBOOK_OWNER: '  ' }, OWNER)).toMatchObject({ owner: null });
   });
 
   it('accepts the owner key as an npub and stores it as hex', () => {

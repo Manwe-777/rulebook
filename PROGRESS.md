@@ -54,6 +54,8 @@
 - Wargear priced per item carried (`itemPoints`, e.g. a Repulsor's default Heavy Laser Destroyer +10), shown on
   datasheets and next to builder choices. The same upgrade can go on several units (as real lists do), unless the
   muster rules set `upgrades.once`.
+- `project.json` (committed) holds the owner's public key and the relay list. The apps, the relay and its installer
+  default to it, and forks keep it, so they read the same data; build variables only override it.
 - Shared datasheets: a faction can `include` others (a chapter including `space-marines`), with `excludes` for
   shared records it can't use. Lists, validation, the builder's unit and detachment pickers and the army sheet use
   the faction's own records plus the included ones; the dataset checks accept a shared leader naming a chapter unit;
@@ -132,7 +134,7 @@
   head or release a client cached before its signer was removed stays trusted in that client until its storage is
   cleared. Hidden content is checked on every read.
 
-- No relay server is chosen yet; `RULEBOOK_RELAYS` and `RULEBOOK_OWNER` must be set before the Pages build is useful.
+- `project.json` has no owner key or relays yet; both must be filled in before the Pages build is useful.
 - The relay installer job in CI (systemd in Docker on GitHub's runners) hasn't run there yet; it passes locally.
 - First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
   the whole rules library.

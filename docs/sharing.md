@@ -6,7 +6,14 @@ write rules; the apps and the relay all register the same rules, so bad data is 
 
 ## Relays
 
-- Clients publish to and read from a configured list: the project relay first, then public relays.
+- The relay list is in `project.json` at the repository root, next to the owner key, so forks use the same relays and
+  the same data unless they change it. A build can override it (`VITE_RELAYS`).
+- Clients connect to every relay in the list, publish each write to all of them and read from whichever answer. Data
+  survives as long as one relay that stored it is up.
+- Browsers can't serve each other: every client needs at least one reachable relay. A client that loaded the rules
+  before keeps its cached copy and works offline; a first-time visitor sees only the demo until a relay answers.
+- Relays don't copy data between each other. A relay added to the list holds what is written after that, plus what is
+  copied into it from another relay.
 - `apps/relay` runs `RulebookRelay` (from `@rulebook/sharing/relay`): a `ToolDbRelay` with LevelDB storage and the
   write rules, reading role lists from its own store. It keeps every record for good, so data survives public relays
   dropping old events.
@@ -32,8 +39,10 @@ by `/`, since tool-db keeps `.` for user namespaces (`:<p>.<key>`). The topic is
 | `:<p>.request/<f>`      | That user (namespace) | `{ message }`: asks to become a contributor                     |
 | `:<p>.list/<n>`         | That user (namespace) | A saved army list                                               |
 
-The owner's public key is not data: it is built into the apps and into the relay installer. A relay started without it
-is an open store that keeps any signed data on the topic; the apps still apply these rules on every read.
+The owner's public key is not data: it is committed in `project.json`, so the apps, the relay and the relay installer
+use it, and so do forks unless they replace it. A build can override it (`VITE_RULEBOOK_OWNER`, `RULEBOOK_OWNER`). A
+relay started with an empty owner setting is an open store that keeps any signed data on the topic; the apps still apply
+these rules on every read.
 
 A release manifest is `{ faction, version, date, core?, records: { 'kind/id': h }, notes }`, hashed as JSON with its
 keys sorted. Turned back into files, a record becomes `<f>/<id>.md` (`<f>/faction.md` for the faction record), ready for

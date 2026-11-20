@@ -8,15 +8,22 @@ the site root, the list builder under `builder/`.
 Setup, once per repository:
 
 1. Settings → Pages → Source: **GitHub Actions**.
-2. Settings → Secrets and variables → Actions → **Variables**:
+2. The owner key and relays come from `project.json` at the repository root:
 
-| Variable          | Value                                                                       |
-| ----------------- | --------------------------------------------------------------------------- |
-| `RULEBOOK_OWNER`  | Owner public key (npub or hex), from `npm run owner-key -w @rulebook/relay` |
-| `RULEBOOK_RELAYS` | Relays the apps read from and write to, comma separated (`wss://…`)         |
-| `PAGES_BASE_PATH` | Optional. `/` for a custom domain; defaults to `/<repository name>/`        |
+```json
+{ "owner": "npub1…", "relays": ["wss://relay.example.org"] }
+```
 
-These values are public: they end up in the built pages.
+`owner` is the public key printed by `npm run owner-key -w @rulebook/relay`; `relays` are the relays the apps read
+from and write to. Both are public and committed, so forks read the same data by default.
+
+3. Optionally, Settings → Secrets and variables → Actions → **Variables**:
+
+| Variable          | Value                                                                  |
+| ----------------- | ---------------------------------------------------------------------- |
+| `RULEBOOK_OWNER`  | Overrides `project.json`'s owner (npub or hex), for a separate project |
+| `RULEBOOK_RELAYS` | Overrides `project.json`'s relays, comma separated (`wss://…`)         |
+| `PAGES_BASE_PATH` | `/` for a custom domain; defaults to `/<repository name>/`             |
 
 ## Relay
 
@@ -28,7 +35,8 @@ installed system-wide.
 curl -fsSL https://github.com/Manwe-777/rulebook/releases/latest/download/install.sh | sudo sh
 ```
 
-No options are needed. The release build writes the `RULEBOOK_OWNER` repository variable into `install.sh`, so the relay
+No options are needed. The release build writes the owner from `project.json` (or the `RULEBOOK_OWNER` variable) into
+`install.sh`, so the relay
 checks every write against the project's roles (who may edit, propose and release). Without an owner key the relay is an
 open store: it keeps any correctly signed data on the topic, and the apps, which check every value against the owner key
 built into them, ignore what doesn't follow the rules. An open relay can't mislead readers, but it stores whatever is
@@ -63,7 +71,7 @@ relay.example.org {
 }
 ```
 
-with the relay installed with `--host 127.0.0.1`. Then add `wss://relay.example.org` to `RULEBOOK_RELAYS`.
+with the relay installed with `--host 127.0.0.1`. Then add `wss://relay.example.org` to `relays` in `project.json`.
 
 ## Releases
 

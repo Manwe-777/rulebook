@@ -19,11 +19,11 @@ Community-written Warhammer 40,000 rules: a datasheet reader and editor, a list 
 npm install
 npm run dev     # rulebook on http://localhost:5190
 npm run dev -w @rulebook/builder   # list builder on http://localhost:5191
-npm start -w @rulebook/relay   # relay on ws://localhost:8080; RULEBOOK_OWNER=<npub> to check writes
+npm start -w @rulebook/relay   # relay on ws://localhost:8080, checking writes against project.json's owner
 ```
 
-The rulebook shows the demo faction. To load releases from relays, set `VITE_RELAYS` (comma separated) and
-`VITE_RULEBOOK_OWNER` before `npm run dev` or `npm run build`. To publish a content folder:
+The apps read the owner key and relays from `project.json`; with none set they show the demo faction. `VITE_RELAYS`
+(comma separated) and `VITE_RULEBOOK_OWNER` override them for a local run. To publish a content folder:
 
 ```sh
 RULEBOOK_OWNER=<hex> RULEBOOK_SECRET=<maintainer secret, hex> RELAYS=ws://localhost:8080 \

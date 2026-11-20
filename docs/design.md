@@ -80,8 +80,8 @@ Identities are Nostr keys; a role belongs to a public key. The apps never send a
 - A lost key can't be recovered. A contributor who loses theirs is added again with their new key by a maintainer.
 - The owner key is made offline with `npm run owner-key -w @rulebook/relay`, which prints the public key and saves the
   secret key only as an `ncryptsec` file outside the repository. The owner keeps that file in a password manager and
-  imports the key into an extension for owner actions. The public key is built into the apps (`VITE_RULEBOOK_OWNER`)
-  and into the relay installer (`RULEBOOK_OWNER`).
+  imports the key into an extension for owner actions. The public key is committed in `project.json`, so the apps,
+  the relay installer and forks use it by default.
 - The owner's secret key can't be replaced: without it nobody can appoint or remove maintainers or hide content. The
   `ncryptsec` file needs at least one backup kept apart from the password manager.
 

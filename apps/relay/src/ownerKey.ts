@@ -51,5 +51,9 @@ const publicKey = getPublicKey(secret);
 writeFileSync(file, `${await encryptSecretKey(secret, password)}\n`, { mode: 0o600 });
 
 console.log(`Saved the password-protected secret key to ${file}. Keep a copy in your password manager.`);
-console.log(`Public key (RULEBOOK_OWNER and VITE_RULEBOOK_OWNER): ${publicKey}`);
+
+console.log(
+  `Public key: ${publicKey}\nPut it in project.json as "owner" and commit it; forks then read your releases by default.`,
+);
+
 console.log(`Same key as npub: ${npubEncode(publicKey)}`);

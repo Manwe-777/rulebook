@@ -6,7 +6,8 @@
   "exports": {
     ".": "./src/index.ts",
     "./relay": "./src/relay/RulebookRelay.ts",
-    "./keys": "./src/utils/ownerKeyHex.ts"
+    "./keys": "./src/utils/ownerKeyHex.ts",
+    "./project": "./src/projectSettings.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

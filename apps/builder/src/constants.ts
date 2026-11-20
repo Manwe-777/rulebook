@@ -1,4 +1,4 @@
-import { ownerKeyHex } from '@rulebook/sharing/keys';
+import { projectSettings } from '@rulebook/sharing/project';
 
 /** Name shown in the page header. */
 export const SITE_NAME = 'List Builder';
@@ -13,11 +13,17 @@ export const LEGACY_LIST_KEY = 'rulebook-builder:list';
 /** Battle size picked for a new list when the muster rules have it. */
 export const DEFAULT_BATTLE_SIZE = 'strike-force';
 
-/** Relays to load released rules from, set with `VITE_RELAYS` (comma separated). None means demo content only. */
-export const RELAYS: string[] = (import.meta.env.VITE_RELAYS ?? '').split(',').filter(Boolean);
+/**
+ * The project owner's public key (hex) and the relays to load released rules from: `project.json` at the repository
+ * root, unless the build sets `VITE_RULEBOOK_OWNER` (npub or hex) or `VITE_RELAYS` (comma separated). No relays means
+ * demo content only.
+ */
+const PROJECT = projectSettings({ owner: import.meta.env.VITE_RULEBOOK_OWNER, relays: import.meta.env.VITE_RELAYS });
 
-/** The project owner's public key (hex), set with `VITE_RULEBOOK_OWNER` (npub or hex). Must match the relay's. */
-export const OWNER_KEY: string = ownerKeyHex(import.meta.env.VITE_RULEBOOK_OWNER ?? '');
+export const RELAYS: string[] = PROJECT.relays;
+
+/** Must match the relays' owner key. */
+export const OWNER_KEY: string = PROJECT.owner;
 
 /** Address of the rulebook, set with `VITE_RULEBOOK_URL`. Empty hides the link. */
 export const RULEBOOK_URL: string = import.meta.env.VITE_RULEBOOK_URL ?? '';
