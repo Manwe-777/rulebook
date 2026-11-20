@@ -1,6 +1,7 @@
 import type { Unit } from '@rulebook/rules';
 
 import { useUnitRoute } from '../hooks/useUnitRoute';
+import CollapseButton from './CollapseButton';
 import CrownIcon from './CrownIcon';
 import UnitPhoto from './photos/UnitPhoto';
 
@@ -12,17 +13,30 @@ interface Props {
   unitId: string;
   points: number;
   warlord: boolean;
+  collapsed: boolean;
+  onToggle: () => void;
   onRemove: () => void;
 }
 
-/** The title bar of a unit card: photo, name (opening the unit's play view), warlord badge, cost and a remove button. */
-export default function EntryHeader({ faction, entryId, unit, unitId, points, warlord, onRemove }: Props) {
+/** The title bar of a unit card: fold switch, photo, name (opening the unit's play view), warlord badge, cost and a remove button. */
+export default function EntryHeader({
+  faction,
+  entryId,
+  unit,
+  unitId,
+  points,
+  warlord,
+  collapsed,
+  onToggle,
+  onRemove,
+}: Props) {
   const name = unit?.name ?? `Unknown unit "${unitId}"`;
   const [, openUnit] = useUnitRoute();
 
   return (
     <div className="flex items-center gap-2 bg-bar px-3 py-1 text-white">
-      {unit && <UnitPhoto faction={faction} unit={unit.id} name={unit.name} size={44} />}
+      <CollapseButton name={name} collapsed={collapsed} onToggle={onToggle} className="-ml-2 hover:bg-bar-dark" />
+      {unit && !collapsed && <UnitPhoto faction={faction} unit={unit.id} name={unit.name} size={44} />}
       <h3 className="flex-1 text-lg font-bold tracking-wide uppercase">
         {unit ? (
           <button type="button" className="text-left uppercase hover:underline" onClick={() => openUnit(entryId)}>

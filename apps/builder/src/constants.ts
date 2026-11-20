@@ -94,3 +94,6 @@ export const ADDED_TOAST_MS = 2_500;
 
 /** How long an add button shows its tick after a press, in milliseconds. */
 export const ADDED_TICK_MS = 600;
+
+/** localStorage key of the unit cards folded down to their title, by army id. */
+export const COLLAPSED_KEY = 'rulebook-builder:collapsed';

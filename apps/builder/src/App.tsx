@@ -75,6 +75,7 @@ export default function App() {
       </div>
       {draft && armyId ? (
         <BuilderPage
+          armyId={armyId}
           draft={draft}
           library={library}
           release={releases.find((r) => r.faction === draft.list.faction)}

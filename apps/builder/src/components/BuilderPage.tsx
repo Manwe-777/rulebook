@@ -2,6 +2,7 @@ import { type Library, listPoints, validateList } from '@rulebook/rules';
 import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
+import { useCollapsedUnits } from '../hooks/useCollapsedUnits';
 import { usePlayMode } from '../hooks/usePlayMode';
 import { useShowStratagems } from '../hooks/useShowStratagems';
 import { useUnitRoute } from '../hooks/useUnitRoute';
@@ -17,6 +18,8 @@ import UnitSheet from './unit/UnitSheet';
 import UnitPicker from './UnitPicker';
 
 interface Props {
+  /** The army's id, for what this device remembers about it. */
+  armyId: string;
   draft: ArmyDraft;
   library: Library;
   /** The release the army's faction is on; undefined for the demo. */
@@ -29,13 +32,14 @@ interface Props {
  * or one of its units in the play view (`?unit=`): settings and unit picker on the left, the army and its problems on the right, in the colour
  * the faction's data sets.
  */
-export default function BuilderPage({ draft, library, release, onChange }: Props) {
+export default function BuilderPage({ armyId, draft, library, release, onChange }: Props) {
   const issues = validateList(draft.list, library);
   const points = listPoints(draft.list, library);
   const faction = library.faction(draft.list.faction);
   const [unitId, openUnit] = useUnitRoute();
   const [playing, setPlaying] = usePlayMode();
   const [showStratagems, setShowStratagems] = useShowStratagems();
+  const [collapsed, toggle] = useCollapsedUnits(armyId);
 
   if (unitId && draft.entry(unitId)) {
     return (
@@ -74,7 +78,7 @@ export default function BuilderPage({ draft, library, release, onChange }: Props
             {showStratagems ? 'Hide stratagems' : 'Show stratagems'}
           </button>
           {showStratagems && <PlayStratagems list={draft.list} library={library} />}
-          <PlayList draft={draft} library={library} points={points.entries} />
+          <PlayList draft={draft} library={library} points={points.entries} collapsed={collapsed} onToggle={toggle} />
         </>
       ) : (
         <div className="grid gap-4 md:grid-cols-[2fr_3fr]">
@@ -84,7 +88,15 @@ export default function BuilderPage({ draft, library, release, onChange }: Props
           </div>
           <div className="flex min-w-0 flex-col gap-4">
             <IssuesPanel issues={issues} />
-            <EntryList draft={draft} library={library} points={points.entries} issues={issues} onChange={onChange} />
+            <EntryList
+              draft={draft}
+              library={library}
+              points={points.entries}
+              issues={issues}
+              collapsed={collapsed}
+              onToggle={toggle}
+              onChange={onChange}
+            />
           </div>
         </div>
       )}

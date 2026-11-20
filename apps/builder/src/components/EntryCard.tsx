@@ -1,10 +1,8 @@
 import type { Issue, Library, ListEntry, Unit } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
-import EntryChoices from './EntryChoices';
+import EntryFields from './EntryFields';
 import EntryHeader from './EntryHeader';
-import WargearFields from './WargearFields';
-import WarlordButton from './WarlordButton';
 
 interface Props {
   draft: ArmyDraft;
@@ -14,11 +12,24 @@ interface Props {
   unit: Unit | undefined;
   points: number;
   issues: Issue[];
+  /** Folded down to its title bar. */
+  collapsed: boolean;
+  onToggle: () => void;
   onChange: (draft: ArmyDraft) => void;
 }
 
 /** One unit in the army: size, wargear, enhancement or upgrade, attachment and warlord, with its own problems. */
-export default function EntryCard({ draft, library, entry, unit, points, issues, onChange }: Props) {
+export default function EntryCard({
+  draft,
+  library,
+  entry,
+  unit,
+  points,
+  issues,
+  collapsed,
+  onToggle,
+  onChange,
+}: Props) {
   const remove = () => onChange(draft.removeUnit(entry.id));
   const broken = issues.some((i) => i.severity === 'error');
   const warlord = draft.list.warlord === entry.id;
@@ -33,13 +44,21 @@ export default function EntryCard({ draft, library, entry, unit, points, issues,
         unitId={entry.unit}
         points={points}
         warlord={warlord}
+        collapsed={collapsed}
+        onToggle={onToggle}
         onRemove={remove}
       />
-      <div className="flex flex-col gap-3 p-3">
-        {unit && <EntryChoices draft={draft} library={library} entry={entry} unit={unit} onChange={onChange} />}
-        {unit && <WargearFields draft={draft} entry={entry} unit={unit} onChange={onChange} />}
-        {unit?.roles.includes('character') && (
-          <WarlordButton warlord={warlord} onChange={(on) => onChange(draft.setWarlord(on ? entry.id : undefined))} />
+      {/* A folded card keeps its problems in view. */}
+      <div className={`flex flex-col gap-3 p-3 ${collapsed && !issues.length ? 'hidden' : ''}`}>
+        {unit && !collapsed && (
+          <EntryFields
+            draft={draft}
+            library={library}
+            entry={entry}
+            unit={unit}
+            warlord={warlord}
+            onChange={onChange}
+          />
         )}
         {issues.length > 0 && (
           <ul className="list-[square] pl-5 text-sm text-red-300">

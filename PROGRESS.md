@@ -155,6 +155,9 @@
 - List builder (`apps/builder`, phase 8 done before the editor): pick faction, battle size and detachments, add units,
   set size, wargear, enhancements, upgrades, attachments and warlord; points and every problem update as you edit; the
   list is saved in the browser (unreadable saves are backed up). Loads relay releases like the rulebook.
+- Unit cards fold down to their title (chevron), in both edit and play, for units lost during a game; folds are kept
+  per army on the device, and a folded edit card still shows its problems.
+- Wide faction glyphs (the Astra Militarum aquila, Tyranids) are drawn smaller so every icon fits the same square.
 
 ## Known issues
 
