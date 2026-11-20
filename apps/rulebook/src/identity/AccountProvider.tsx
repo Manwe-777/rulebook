@@ -37,31 +37,45 @@ export default function AccountProvider({ children }: { children: ReactNode }) {
   const [link, setLink] = useState<{ id: string; state: Connection } | null>(null);
   const connection: Connection = !online ? 'offline' : link?.id === signerId ? link.state : 'connecting';
 
+  // Whether the browser extension failed to answer for this signer; the app then reads without signing.
+  const [stalled, setStalled] = useState<string | null>(null);
+
   useEffect(() => {
     if (!online) return;
 
     let closed = false;
     const report = (state: Connection) => !closed && setLink({ id: signerId, state });
-    const opened = connect(RELAYS, OWNER_KEY, signer, (up) => report(up ? 'connected' : 'reconnecting'));
+    const onLink = (up: boolean) => report(up ? 'connected' : 'reconnecting');
+    const dbs: Promise<{ db: { close: () => void } }>[] = [];
 
-    opened
-      .then(({ client: c }) => {
+    const use = (opening: ReturnType<typeof connect>) => {
+      dbs.push(opening);
+
+      return opening.then(({ client: c }) => {
         if (closed) return;
 
         setClient(c);
         report('connected');
-        if (c.me) setMe({ id: signerId, pubkey: c.me });
-      })
-      .catch(() => {
-        if (closed) return;
+        if (c.me && signer) setMe({ id: signerId, pubkey: c.me });
+      });
+    };
 
+    use(connect(RELAYS, OWNER_KEY, signer, onLink)).catch(() => {
+      if (closed) return;
+
+      // A browser extension that never answers mustn't stop reading: read the relays without signing.
+      if (signer && 'extension' in signer) {
+        setStalled(signerId);
+        use(connect(RELAYS, OWNER_KEY, null, onLink)).catch(() => !closed && report('failed'));
+      } else {
         setClient(null);
         report('failed');
-      });
+      }
+    });
 
     return () => {
       closed = true;
-      opened.then(({ db }) => db.close()).catch(() => undefined);
+      for (const opening of dbs) opening.then(({ db }) => db.close()).catch(() => undefined);
     };
     // The signer object changes every render; its identity is signerId.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -83,6 +97,7 @@ export default function AccountProvider({ children }: { children: ReactNode }) {
       stored,
       pubkey,
       locked: stored?.mode === 'protected' && !secret,
+      extensionStalled: stalled === signerId,
       ensureKey: async () => {
         if (!stored) {
           const fresh = (await keys()).generateSecretKey();
@@ -140,7 +155,7 @@ export default function AccountProvider({ children }: { children: ReactNode }) {
       exportNcryptsec: async (password) =>
         secret ? (await keys()).encryptSecretKey(secret, password, KEY_PROTECTION_LOGN) : null,
     };
-  }, [client, connection, stored, secret, signerId, me, remember]);
+  }, [client, connection, stored, secret, signerId, me, remember, stalled]);
 
   return <AccountContext value={account}>{children}</AccountContext>;
 }

@@ -15,6 +15,8 @@ export interface Account {
   /** Public key in hex while signing is possible; null with no identity or a locked one. */
   pubkey: string | null;
   locked: boolean;
+  /** The browser extension didn't answer in time; the app reads the relays without signing. */
+  extensionStalled: boolean;
   /** Makes a browser key when there is no identity yet, and returns the client to write with. */
   ensureKey: () => Promise<RulebookClient | null>;
   /** Uses a pasted key; returns an error message or null. */

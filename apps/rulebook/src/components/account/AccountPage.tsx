@@ -35,7 +35,16 @@ export default function AccountPage() {
         )}
         {account.pubkey && <SignedInPanel pubkey={account.pubkey} />}
         {account.stored?.mode === 'extension' && !account.pubkey && (
-          <p className={NOTE}>Waiting for your browser extension… approve the request in it.</p>
+          <SectionPanel title="Browser extension">
+            <p className={NOTE}>
+              {account.extensionStalled
+                ? "Your browser extension didn't answer, so the rules are read without signing. Approve the request in the extension and reload, or stop using it here."
+                : 'Waiting for your browser extension… approve the request in it.'}
+            </p>
+            <div className="mt-3">
+              <ForgetButton />
+            </div>
+          </SectionPanel>
         )}
         {!account.stored && (
           <>

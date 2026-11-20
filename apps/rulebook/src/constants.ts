@@ -43,3 +43,9 @@ export const BUILDER_URL: string = import.meta.env.VITE_BUILDER_URL ?? '';
 
 /** localStorage key of the print page's include options (a per-browser convenience). */
 export const PRINT_OPTIONS_KEY = 'rulebook:print-options';
+
+/**
+ * How long to wait for a Nostr browser extension to share its public key, in milliseconds. Past that the app reads the
+ * relays without signing, so a missing or stuck extension never blocks reading.
+ */
+export const EXTENSION_TIMEOUT_MS = 15_000;
