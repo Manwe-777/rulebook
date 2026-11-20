@@ -35,9 +35,6 @@ export const RELAYS: string[] = [...new Set([...PROJECT.relays, ...loadKnownRela
 /** Must match the relays' owner key. */
 export const OWNER_KEY: string = PROJECT.owner;
 
-/** localStorage key of how this browser signs. */
-export const IDENTITY_KEY = 'rulebook:identity';
-
 /** scrypt cost for password-protected keys (2^16: about 100 ms and 64 MB). */
 export const KEY_PROTECTION_LOGN = 16;
 

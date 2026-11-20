@@ -1,9 +1,9 @@
+import { IDENTITY_KEY } from '@rulebook/sharing';
+import { loadStoredIdentity, saveStoredIdentity } from '@rulebook/sharing/identity';
 import { encryptSecretKey, generateSecretKey, nsecEncode } from 'tool-db';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { IDENTITY_KEY } from '../constants';
 import { readSecretKey } from './readSecretKey';
-import { loadStoredIdentity, saveStoredIdentity } from './storedIdentity';
 
 describe('readSecretKey', () => {
   const secret = generateSecretKey();

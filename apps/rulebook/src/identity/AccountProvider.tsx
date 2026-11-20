@@ -1,10 +1,10 @@
 import type { RulebookClient } from '@rulebook/sharing';
+import { loadStoredIdentity, saveStoredIdentity, type StoredIdentity } from '@rulebook/sharing/identity';
 import { type ReactNode, useCallback, useEffect, useMemo, useState } from 'react';
 
 import { KEY_PROTECTION_LOGN, OWNER_KEY, RELAYS } from '../constants';
 import { type Account, AccountContext } from './AccountContext';
 import type { Connection } from './connectionSummary';
-import { loadStoredIdentity, saveStoredIdentity, type StoredIdentity } from './storedIdentity';
 
 const online = RELAYS.length > 0 && OWNER_KEY !== '';
 

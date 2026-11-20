@@ -1,8 +1,8 @@
 import type { RulebookClient } from '@rulebook/sharing';
+import type { StoredIdentity } from '@rulebook/sharing/identity';
 import { createContext } from 'react';
 
 import type { Connection } from './connectionSummary';
-import type { StoredIdentity } from './storedIdentity';
 
 export interface Account {
   /** False when no relays are configured: nothing can be read from or written to them. */

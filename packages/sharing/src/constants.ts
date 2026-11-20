@@ -1,3 +1,9 @@
+/**
+ * Where the apps keep how this browser signs (`localStorage`). The rulebook and the list builder share it, so hosted on
+ * the same site they use the same identity.
+ */
+export const IDENTITY_KEY = 'rulebook:identity';
+
 /** The tool-db topic every Rulebook app and relay shares. */
 export const TOPIC = 'rulebook-40k';
 
