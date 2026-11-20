@@ -10,16 +10,24 @@ export interface PublishRequest {
   keyFile?: string;
   /** Release notes. */
   notes: string;
+  /** Only these faction folders; every folder when empty. */
+  only: string[];
 }
 
-const USAGE = 'Usage: npm run publish -w @rulebook/relay -- <folder> <version> [--key key.ncryptsec] [--notes "…"]';
+const USAGE =
+  'Usage: npm run publish -w @rulebook/relay -- <folder> <version> [--key key.ncryptsec] [--notes "…"] [--only a,b]';
 
 /** Reads `publish`'s arguments, or says what is missing. */
 export function parsePublishArgs(argv: string[]): PublishRequest | { error: string } {
-  const { options, rest, missing } = splitOptions(argv, ['--key', '--notes']);
+  const { options, rest, missing } = splitOptions(argv, ['--key', '--notes', '--only']);
   const [folder, version] = rest;
 
   if (!folder || !version || missing.length) return { error: USAGE };
 
-  return { folder, version, keyFile: options['--key'], notes: options['--notes'] ?? '' };
+  const only = (options['--only'] ?? '')
+    .split(',')
+    .map((f) => f.trim())
+    .filter(Boolean);
+
+  return { folder, version, keyFile: options['--key'], notes: options['--notes'] ?? '', only };
 }

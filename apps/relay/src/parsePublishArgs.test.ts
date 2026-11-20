@@ -5,13 +5,25 @@ import { parsePublishArgs } from './parsePublishArgs';
 
 describe('parsePublishArgs', () => {
   it('takes a folder and a version, with an optional key file and notes in any order', () => {
-    expect(parsePublishArgs(['content', '2026-11'])).toEqual({ folder: 'content', version: '2026-11', notes: '' });
+    expect(parsePublishArgs(['content', '2026-11'])).toEqual({
+      folder: 'content',
+      version: '2026-11',
+      notes: '',
+      only: [],
+    });
 
     expect(parsePublishArgs(['--key', '/nas/me.ncryptsec', 'content', '2026-11', '--notes', 'First release'])).toEqual({
       folder: 'content',
       version: '2026-11',
       keyFile: '/nas/me.ncryptsec',
       notes: 'First release',
+      only: [],
+    });
+  });
+
+  it('can publish only some of the faction folders', () => {
+    expect(parsePublishArgs(['content', 'v1', '--only', 'space-marines, blood-angels'])).toMatchObject({
+      only: ['space-marines', 'blood-angels'],
     });
   });
 

@@ -34,7 +34,8 @@ npm run publish -w @rulebook/relay -- packages/rules/content 2026-11 --key ~/rul
 ```
 
 It asks for the key's password, uploads every record to the project's relays, releases each faction and reads the
-release back to check every record was stored. `RELAYS=ws://localhost:8080` publishes to a local relay instead.
+release back to check every record was stored. `--only space-marines,blood-angels` publishes just those faction
+folders; `RELAYS=ws://localhost:8080` publishes to a local relay instead.
 
 ## Test
 

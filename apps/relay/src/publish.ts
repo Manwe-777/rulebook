@@ -49,7 +49,18 @@ const client = new RulebookClient(db, owner);
 
 console.log(`Publishing as ${getPublicKey(secret)} to ${db.relays.connected} of ${relays.length} relays`);
 
-for (const faction of readdirSync(folder, { withFileTypes: true }).filter((d) => d.isDirectory())) {
+const factions = readdirSync(folder, { withFileTypes: true }).filter(
+  (d) => d.isDirectory() && (!request.only.length || request.only.includes(d.name)),
+);
+
+const unknown = request.only.filter((f) => !factions.some((d) => d.name === f));
+
+if (unknown.length) {
+  console.error(`No folder for ${unknown.join(', ')} in ${folder}.`);
+  process.exit(1);
+}
+
+for (const faction of factions) {
   const files = readdirSync(join(folder, faction.name))
     .filter((name) => name.endsWith('.md'))
     .map((name) => ({ name, source: readFileSync(join(folder, faction.name, name), 'utf8') }));
