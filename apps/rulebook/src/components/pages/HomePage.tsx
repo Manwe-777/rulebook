@@ -1,9 +1,7 @@
-import { checkDataset } from '@rulebook/rules';
 import { Link } from 'react-router';
 
 import { useLibrary } from '../../hooks/useLibrary';
-import ErrorsPanel from '../common/ErrorsPanel';
-import IssuesPanel from '../common/IssuesPanel';
+import DataChecks from '../common/DataChecks';
 import FactionCard from './FactionCard';
 
 export default function HomePage() {
@@ -21,14 +19,13 @@ export default function HomePage() {
       {library.factions.length ? (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {library.factions.map((f) => (
-            <FactionCard key={f.id} faction={f} />
+            <FactionCard key={f.id} faction={f} units={library.unitCount(f.id)} />
           ))}
         </div>
       ) : (
         <p className="text-text/70">No factions loaded.</p>
       )}
-      <ErrorsPanel errors={library.errors} />
-      <IssuesPanel issues={checkDataset(library)} />
+      <DataChecks />
     </div>
   );
 }

@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 import { factionTheme } from '../../utils/factionTheme';
 import FactionIcon from '../icons/FactionIcon';
 
-export default function FactionCard({ faction }: { faction: Faction }) {
+export default function FactionCard({ faction, units }: { faction: Faction; units: number }) {
   const theme = factionTheme({}, faction);
 
   return (
@@ -21,7 +21,7 @@ export default function FactionCard({ faction }: { faction: Faction }) {
       <div className="relative">
         <div className="text-2xl font-extrabold tracking-wide uppercase">{faction.name}</div>
         <div className="text-sm text-white/75">
-          {faction.units.length} datasheet{faction.units.length === 1 ? '' : 's'}
+          {units} datasheet{units === 1 ? '' : 's'}
         </div>
       </div>
     </Link>

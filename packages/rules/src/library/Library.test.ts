@@ -147,4 +147,29 @@ describe('demo content', () => {
       ['demo-host', true, true],
     ]);
   });
+
+  it("counts a faction's datasheets before reading them, and reads them only when asked", () => {
+    const lib = Library.fromFiles([
+      { path: 'content/orks/faction.md', source: faction('Orks') },
+      { path: 'content/orks/boyz.md', source: unit('Boyz') },
+      { path: 'content/orks/nobz.md', source: unit('Nobz') },
+      { path: 'content/orks/waaagh.md', source: detachment('Waaagh') },
+    ]);
+
+    expect(lib.unitCount('orks')).toBe(2);
+    expect(lib.faction('orks')?.units.map((u) => u.name)).toEqual(['Boyz', 'Nobz']);
+    expect(lib.unitCount('orks')).toBe(2);
+    expect(lib.unitCount('nobody')).toBe(0);
+  });
+
+  it('a broken datasheet is reported once its faction is read, and the rest of the faction still loads', () => {
+    const lib = Library.fromFiles([
+      { path: 'content/orks/faction.md', source: faction('Orks') },
+      { path: 'content/orks/boyz.md', source: unit('Boyz') },
+      { path: 'content/orks/broken.md', source: '---\nkind: unit\n---\n' },
+    ]);
+
+    expect(lib.faction('orks')?.units.map((u) => u.name)).toEqual(['Boyz']);
+    expect(lib.errors.map((e) => e.path)).toEqual(['content/orks/broken.md']);
+  });
 });

@@ -158,6 +158,10 @@
 - Unit cards fold down to their title (chevron), in both edit and play, for units lost during a game; folds are kept
   per army on the device, and a folded edit card still shows its problems.
 - Wide faction glyphs (the Astra Militarum aquila, Tyranids) are drawn smaller so every icon fits the same square.
+- Rules are read lazily: only the core records and each `faction.md` at startup, a faction's datasheets and
+  detachments the first time they're used, and files already read aren't read again when another faction arrives
+  (startup with 35 factions ~1.5 s → ~60 ms; a full sync's rebuilds ~30 s → ~50 ms). The home page counts datasheets
+  without reading them; the data checks run when asked.
 
 ## Known issues
 
