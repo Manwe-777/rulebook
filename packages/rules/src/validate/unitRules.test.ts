@@ -98,4 +98,17 @@ describe('leaders and support units with a condition', () => {
     expect(errors(base, captainUnlessVenn)).toEqual([]);
     expect(errors(demoList({ units: [...base.units, venn] }), captainUnlessVenn)).toEqual(['cannot-attach']);
   });
+
+  it('the same rule on several datasheets is reported once', () => {
+    const rule = '  - { id: no-captains, select: { units: { ids: [field-captain] } }, max: 0, message: No captains. }';
+
+    const both = demoLibraryWith({
+      'demo-host/field-captain.md': (src) =>
+        src.replace('factionKeywords: [DEMO HOST]', `factionKeywords: [DEMO HOST]\nconstraints:\n${rule}`),
+      'demo-host/standard-bearer.md': (src) =>
+        src.replace('factionKeywords: [DEMO HOST]', `factionKeywords: [DEMO HOST]\nconstraints:\n${rule}`),
+    });
+
+    expect(errors(base, both)).toEqual(['no-captains']);
+  });
 });

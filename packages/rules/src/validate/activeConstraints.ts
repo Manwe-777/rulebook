@@ -11,6 +11,24 @@ function armyDatasheets(ctx: ValidationContext) {
 }
 
 /**
+ * The rules the datasheets in the army bring. A rule written the same way on several datasheets (a shared ally limit)
+ * counts once, so a broken one is reported once.
+ */
+function datasheetConstraints(ctx: ValidationContext) {
+  const found = new Map<string, { constraint: Constraint; source: string }>();
+
+  for (const unit of armyDatasheets(ctx)) {
+    for (const constraint of unit.constraints) {
+      const key = JSON.stringify(constraint);
+
+      if (!found.has(key)) found.set(key, { constraint, source: unit.id });
+    }
+  }
+
+  return [...found.values()];
+}
+
+/**
  * Every constraint from the muster rules, the faction, the chosen detachments and the datasheets in the army whose
  * `when` holds and `unless` doesn't.
  */
@@ -19,7 +37,7 @@ export function activeConstraints(ctx: ValidationContext): { constraint: Constra
     ...ctx.muster.constraints.map((constraint) => ({ constraint, source: 'core' })),
     ...ctx.faction.constraints.map((constraint) => ({ constraint, source: ctx.faction.id })),
     ...ctx.detachments.flatMap((d) => d.constraints.map((constraint) => ({ constraint, source: d.id }))),
-    ...armyDatasheets(ctx).flatMap((u) => u.constraints.map((constraint) => ({ constraint, source: u.id }))),
+    ...datasheetConstraints(ctx),
   ];
 
   return all.filter(({ constraint }) => applies(ctx, constraint));
