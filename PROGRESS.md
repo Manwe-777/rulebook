@@ -167,6 +167,9 @@
   change is checked against who may set that entry, on the relays and in the apps. A client reads `index` once and
   downloads only factions whose release hash changed (up-to-date check ~6 s → ~10 ms). Relays copy map change sets
   between each other. `npm run reindex -w @rulebook/relay` moves existing data into the maps (owner key).
+- The rulebook home page shows how current the rules data is (up to date, checking, offline) and, on each faction card
+  and for the core rules, the loaded release: version, how long ago it was released and how many records it has (its
+  notes as the card's tooltip). The list builder's rules data table is gone.
 
 ## Known issues
 

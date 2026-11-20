@@ -8,7 +8,6 @@ import { PANEL, PANEL_TITLE } from '../styles';
 import SyncPanel from '../sync/SyncPanel';
 import ArmyCard from './ArmyCard';
 import NewArmyForm from './NewArmyForm';
-import RulesPanel from './RulesPanel';
 
 interface Props {
   saved: SavedArmies;
@@ -54,7 +53,6 @@ export default function ArmiesPage({ saved, rules, sync, onOpen, onCreate, onDup
         </ul>
       )}
       <SyncPanel sync={sync} now={now} />
-      <RulesPanel library={library} releases={releases} status={rules.status} checkedAt={rules.checkedAt} now={now} />
       <p className="text-xs text-text/60">
         Photos are saved on this device only. Armies too, unless sync between devices is on.
       </p>

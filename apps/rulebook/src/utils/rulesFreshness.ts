@@ -1,10 +1,10 @@
 import { formatAgo } from '@rulebook/rules';
 
-import type { BuilderSource } from '../hooks/useBuilderLibrary';
+import type { SourceStatus } from '../library/SourceContext';
 
 /** One line on how current the rules are: where they come from and when the relays last gave them. */
 export function rulesFreshness(
-  status: BuilderSource,
+  status: SourceStatus,
   checkedAt: number | null,
   now: number,
 ): {

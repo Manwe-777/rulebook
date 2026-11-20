@@ -7,6 +7,7 @@ import { loadBundledFiles } from '../sources/loadBundledFiles';
 import { bundledLibrary } from './bundledLibrary';
 import { FilesContext } from './FilesContext';
 import { LibraryContext } from './LibraryContext';
+import { type Releases, ReleasesContext } from './ReleasesContext';
 import { SourceContext, type SourceStatus } from './SourceContext';
 
 const configured = RELAYS.length > 0 && OWNER_KEY !== '';
@@ -19,6 +20,7 @@ export default function LibraryProvider({ children }: { children: ReactNode }) {
   const [library, setLibrary] = useState(bundledLibrary);
   const [files, setFiles] = useState(loadBundledFiles);
   const [status, setStatus] = useState<SourceStatus>(configured ? 'loading' : 'demo');
+  const [releases, setReleases] = useState<Releases>({ releases: [], checkedAt: null });
 
   useEffect(() => {
     if (!configured) return;
@@ -37,13 +39,15 @@ export default function LibraryProvider({ children }: { children: ReactNode }) {
             onRelease: onProgress,
           }),
         cache: new ReleaseCache(OWNER_KEY),
-        onChange: (remote, source) => {
+        onChange: (remote, source, checkedAt) => {
           if (remote) {
             const merged = mergeFiles(loadBundledFiles(), remote.files);
 
             setFiles(merged);
             setLibrary(Library.fromFiles(merged));
           }
+
+          setReleases({ releases: remote?.releases ?? [], checkedAt });
 
           setStatus(source);
         },
@@ -59,7 +63,9 @@ export default function LibraryProvider({ children }: { children: ReactNode }) {
   return (
     <LibraryContext value={library}>
       <FilesContext value={files}>
-        <SourceContext value={status}>{children}</SourceContext>
+        <SourceContext value={status}>
+          <ReleasesContext value={releases}>{children}</ReleasesContext>
+        </SourceContext>
       </FilesContext>
     </LibraryContext>
   );
