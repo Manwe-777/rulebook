@@ -111,7 +111,8 @@ they all hold.
 
 **Measures:** `count` (entries), `models` (models in them), `points` (their total cost).
 
-**Comparisons:** `min`, `max`, `maxShare` (share of the points limit), `equal`.
+**Comparisons:** `min`, `max`, `maxShare` (share of the points limit), `equal`. Every constraint needs one, except an
+`allow` with no limit.
 
 **`allow`** turns a constraint into an exception for a core check on the selected entries, limited by the comparison:
 `faction` (units without the faction keyword), `datasheet-limit`, `attachments` (more than one leader per bodyguard).

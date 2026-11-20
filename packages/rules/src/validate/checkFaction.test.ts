@@ -63,4 +63,12 @@ describe('checkFaction', () => {
     expect(errors(scouts(2), allies)).toEqual([]);
     expect(errors(scouts(3), allies).sort()).toEqual(['allies', 'wrong-faction', 'wrong-faction', 'wrong-faction']);
   });
+
+  it('an allow constraint without a comparison lets every selected unit in', () => {
+    const allies = libraryWithAllies([
+      { id: 'allies', allow: 'faction', select: { units: { ids: ['allied-scout'] } }, message: 'Allies.' },
+    ]);
+
+    expect(errors(scouts(3), allies)).toEqual([]);
+  });
 });

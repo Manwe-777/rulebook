@@ -44,8 +44,8 @@ export const constraintSchema = z
     maxShare: share.optional(),
     message: text,
   })
-  .refine((c) => [c.min, c.max, c.equal, c.maxShare].some((v) => v !== undefined), {
-    message: 'needs a comparison: min, max, equal or maxShare',
+  .refine((c) => c.allow !== undefined || [c.min, c.max, c.equal, c.maxShare].some((v) => v !== undefined), {
+    message: 'needs a comparison: min, max, equal or maxShare (only an allow can go without one)',
   });
 
 export const constraintsSchema = z.array(constraintSchema).default([]);
