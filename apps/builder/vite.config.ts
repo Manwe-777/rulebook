@@ -20,6 +20,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       manifest: {
+        // Its own id, so Android keeps it apart from the rulebook installed from the same site.
+        id: process.env.BASE_PATH ?? '/',
         name: 'Rulebook List Builder',
         short_name: 'List Builder',
         description: 'Build and check Warhammer 40,000 army lists with community-written rules.',
