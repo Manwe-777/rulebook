@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs';
 
 import { CORE, loadRelayAnnouncements, RulebookClient, TOPIC } from '@rulebook/sharing';
-import { PROJECT } from '@rulebook/sharing/project';
+import { PROJECT, projectSettings } from '@rulebook/sharing/project';
 import { decryptSecretKey, getPublicKey, ToolDb } from 'tool-db';
 
 import { askHidden } from './askHidden';
@@ -31,9 +31,11 @@ if (!secret) {
 }
 
 const owner = getPublicKey(secret);
+// The project owner as hex: project.json (npub or hex), or RULEBOOK_OWNER when set, as the apps read it.
+const projectOwner = projectSettings({ owner: process.env.RULEBOOK_OWNER }).owner;
 
-if (owner !== PROJECT.owner && process.env.RULEBOOK_OWNER === undefined) {
-  console.error(`That key (${owner}) is not the project owner in project.json.`);
+if (owner !== projectOwner) {
+  console.error(`That key (${owner}) is not the project owner (${projectOwner || 'none set'}).`);
   process.exit(1);
 }
 
