@@ -23,9 +23,15 @@ cp -r release "$WORK/bad"
 echo tampered >> "$WORK/bad/rulebook-relay.tar.gz"
 
 docker build -q -t rulebook-relay-test tests/installer >/dev/null
-# Not --privileged: SYS_ADMIN only to remount the container's own cgroup tree.
-c=$(docker run -d --cgroupns=private --cap-add SYS_ADMIN --tmpfs /run --tmpfs /run/lock \
+# Not --privileged: SYS_ADMIN only to remount the container's own cgroup tree. AppArmor (on Ubuntu hosts such as
+# GitHub's runners) blocks that remount, so the container runs without its profile.
+c=$(docker run -d --cgroupns=private --cap-add SYS_ADMIN --security-opt apparmor=unconfined \
+      --tmpfs /run --tmpfs /run/lock \
       --label rulebook-relay-test -v "$WORK/dl":/dl:ro -v "$WORK/bad":/bad:ro rulebook-relay-test)
+sleep 2
+if [ "$(docker inspect -f '{{.State.Running}}' "$c")" != true ]; then
+  echo "FAIL: the systemd container stopped:"; docker logs "$c" 2>&1 | tail -20; exit 1
+fi
 docker exec "$c" sh -c 'until systemctl is-system-running 2>/dev/null | grep -qE "running|degraded"; do sleep 1; done'
 IP=$(docker inspect -f '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' "$c")
 
