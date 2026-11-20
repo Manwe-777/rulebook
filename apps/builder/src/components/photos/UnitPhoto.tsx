@@ -11,10 +11,26 @@ interface Props {
   size: number;
   /** Show an add-photo button when there's no photo yet (otherwise nothing). */
   placeholder?: boolean;
+  /** Only show the photo: no add or change button (play mode). */
+  readOnly?: boolean;
 }
 
-/** A unit's photo as a small square, or an add-photo placeholder; opens the photo dialog. */
-export default function UnitPhoto({ faction, unit, name, size, placeholder = true }: Props) {
+/** A unit's photo as a small square, or an add-photo placeholder; opens the photo dialog unless read-only. */
+export default function UnitPhoto({ readOnly = false, ...props }: Props) {
+  return readOnly ? <PhotoImage {...props} /> : <EditablePhoto {...props} />;
+}
+
+/** The photo alone, or nothing when there is none. */
+function PhotoImage({ faction, unit, size }: Props) {
+  const url = usePhotoUrl(faction, unit);
+
+  return url ? (
+    <img src={url} alt="" className="shrink-0 rounded object-cover" style={{ width: size, height: size }} />
+  ) : null;
+}
+
+/** The photo or an add-photo placeholder, opening the photo dialog. */
+function EditablePhoto({ faction, unit, name, size, placeholder = true }: Props) {
   const url = usePhotoUrl(faction, unit);
   const [open, setOpen] = useState(false);
 

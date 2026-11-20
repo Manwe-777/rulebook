@@ -2,12 +2,14 @@ import { type Library, listPoints, validateList } from '@rulebook/rules';
 import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
+import { usePlayMode } from '../hooks/usePlayMode';
 import { useUnitRoute } from '../hooks/useUnitRoute';
 import { factionTint } from '../utils/factionTint';
 import ArmyHeader from './ArmyHeader';
 import ArmySettings from './ArmySettings';
 import EntryList from './EntryList';
 import IssuesPanel from './IssuesPanel';
+import PlayList from './play/PlayList';
 import UnitSheet from './unit/UnitSheet';
 import UnitPicker from './UnitPicker';
 
@@ -20,7 +22,8 @@ interface Props {
 }
 
 /**
- * One army being built, or one of its units in the play view (`?unit=`): settings and unit picker on the left, the army and its problems on the right, in the colour
+ * One army in edit mode (settings, unit picker, editable cards), in play mode (`?mode=play`: compact read-only cards),
+ * or one of its units in the play view (`?unit=`): settings and unit picker on the left, the army and its problems on the right, in the colour
  * the faction's data sets.
  */
 export default function BuilderPage({ draft, library, release, onChange }: Props) {
@@ -28,6 +31,7 @@ export default function BuilderPage({ draft, library, release, onChange }: Props
   const points = listPoints(draft.list, library);
   const faction = library.faction(draft.list.faction);
   const [unitId, openUnit] = useUnitRoute();
+  const [playing, setPlaying] = usePlayMode();
 
   if (unitId && draft.entry(unitId)) {
     return (
@@ -37,6 +41,7 @@ export default function BuilderPage({ draft, library, release, onChange }: Props
           library={library}
           entryId={unitId}
           points={points.entries}
+          playing={playing}
           onClose={() => openUnit(null)}
         />
       </div>
@@ -45,17 +50,29 @@ export default function BuilderPage({ draft, library, release, onChange }: Props
 
   return (
     <div className="flex flex-col gap-4" style={factionTint(faction?.color)}>
-      <ArmyHeader draft={draft} points={points} issues={issues} icon={faction?.icon} onChange={onChange} />
-      <div className="grid gap-4 md:grid-cols-[2fr_3fr]">
-        <div className="flex min-w-0 flex-col gap-4">
-          <ArmySettings draft={draft} library={library} release={release} onChange={onChange} />
-          <UnitPicker draft={draft} library={library} onChange={onChange} />
+      <ArmyHeader
+        draft={draft}
+        points={points}
+        issues={issues}
+        icon={faction?.icon}
+        playing={playing}
+        onPlayingChange={setPlaying}
+        onChange={onChange}
+      />
+      {playing ? (
+        <PlayList draft={draft} library={library} points={points.entries} />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-[2fr_3fr]">
+          <div className="flex min-w-0 flex-col gap-4">
+            <ArmySettings draft={draft} library={library} release={release} onChange={onChange} />
+            <UnitPicker draft={draft} library={library} onChange={onChange} />
+          </div>
+          <div className="flex min-w-0 flex-col gap-4">
+            <IssuesPanel issues={issues} />
+            <EntryList draft={draft} library={library} points={points.entries} issues={issues} onChange={onChange} />
+          </div>
         </div>
-        <div className="flex min-w-0 flex-col gap-4">
-          <IssuesPanel issues={issues} />
-          <EntryList draft={draft} library={library} points={points.entries} issues={issues} onChange={onChange} />
-        </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -47,3 +47,7 @@ export const ICON_CREDIT = {
 /** Address parameters: the open army and the unit open in the play view. */
 export const ARMY_PARAM = 'army';
 export const UNIT_PARAM = 'unit';
+
+/** Address parameter for the army page's mode; `?mode=play` hides every control that changes the list. */
+export const MODE_PARAM = 'mode';
+export const PLAY_MODE = 'play';

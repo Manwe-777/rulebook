@@ -5,7 +5,7 @@ import type { SavedArmy } from '../../army/SavedArmies';
 import { armySummary } from '../../utils/armySummary';
 import { factionTint } from '../../utils/factionTint';
 import { formatAgo } from '../../utils/formatAgo';
-import { BUTTON_QUIET } from '../styles';
+import { BUTTON, BUTTON_QUIET } from '../styles';
 import ArmyBanner from './ArmyBanner';
 import ArmyRulesLine from './ArmyRulesLine';
 import DeleteArmyButton from './DeleteArmyButton';
@@ -18,12 +18,14 @@ interface Props {
   release: ReleaseInfo | undefined;
   now: number;
   onOpen: () => void;
+  /** Opens the army in play mode. */
+  onPlay: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
 }
 
 /** A saved army on the armies screen: name, faction, size, detachments, points, legality and photos of its units. */
-export default function ArmyCard({ army, library, release, now, onOpen, onDuplicate, onDelete }: Props) {
+export default function ArmyCard({ army, library, release, now, onOpen, onPlay, onDuplicate, onDelete }: Props) {
   const s = armySummary(army.list, library);
 
   return (
@@ -58,6 +60,9 @@ export default function ArmyCard({ army, library, release, now, onOpen, onDuplic
         </span>
       </button>
       <div className="flex flex-wrap items-center gap-2 border-t border-white/10 p-2">
+        <button type="button" className={BUTTON} onClick={onPlay}>
+          Play
+        </button>
         <button type="button" className={BUTTON_QUIET} onClick={onDuplicate}>
           Duplicate
         </button>

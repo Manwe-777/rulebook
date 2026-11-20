@@ -11,7 +11,7 @@ import RulesPanel from './RulesPanel';
 interface Props {
   saved: SavedArmies;
   rules: BuilderRules;
-  onOpen: (id: string) => void;
+  onOpen: (id: string, play?: boolean) => void;
   onCreate: (faction: string) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
@@ -43,6 +43,7 @@ export default function ArmiesPage({ saved, rules, onOpen, onCreate, onDuplicate
               release={releaseOf(army.list.faction)}
               now={now}
               onOpen={() => onOpen(army.id)}
+              onPlay={() => onOpen(army.id, true)}
               onDuplicate={() => onDuplicate(army.id)}
               onDelete={() => onDelete(army.id)}
             />

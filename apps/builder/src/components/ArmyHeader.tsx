@@ -3,7 +3,7 @@ import { encodeListLink, type Issue } from '@rulebook/rules';
 import type { ArmyDraft } from '../army/ArmyDraft';
 import { RULEBOOK_URL } from '../constants';
 import FactionIcon from './FactionIcon';
-import { INPUT } from './styles';
+import { BUTTON, BUTTON_QUIET, INPUT } from './styles';
 
 interface Props {
   draft: ArmyDraft;
@@ -11,11 +11,14 @@ interface Props {
   issues: Issue[];
   /** The faction's icon from its data. */
   icon: string | undefined;
+  /** Play mode: the name can't be edited, and the switch offers edit mode. */
+  playing: boolean;
+  onPlayingChange: (playing: boolean) => void;
   onChange: (draft: ArmyDraft) => void;
 }
 
-/** The list's name, its points against the limit, and whether it is legal. */
-export default function ArmyHeader({ draft, points, issues, icon, onChange }: Props) {
+/** The list's name, its points against the limit, whether it is legal, and the switch between edit and play mode. */
+export default function ArmyHeader({ draft, points, issues, icon, playing, onPlayingChange, onChange }: Props) {
   const errors = issues.filter((i) => i.severity === 'error').length;
   const legal = errors === 0;
 
@@ -26,12 +29,16 @@ export default function ArmyHeader({ draft, points, issues, icon, onChange }: Pr
           <FactionIcon name={icon} className="text-3xl leading-none" />
         </span>
       )}
-      <input
-        aria-label="List name"
-        className={`${INPUT} min-w-0 flex-1 text-xl font-bold`}
-        value={draft.list.name}
-        onChange={(e) => onChange(draft.rename(e.target.value))}
-      />
+      {playing ? (
+        <h2 className="min-w-0 flex-1 text-2xl font-extrabold">{draft.list.name}</h2>
+      ) : (
+        <input
+          aria-label="List name"
+          className={`${INPUT} min-w-0 flex-1 text-xl font-bold`}
+          value={draft.list.name}
+          onChange={(e) => onChange(draft.rename(e.target.value))}
+        />
+      )}
       <span className="rounded bg-panel px-3 py-1 text-xl font-extrabold">
         {points.total}
         {points.limit !== null && <span className="text-text/60"> / {points.limit} pts</span>}
@@ -41,6 +48,13 @@ export default function ArmyHeader({ draft, points, issues, icon, onChange }: Pr
       >
         {legal ? 'Legal' : `${errors} problem${errors === 1 ? '' : 's'}`}
       </span>
+      <button
+        type="button"
+        className={`${playing ? BUTTON_QUIET : BUTTON} text-lg`}
+        onClick={() => onPlayingChange(!playing)}
+      >
+        {playing ? 'Edit list' : 'Play'}
+      </button>
       {RULEBOOK_URL && (
         // The list goes after `#`, so it stays in the browser and never reaches a server.
         <a

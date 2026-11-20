@@ -16,12 +16,14 @@ interface Props {
   unit: Unit;
   /** Show every weapon and wargear rule on the datasheet, not only what this unit carries. */
   showAll: boolean;
+  /** Play mode: the photo can't be changed. */
+  readOnly: boolean;
   /** What the unit is in its combined unit, e.g. "Leader". */
   role?: string;
 }
 
 /** One unit as it was built, for playing: stats, what each model carries, its weapons with counts and its rules. */
-export default function UnitPanel({ library, list, entry, unit, showAll, role }: Props) {
+export default function UnitPanel({ library, list, entry, unit, showAll, readOnly, role }: Props) {
   const loadout = entryLoadout(unit, entry);
   const { ranged, melee } = weaponRows(unit, loadout, showAll);
   const carried = loadout.flatMap((l) => l.items.map((i) => i.id));
@@ -30,7 +32,7 @@ export default function UnitPanel({ library, list, entry, unit, showAll, role }:
     <article className="overflow-hidden rounded-lg bg-panel shadow-lg">
       <header className="flex flex-col gap-3 bg-bar-dark px-3 py-3 text-white">
         <div className="flex items-center gap-3">
-          <UnitPhoto faction={list.faction} unit={unit.id} name={unit.name} size={64} />
+          <UnitPhoto faction={list.faction} unit={unit.id} name={unit.name} size={64} readOnly={readOnly} />
           <div className="flex-1">
             {role && <p className="text-xs font-bold tracking-wide uppercase opacity-80">{role}</p>}
             <h3 className="text-2xl font-extrabold tracking-wide uppercase">{unit.name}</h3>

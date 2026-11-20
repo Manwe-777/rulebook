@@ -5,6 +5,7 @@ import { loadBundledFiles } from '../sources/loadBundledFiles';
 import { attackDice, totalAttacks } from './attackDice';
 import { carriedWargearRules } from './carriedWargearRules';
 import { combinedUnit } from './combinedUnit';
+import { gearSummary } from './gearSummary';
 import { loadoutLines } from './loadoutLines';
 import { mergedProfiles } from './mergedProfiles';
 import { weaponRows } from './weaponRows';
@@ -97,5 +98,18 @@ describe('attack dice', () => {
     expect(attackDice('2', '3+', 5)).toBe('Roll 10 attacks, hitting on 3+');
     expect(attackDice('1', '4+', 1)).toBe('Roll 1 attack, hitting on 4+');
     expect(attackDice('D6', 'N/A', 2)).toBe('Roll 2D6 attacks, hitting automatically');
+  });
+});
+
+describe('gear summary on play cards', () => {
+  it('totals what the models carry, weapons before other wargear', () => {
+    const troopers = unit('line-troopers');
+
+    expect(gearSummary(troopers, entryLoadout(troopers, entry('line-troopers', 10)))).toEqual([
+      'Service pistol',
+      '10 × Close combat weapon',
+      '9 × Service rifle',
+      'Signal flare',
+    ]);
   });
 });

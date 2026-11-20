@@ -11,6 +11,8 @@ interface Props {
   library: Library;
   entryId: string;
   points: Record<string, number>;
+  /** Play mode: photos can't be changed. */
+  playing: boolean;
   onClose: () => void;
 }
 
@@ -18,7 +20,7 @@ interface Props {
  * The play view of a unit: the unit as built, with the leaders and support units attached to it, showing only the
  * weapons and wargear rules it has unless "show all" is on.
  */
-export default function UnitSheet({ draft, library, entryId, points, onClose }: Props) {
+export default function UnitSheet({ draft, library, entryId, points, playing, onClose }: Props) {
   const [showAll, setShowAll] = useState(false);
   const group = combinedUnit(draft.list, entryId);
   const unitOf = (e: ListEntry) => library.unit(draft.list.faction, e.unit)?.unit;
@@ -39,6 +41,7 @@ export default function UnitSheet({ draft, library, entryId, points, onClose }: 
         entry={entry}
         unit={unit}
         showAll={showAll}
+        readOnly={playing}
         role={role}
       />
     ) : null;
