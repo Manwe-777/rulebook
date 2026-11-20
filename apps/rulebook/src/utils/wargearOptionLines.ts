@@ -13,7 +13,9 @@ function who(unit: Unit, option: WargearOption): string {
   if (option.per === 'all') return `Any number of ${kind}models`;
   if (typeof option.per === 'number') return `Up to ${option.per} ${kind}model${option.per === 1 ? '' : 's'}`;
 
-  return `1 ${kind}model in every ${option.per.every}`;
+  const { count, every } = option.per;
+
+  return count === 1 ? `1 ${kind}model in every ${every}` : `Up to ${count} ${kind}models in every ${every}`;
 }
 
 /** Each structured wargear option in plain words, e.g. `Up to 2 Veteran models can replace carbine with melta gun.` */

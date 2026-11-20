@@ -21,5 +21,5 @@ export function wargearAllowance(unit: Unit, size: number, option: WargearOption
   if (option.per === 'all') return eligible;
   if (typeof option.per === 'number') return Math.min(option.per, eligible);
 
-  return Math.min(Math.floor(size / option.per.every), eligible);
+  return Math.min(Math.floor(size / option.per.every) * option.per.count, eligible);
 }

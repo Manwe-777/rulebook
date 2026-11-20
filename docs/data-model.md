@@ -96,7 +96,7 @@ equipment: # wargear without a weapon profile, referred to by id like weapons
 wargearOptions:
   - id: launcher
     models: Field Captain # optional: which model type may take it; any model when left out
-    per: 1 # up to this many models; { every: 5 } for one in every 5 models; all (the default) for any number
+    per: 1 # up to this many models; { every: 5 } for one in every 5 ({ every: 5, count: 2 } for two); all (the default) for any number
     replace: [service-pistol]
     with: [[grenade-launcher]] # pick one list of weapon or equipment ids
     points: 0 # optional cost per model taking it

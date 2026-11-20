@@ -36,8 +36,15 @@ const rangedWeapon = z.strictObject({ ...weaponFields, range: stat, BS: stat });
 
 const meleeWeapon = z.strictObject({ ...weaponFields, WS: stat });
 
-/** How many models may take a wargear option: up to a number, one in every N models, or all of them. */
-const per = z.union([z.int().min(1), z.strictObject({ every: z.int().min(1) }), z.literal('all')]);
+/**
+ * How many models may take a wargear option: up to a number, `count` (default 1) in every `every` models, or all of
+ * them.
+ */
+const per = z.union([
+  z.int().min(1),
+  z.strictObject({ every: z.int().min(1), count: z.int().min(1).default(1) }),
+  z.literal('all'),
+]);
 
 const wargearOption = z.strictObject({
   id: slug,

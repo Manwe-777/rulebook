@@ -7,6 +7,7 @@ import type { ArmyList, ListEntry } from '../types';
 import { detachmentPoints } from './detachmentPoints';
 import { listPoints } from './listPoints';
 import { validateList } from './validateList';
+import { wargearAllowance } from './wargearAllowance';
 
 const base = demoList();
 
@@ -76,6 +77,14 @@ describe('validateList: unit size and wargear', () => {
     expect(codes(replaceUnit('troopers', { wargear: flamers(1) }))).toEqual([]);
     expect(codes(replaceUnit('troopers', { wargear: flamers(2) }))).toEqual(['wargear-limit']);
     expect(codes(replaceUnit('troopers', { models: 20, wargear: flamers(2) }))).toEqual([]);
+  });
+
+  it('"up to 2 in every 5" allows twice as many as "1 in every 5"', () => {
+    const troopers = demoLibrary.unit('demo-host', 'line-troopers')!.unit;
+    const option = { ...troopers.wargearOptions[0], per: { every: 5, count: 2 } };
+
+    expect(wargearAllowance(troopers, 10, option)).toBe(4);
+    expect(wargearAllowance(troopers, 20, option)).toBe(8);
   });
 
   it('the same option taken in two rows counts all of its models', () => {
