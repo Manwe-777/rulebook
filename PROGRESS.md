@@ -168,6 +168,11 @@
 - First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
   the whole rules library.
 
+- List checks added for the gaps the factions found: allies only through an `allow: faction` rule (Deathwatch Allies,
+  500 points); datasheet rules ("must / can't be the Warlord", "one per army") as unit `constraints` with a
+  `warlord` selector and `when`/`unless` conditions; conditional leader and support blocks (Cato Sicarius with
+  Marneus Calgar); sizes priced by model type (Wolf Guard Headtakers); wargear `group`s for "one or the other" swaps,
+  and a check that every swap still finds what it replaces. All 31 local lists stay legal.
 - Format gaps found across the 18 factions (details in each NOTES file): allied units from other factions (an
   Assassin in a White Scars list); per-datasheet army rules ("must / can't be the Warlord", "one per army",
   conditional Support); wargear rules "no duplicates", "one of these per model" and "replace X or Y"; points that
