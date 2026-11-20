@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Link, Route, Routes, useLocation } from 'react-router';
+import { Link, NavLink, Route, Routes, useLocation } from 'react-router';
 
 import ConnectionBadge from './components/common/ConnectionBadge';
 import SourceStatusLine from './components/common/SourceStatusLine';
@@ -13,6 +13,10 @@ import { useDocumentTitle } from './hooks/useDocumentTitle';
 import { useLibrary } from './hooks/useLibrary';
 import { titleForPath } from './library/titleForPath';
 
+const LINK = 'text-sm font-semibold tracking-wide uppercase hover:underline';
+const CURRENT = 'text-sm font-semibold tracking-wide uppercase underline decoration-2 underline-offset-4';
+const navClass = ({ isActive }: { isActive: boolean }) => (isActive ? CURRENT : LINK);
+
 // Pages for contributors load when opened, so readers never download the editor.
 const AccountPage = lazy(() => import('./components/account/AccountPage'));
 const FactionWorkspace = lazy(() => import('./components/editor/FactionWorkspace'));
@@ -25,7 +29,11 @@ const AdminPage = lazy(() => import('./components/admin/AdminPage'));
 export default function App() {
   const library = useLibrary();
 
-  useDocumentTitle(titleForPath(library, useLocation().pathname));
+  const path = useLocation().pathname;
+  // Every page but the admin and account pages is part of the rulebook itself.
+  const inRulebook = !/^\/(admin|account)\b/.test(path);
+
+  useDocumentTitle(titleForPath(library, path));
 
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-6 px-4 py-6 font-sans text-text print:max-w-none print:p-0">
@@ -33,19 +41,23 @@ export default function App() {
         <Link to="/" className="text-3xl font-extrabold tracking-wide uppercase">
           {SITE_NAME}
         </Link>
-        <nav className="flex items-center gap-4">
+        {/* The same links, in the same order, as the list builder's. */}
+        <nav className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <ConnectionBadge />
+          <Link to="/" className={inRulebook ? CURRENT : LINK} aria-current={inRulebook ? 'page' : undefined}>
+            Rulebook
+          </Link>
           {BUILDER_URL && (
-            <a href={BUILDER_URL} className="text-sm font-semibold tracking-wide uppercase hover:underline">
+            <a href={BUILDER_URL} className={LINK}>
               List builder
             </a>
           )}
-          <Link to="/admin" className="text-sm font-semibold tracking-wide uppercase hover:underline">
+          <NavLink to="/admin" className={navClass}>
             Admin
-          </Link>
-          <Link to="/account" className="text-sm font-semibold tracking-wide uppercase hover:underline">
+          </NavLink>
+          <NavLink to="/account" className={navClass}>
             Account
-          </Link>
+          </NavLink>
         </nav>
       </header>
       <Suspense fallback={<p className="text-text/70">Loading…</p>}>

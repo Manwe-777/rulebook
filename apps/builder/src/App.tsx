@@ -19,6 +19,7 @@ const SOURCE: Record<BuilderSource, string> = {
 };
 
 const LINK = 'text-sm font-semibold tracking-wide uppercase hover:underline';
+const CURRENT = 'text-sm font-semibold tracking-wide uppercase underline decoration-2 underline-offset-4';
 
 /** The list builder: the saved armies, or the army open in the address (`?army=<id>`). */
 export default function App() {
@@ -39,7 +40,7 @@ export default function App() {
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col gap-4 px-4 py-6 font-sans text-text">
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <h1 className="text-3xl font-extrabold tracking-wide uppercase">{SITE_NAME}</h1>
-        <nav className="flex items-center gap-4">
+        <nav className="flex flex-wrap items-center gap-x-4 gap-y-1">
           {draft && (
             <button type="button" className={LINK} onClick={() => open(null)}>
               ← Armies
@@ -49,6 +50,19 @@ export default function App() {
             <a href={RULEBOOK_URL} className={LINK}>
               Rulebook
             </a>
+          )}
+          <button type="button" aria-current="page" className={CURRENT} onClick={() => open(null)}>
+            List builder
+          </button>
+          {RULEBOOK_URL && (
+            <>
+              <a href={`${RULEBOOK_URL}admin`} className={LINK}>
+                Admin
+              </a>
+              <a href={`${RULEBOOK_URL}account`} className={LINK}>
+                Account
+              </a>
+            </>
           )}
         </nav>
       </div>
