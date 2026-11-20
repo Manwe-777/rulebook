@@ -57,6 +57,14 @@
 - Live: the repository is on GitHub (Manwe-777/rulebook), the apps on GitHub Pages
   (manwe-777.github.io/rulebook/), relay release v1.0.0 with the owner key built in, and the first relay "Rulebook
   NYC" at `wss://192-241-132-246.sslip.io` (DigitalOcean droplet, Caddy for TLS), announced on the bootstrap relays.
+- Local test content (gitignored `local-content/`, unpublished): 18 factions, 371 datasheets and 93 detachments,
+  from 40k.app with rules in our own words: Leagues of Votann, Emperor's Children, Tyranids, Orks, T'au Empire, Grey
+  Knights, the shared Space Marines bundle (69 datasheets, 16 detachments) and 11 chapters including it (Blood Angels,
+  White Scars, Space Wolves, Ultramarines, Salamanders, Imperial Fists, Iron Hands, Raven Guard, Dark Angels, Black
+  Templars, Deathwatch). Shared leaders name the chapter units they can lead. `check-content` reports no errors; 30
+  tournament lists in `local-lists/` are legal and match their exports (one White Scars list is 100 short: its allied Callidus
+  Assassin can't be expressed). Per-faction notes: `local-content/NOTES-<faction>.txt`; the method for adding a
+  faction: `local-content/FACTION-BRIEF.txt`.
 - Detachment `grants`: roles and keywords a detachment gives selected units (optionally up to `max`); validation
   applies them before every check and the builder's cards use the granted units (warlord, enhancements). Needed by
   Tyranids (Warrior Bioform Onslaught, Subterranean Assault), Orks (Kult of Speed, Runt Swarm) and Votann.
@@ -160,6 +168,13 @@
 - First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
   the whole rules library.
 
+- Format gaps found across the 18 factions (details in each NOTES file): allied units from other factions (an
+  Assassin in a White Scars list); per-datasheet army rules ("must / can't be the Warlord", "one per army",
+  conditional Support); wargear rules "no duplicates", "one of these per model" and "replace X or Y"; points that
+  depend on which models a unit has, not how many (Wolf Guard Headtakers with or without Hunting Wolves); transport
+  space by model type or wounds and mixed capacity pools; detachment allowances for allies (Deathwatch Support's 500
+  points); 40k.app leaving a unit's own name keyword off its card (added by hand where rules check it); two close
+  combat weapon profiles sharing one id (Grey Knights squads, S5 row dropped).
 - Format gaps found with Blood Angels: detachment restrictions on other Chapters' units (Encarmine Speartip) aren't
   checked; leaders that can only lead units missing from the data drop their Leader ability (Techmarine); 11th edition
   terms (HUNTER, Damaged X, psychic levels, combat doctrines) have no glossary entries yet.
