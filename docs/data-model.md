@@ -142,6 +142,9 @@ name: Shield Wall
 cost: 2 # detachment points, paid from the battle size's budget (not from the army's points)
 dispositions: [take-and-hold] # force dispositions it offers, ids from the muster rules' dispositions
 unique: [VANGUARD] # tags: an army can't take two detachments that share one
+grants: # optional: roles and keywords units get in this army
+  - { units: { ids: [veteran-squad] }, roles: [battleline], keywords: [BATTLELINE] }
+  - { units: { keywords: [TRYGON] }, roles: [character], keywords: [CHARACTER], max: 2 } # up to 2, in list order
 enhancements:
   - id: banner-of-resolve
     name: Banner of Resolve

@@ -204,6 +204,19 @@ describe('validateList: datasheet limits', () => {
     expect(codes(withUnits(...troopers, { unit: 'line-troopers', models: 10 }))).toEqual(['datasheet-limit']);
   });
 
+  it('a detachment can make a unit battleline, and its limit with it', () => {
+    const army = (n: number, detachments: string[]) =>
+      demoList({
+        detachments,
+        disposition: detachments.includes('armoured-column') ? 'disruption' : undefined,
+        units: [{ id: 'captain', unit: 'field-captain', models: 1 }, ...vets(n).map((v, i) => ({ ...v, id: `v${i}` }))],
+      });
+
+    expect(codes(army(6, ['armoured-column']))).toEqual([]);
+    expect(codes(army(7, ['armoured-column']))).toEqual(['datasheet-limit']);
+    expect(codes(army(4, ['shield-wall']))).toEqual(['datasheet-limit']);
+  });
+
   it('an epic hero can be taken once', () => {
     expect(codes(withUnits({ unit: 'marshal-venn' }))).toEqual([]);
     expect(codes(withUnits({ unit: 'marshal-venn' }, { unit: 'marshal-venn' }))).toEqual(['datasheet-limit']);

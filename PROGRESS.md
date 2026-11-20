@@ -57,6 +57,11 @@
 - Live: the repository is on GitHub (Manwe-777/rulebook), the apps on GitHub Pages
   (manwe-777.github.io/rulebook/), relay release v1.0.0 with the owner key built in, and the first relay "Rulebook
   NYC" at `wss://192-241-132-246.sslip.io` (DigitalOcean droplet, Caddy for TLS), announced on the bootstrap relays.
+- Detachment `grants`: roles and keywords a detachment gives selected units (optionally up to `max`); validation
+  applies them before every check and the builder's cards use the granted units (warlord, enhancements). Needed by
+  Tyranids (Warrior Bioform Onslaught, Subterranean Assault), Orks (Kult of Speed, Runt Swarm) and Votann.
+- `npm run check-content` and `npm run check-list` (rules package) check a content folder and price lists against
+  it; the local factions' tournament lists live in the gitignored `local-lists/`.
 - `npm run publish -w @rulebook/relay -- <folder> <version> --key <file>` signs with a password-protected key file
   (the Account page's backup), on project.json's relays plus the announced ones; RULEBOOK_SECRET still works for
   scripts. The bootstrap relays are nostr.mom, nos.lol and relay.primal.net (relay.damus.io connected too slowly).

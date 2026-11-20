@@ -1,4 +1,4 @@
-import type { Issue, Library, ListEntry } from '@rulebook/rules';
+import type { Issue, Library, ListEntry, Unit } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
 import EntryChoices from './EntryChoices';
@@ -9,14 +9,15 @@ interface Props {
   draft: ArmyDraft;
   library: Library;
   entry: ListEntry;
+  /** The datasheet as the army uses it (with what its detachments grant); undefined when the rules don't have it. */
+  unit: Unit | undefined;
   points: number;
   issues: Issue[];
   onChange: (draft: ArmyDraft) => void;
 }
 
 /** One unit in the army: size, wargear, enhancement or upgrade, attachment and warlord, with its own problems. */
-export default function EntryCard({ draft, library, entry, points, issues, onChange }: Props) {
-  const unit = library.unit(draft.list.faction, entry.unit)?.unit;
+export default function EntryCard({ draft, library, entry, unit, points, issues, onChange }: Props) {
   const remove = () => onChange(draft.removeUnit(entry.id));
   const broken = issues.some((i) => i.severity === 'error');
 

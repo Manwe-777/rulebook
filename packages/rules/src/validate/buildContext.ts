@@ -1,5 +1,6 @@
 import type { Library } from '../library/Library';
 import type { ArmyList, Detachment, Issue } from '../types';
+import { applyGrants } from './applyGrants';
 import { issue } from './issue';
 import { resolveUnit } from './resolveUnit';
 import type { Resolved, ValidationContext } from './types';
@@ -52,7 +53,10 @@ export function buildContext(list: ArmyList, library: Library): { ctx: Validatio
   if (muster && !battleSize) issues.push(issue('unknown-battle-size', `There is no battle size "${list.battleSize}".`));
   if (!faction || !muster || !battleSize) return { ctx: null, issues };
 
-  const entries = resolveEntries(list, library, issues);
+  const resolved = resolveEntries(list, library, issues);
+  const chosen = resolveDetachments(list, library.armyDetachments(faction.id), issues);
+  // Roles and keywords from the detachments count for every check (datasheet limits, enhancements, warlord).
+  const entries = applyGrants(resolved, chosen);
 
   const { detachments, detachmentPoints, datasheetLimits, enhancements, upgrades } = {
     ...muster,
@@ -66,7 +70,7 @@ export function buildContext(list: ArmyList, library: Library): { ctx: Validatio
     muster,
     battleSize,
     limits: { detachments, detachmentPoints, datasheetLimits, enhancements, upgrades },
-    detachments: resolveDetachments(list, library.armyDetachments(faction.id), issues),
+    detachments: chosen,
     entries,
     byId: new Map(entries.map((r) => [r.entry.id, r])),
     allowed: { faction: new Set(), 'datasheet-limit': new Set(), attachments: new Set() },

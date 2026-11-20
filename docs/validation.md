@@ -35,6 +35,9 @@ Run in this order; every check runs even when an earlier one fails.
    summed; a datasheet's later copies add its
    `copies` surcharge, counted in list order. Over the battle size's limit is an error. Detachments don't cost
    points.
+   Before the checks, each chosen detachment's `grants` add their roles and keywords to the units they select (up to
+   `max`, in list order), so datasheet limits, enhancements and the warlord see the units as the army uses them.
+
 6. **Detachments.** At least `detachments.min` (and at most `max` when set), each once. Their `cost` adds up to no
    more than the battle size's `detachmentPoints`, unless `anyLoneDetachment` is on and there is only one. No two
    share a `unique` tag. When the chosen detachments offer more than one disposition, even a single detachment, the

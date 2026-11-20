@@ -3,6 +3,8 @@ kind: detachment
 name: Armoured Column
 cost: 1 # detachment points
 dispositions: [disruption, purge-the-foe]
+grants:
+  - { units: { ids: [veteran-squad] }, roles: [battleline], keywords: [BATTLELINE] }
 enhancements:
   - { name: Overcharged Engines, points: 15, target: unit, keywords: [TRANSPORT] }
 stratagems:
@@ -13,7 +15,8 @@ stratagems:
 
 ### Mounted Advance
 
-Units that disembark from a DEMO HOST TRANSPORT can still declare a charge that turn.
+Units that disembark from a DEMO HOST TRANSPORT can still declare a charge that turn. VETERAN SQUAD units are
+BATTLELINE in this army.
 
 ## Enhancements
 

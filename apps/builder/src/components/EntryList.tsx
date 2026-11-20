@@ -1,4 +1,4 @@
-import { groupEntries, type Issue, type Library, type ListEntry } from '@rulebook/rules';
+import { grantedUnits, groupEntries, type Issue, type Library, type ListEntry } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
 import CombinedUnit from './CombinedUnit';
@@ -21,12 +21,16 @@ export default function EntryList({ draft, library, points, issues, onChange }: 
     return <p className="text-text/70">No units yet. Add some from the list on the left.</p>;
   }
 
+  // Datasheets as the army uses them: a detachment can make a unit a character or battleline.
+  const units = grantedUnits(draft.list, library);
+
   const card = (entry: ListEntry) => (
     <EntryCard
       key={entry.id}
       draft={draft}
       library={library}
       entry={entry}
+      unit={units.get(entry.id) ?? library.unit(draft.list.faction, entry.unit)?.unit}
       points={points[entry.id] ?? 0}
       issues={issues.filter((i) => i.entries.includes(entry.id))}
       onChange={onChange}

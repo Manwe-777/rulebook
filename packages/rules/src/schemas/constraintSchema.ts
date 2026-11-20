@@ -2,7 +2,7 @@ import { z } from 'zod';
 
 import { count, keywords, role, share, slug, text } from './fields';
 
-const unitFilter = z.strictObject({
+export const unitFilter = z.strictObject({
   ids: z.array(slug).optional(),
   keywords: z.array(text).optional(),
   anyKeywords: z.array(text).optional(),

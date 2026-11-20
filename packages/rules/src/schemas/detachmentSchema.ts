@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
-import { constraintsSchema, eligibility } from './constraintSchema';
-import { points, slug, text } from './fields';
+import { constraintsSchema, eligibility, unitFilter } from './constraintSchema';
+import { count, keywords, points, role, slug, text } from './fields';
 
 const enhancement = z.strictObject({
   id: slug.optional(),
@@ -10,6 +10,17 @@ const enhancement = z.strictObject({
   /** `model`: given to one model; `unit`: an upgrade for a whole unit. */
   target: z.enum(['model', 'unit']).default('model'),
   ...eligibility,
+});
+
+/**
+ * Roles and keywords the detachment gives units of the army, e.g. `{ units: { ids: [warbikers] }, roles: [battleline],
+ * keywords: [BATTLELINE] }`, or up to `max` of them in list order (`max: 2` Trygons become characters).
+ */
+const grant = z.strictObject({
+  units: unitFilter,
+  roles: z.array(role).default([]),
+  keywords,
+  max: count.optional(),
 });
 
 const stratagem = z.strictObject({
@@ -35,5 +46,6 @@ export const detachmentSchema = z.strictObject({
   unique: z.array(text).default([]),
   enhancements: z.array(enhancement).default([]),
   stratagems: z.array(stratagem).default([]),
+  grants: z.array(grant).default([]),
   constraints: constraintsSchema,
 });
