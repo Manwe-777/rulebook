@@ -6,6 +6,8 @@ export const unitFilter = z.strictObject({
   ids: z.array(slug).optional(),
   keywords: z.array(text).optional(),
   anyKeywords: z.array(text).optional(),
+  /** Units with none of these keywords. */
+  notKeywords: z.array(text).optional(),
   roles: z.array(role).optional(),
   not: z.boolean().default(false),
 });
@@ -35,8 +37,8 @@ export const constraintSchema = z
   .strictObject({
     id: slug,
     when: conditionSchema.optional(),
-    /** The constraint doesn't apply while this holds. */
-    unless: conditionSchema.optional(),
+    /** The constraint doesn't apply while this holds, or while any one of a list of conditions holds. */
+    unless: z.union([conditionSchema, z.array(conditionSchema)]).optional(),
     allow: z.enum(['faction', 'datasheet-limit', 'attachments']).optional(),
     select: selectorSchema,
     measure: z.enum(['count', 'models', 'points']).default('count'),

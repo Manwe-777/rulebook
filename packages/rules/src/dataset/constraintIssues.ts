@@ -7,14 +7,15 @@ export function constraintIssues(faction: Faction, constraints: Constraint[], so
   const detachments = new Set(faction.detachments.map((d) => d.id));
 
   return constraints.flatMap((c) => {
-    const selectors = [c.select, c.when?.has, c.unless?.has].filter((s) => s !== undefined);
+    const unless = [c.unless ?? []].flat();
+    const selectors = [c.select, c.when?.has, ...unless.map((u) => u.has)].filter((s) => s !== undefined);
     const unitIds = selectors.flatMap((s) => [...(s.units?.ids ?? []), ...(s.attached?.ids ?? [])]);
     const itemIds = selectors.flatMap((s) => [...(s.enhancements?.ids ?? []), ...(s.upgrades?.ids ?? [])]);
 
     const unknown = [
       ...unitIds.filter((id) => !units.has(id)).map((id) => `unit "${id}"`),
       ...itemIds.filter((id) => !items.has(id)).map((id) => `enhancement "${id}"`),
-      ...[c.when?.detachment, c.unless?.detachment]
+      ...[c.when?.detachment, ...unless.map((u) => u.detachment)]
         .filter((id) => id !== undefined && !detachments.has(id))
         .map((id) => `detachment "${id}"`),
     ];

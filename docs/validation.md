@@ -94,7 +94,7 @@ constraints:
 
 **`when`** (all given conditions must hold): `detachment: id`, `battleSize: id`, `faction: id` (the army's faction),
 `has: <selector>` (at least one match). **`unless`** takes the same conditions and switches the constraint off while
-they all hold.
+they all hold; a list of conditions switches it off while any one of them holds.
 
 **Selectors** pick list entries:
 
@@ -103,6 +103,7 @@ they all hold.
 | `units: { ids: [...] }`                      | use one of these datasheets                        |
 | `units: { keywords: [...] }`                 | have all of these keywords                         |
 | `units: { anyKeywords: [...] }`              | have at least one of these keywords                |
+| `units: { notKeywords: [...] }`              | have none of these keywords                        |
 | `units: { roles: [...] }`                    | have one of these roles                            |
 | `units: { … , not: true }`                   | don't match the rest of the selector               |
 | `enhancements: { ids: [...] }` / `upgrades:` | carry one of these                                 |

@@ -3,7 +3,7 @@ import { conditionHolds } from './conditionHolds';
 import type { ValidationContext } from './types';
 
 const applies = (ctx: ValidationContext, { when, unless }: Constraint) =>
-  (!when || conditionHolds(ctx, when)) && !(unless && conditionHolds(ctx, unless));
+  (!when || conditionHolds(ctx, when)) && ![unless ?? []].flat().some((c) => conditionHolds(ctx, c));
 
 /** Each datasheet in the army once, for the rules it brings. */
 function armyDatasheets(ctx: ValidationContext) {

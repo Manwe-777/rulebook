@@ -402,6 +402,22 @@ describe('validateList: constraints', () => {
     expect(codes(withUnits(...captains(2, 'vets')), allowTroopers)).toEqual(['too-many-leaders']);
   });
 
+  it('unless can list several conditions, any one of which switches the constraint off', () => {
+    const unless = [{ detachment: 'rapid-response' }, { faction: 'demo-host' }];
+
+    expect(codes(base, library({ max: 0, unless }))).toEqual([]);
+    expect(codes(base, library({ max: 0, unless: [{ detachment: 'rapid-response' }] }))).toEqual(['c']);
+  });
+
+  it('notKeywords picks units without any of those keywords', () => {
+    const notCharacters = (max: number) =>
+      library({ select: { units: { keywords: ['DEMO HOST'], notKeywords: ['CHARACTER'] } }, measure: 'count', max });
+
+    // Line Troopers and the Veteran Squad; not the Field Captain or the Standard Bearer.
+    expect(codes(base, notCharacters(2))).toEqual([]);
+    expect(codes(base, notCharacters(1))).toEqual(['c']);
+  });
+
   it("unless switches a constraint off while its condition holds, and faction tests the army's faction", () => {
     expect(codes(base, library({ max: 0, unless: { detachment: 'shield-wall' } }))).toEqual([]);
     expect(codes(base, library({ max: 0, unless: { faction: 'other-host' } }))).toEqual(['c']);

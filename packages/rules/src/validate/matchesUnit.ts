@@ -9,6 +9,7 @@ export function matchesUnit(unit: Unit, filter: UnitFilter): boolean {
     !filter.ids || filter.ids.includes(unit.id),
     !filter.keywords || hasKeywords(unit, filter.keywords),
     !filter.anyKeywords || hasKeywords(unit, filter.anyKeywords, true),
+    !filter.notKeywords || !hasKeywords(unit, filter.notKeywords, true),
     !filter.roles || filter.roles.some((r) => unit.roles.includes(r)),
   ];
 
