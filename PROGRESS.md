@@ -170,6 +170,8 @@
 - The rulebook home page shows how current the rules data is (up to date, checking, offline) and, on each faction card
   and for the core rules, the loaded release: version, how long ago it was released and how many records it has (its
   notes as the card's tooltip). The list builder's rules data table is gone.
+- The Admin page is gone: the connection badge in the rulebook header opens a Connection popup with what this browser
+  can do now (and a link to the account) and the relay list. `/admin` goes to the home page.
 
 ## Known issues
 

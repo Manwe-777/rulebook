@@ -16,7 +16,6 @@ function pageName(library: Library, factionId: string, rest: string[]): string |
 const FIXED_PAGES: Record<string, string> = {
   account: 'Account',
   print: 'Army sheet',
-  admin: 'Admin',
   stratagems: 'Core stratagems',
 };
 

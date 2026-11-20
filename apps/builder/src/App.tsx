@@ -62,14 +62,9 @@ export default function App() {
             List builder
           </button>
           {RULEBOOK_URL && (
-            <>
-              <a href={`${RULEBOOK_URL}admin`} className={LINK}>
-                Admin
-              </a>
-              <a href={`${RULEBOOK_URL}account`} className={LINK}>
-                Account
-              </a>
-            </>
+            <a href={`${RULEBOOK_URL}account`} className={LINK}>
+              Account
+            </a>
           )}
         </nav>
       </div>

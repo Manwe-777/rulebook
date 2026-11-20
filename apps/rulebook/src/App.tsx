@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Link, NavLink, Route, Routes, useLocation } from 'react-router';
+import { Link, Navigate, NavLink, Route, Routes, useLocation } from 'react-router';
 
 import ConnectionBadge from './components/common/ConnectionBadge';
 import SourceStatusLine from './components/common/SourceStatusLine';
@@ -24,15 +24,14 @@ const FactionWorkspace = lazy(() => import('./components/editor/FactionWorkspace
 const RecordEditor = lazy(() => import('./components/editor/RecordEditor'));
 // The army sheet the list builder links to.
 const PrintPage = lazy(() => import('./components/print/PrintPage'));
-const AdminPage = lazy(() => import('./components/admin/AdminPage'));
 
 /** Page layout and routes. The router and library provider are set up by the client or server entry. */
 export default function App() {
   const library = useLibrary();
 
   const path = useLocation().pathname;
-  // Every page but the admin and account pages is part of the rulebook itself.
-  const inRulebook = !/^\/(admin|account)\b/.test(path);
+  // Every page but the account page is part of the rulebook itself.
+  const inRulebook = !/^\/account\b/.test(path);
 
   useDocumentTitle(titleForPath(library, path));
 
@@ -53,9 +52,6 @@ export default function App() {
               List builder
             </a>
           )}
-          <NavLink to="/admin" className={navClass}>
-            Admin
-          </NavLink>
           <NavLink to="/account" className={navClass}>
             Account
           </NavLink>
@@ -70,7 +66,8 @@ export default function App() {
           <Route path="/:faction/detachment/:detachment" element={<DetachmentPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/print" element={<PrintPage />} />
-          <Route path="/admin" element={<AdminPage />} />
+          {/* The relay list moved into the connection popup. */}
+          <Route path="/admin" element={<Navigate to="/" replace />} />
           <Route path="/:faction/edit" element={<FactionWorkspace />} />
           <Route path="/:faction/edit/:kind/:id" element={<RecordEditor />} />
           <Route path="*" element={<NotFoundPage />} />

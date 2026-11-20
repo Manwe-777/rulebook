@@ -29,7 +29,7 @@ write rules; the apps and the relay all register the same rules, so bad data is 
   dropping old events.
 - Records are kept under the relays' message size limit (NIP-11); one record is one unit, detachment or similar, never a
   whole faction.
-- The rulebook's Admin page lists every relay it knows of: name, address, key, when it last announced itself, whether
+- The rulebook's connection popup (opened from the connection badge in the header) lists every relay it knows of: name, address, key, when it last announced itself, whether
   this browser uses it, and how long it takes to answer.
 
 ## Keys
