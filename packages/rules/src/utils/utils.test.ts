@@ -102,7 +102,7 @@ describe('glossaryKey and Library.explain', () => {
     const library = Library.fromFiles(loadDemoFiles());
 
     expect(library.explain('ANTI-INFANTRY 4+')?.term).toBe('Anti-keyword X+');
-    expect(library.explain('Twin-linked')?.text).toContain('Re-roll');
+    expect(library.explain('Twin-linked')?.text).toContain('re-roll the wound roll');
     expect(library.explain('Made-up rule')).toBeUndefined();
   });
 });

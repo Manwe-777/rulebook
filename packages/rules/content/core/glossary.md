@@ -3,98 +3,166 @@ kind: glossary
 name: Core rules glossary
 ---
 
-Short explanations of rule terms, written in our own words. Check each against the current core rules; the core
-rules win where they differ.
+Short explanations of the 11th edition core abilities and weapon abilities, written in our own words; the core rules
+win where they differ. A weapon ability followed by keywords (`[LETHAL HITS: VEHICLE]`) only applies against units
+with one of those keywords. The same ability twice doesn't stack, even with different numbers or keywords: the owner
+picks which one applies.
 
 ### Anti-keyword X+
 
-An attack against a unit with that keyword scores a Critical Wound on an unmodified wound roll of X or more.
+Against a unit with that keyword, an unmodified wound roll of X or more is a critical wound.
 
 ### Assault
 
-The weapon can shoot in a turn in which its unit Advanced.
+A unit that Advanced and isn't engaged can still shoot, but only with its [ASSAULT] weapons (assault shooting). It
+can't start an action that phase.
 
 ### Blast
 
-Add 1 to the attack count for every 5 models in the target unit. Can't target a unit in Engagement Range of your
-own units.
+Add one attack for every five models in the target unit (Blast X: add X for every five). A Blast weapon can't target
+a unit its own unit is engaged with.
+
+### Cleave X
+
+When all of the weapon's attacks go into one target, add X attacks for every five models in that unit.
+
+### Close-quarters
+
+The unit can shoot while engaged, if it didn't Advance, but only at units it is engaged with and only with its
+[CLOSE-QUARTERS] weapons (close-quarters shooting). In any other kind of shooting, each model (other than monsters and
+vehicles) fires either its [CLOSE-QUARTERS] weapons or its other ranged weapons, not both.
 
 ### Deadly Demise X
 
-When this model is destroyed, roll a D6 before removing it: on a 6, every unit within 6" suffers X mortal wounds.
+When a model with this ability is destroyed, after its passengers have disembarked, roll a D6: on a 6, every unit
+within 6" suffers X mortal wounds (rolled separately for each unit when X is random).
+
+### Deep Strike
+
+When every model in the unit has this ability, its ingress move can set it up anywhere more than 8" horizontally from
+all enemy units, even in the enemy's deployment zone.
 
 ### Devastating Wounds
 
-A Critical Wound inflicts mortal wounds equal to the attack's Damage instead of a normal wound; no saving throw.
+A critical wound ends that attack's normal sequence: the target suffers mortal wounds equal to the weapon's Damage
+instead, at most enough to destroy one model per critical wound.
 
 ### Extra Attacks
 
-The bearer attacks with this weapon in addition to its other melee weapon, and the attack count can't be changed.
+The model attacks with all of these weapons as well as one of its other melee weapons.
 
 ### Feel No Pain X+
 
-Each time this model would lose a wound, roll a D6: on X or more, that wound is not lost.
+Each time the model would lose a wound, roll a D6: on X or more, the wound isn't lost.
+
+### Fights First
+
+A unit whose every model has this ability fights in the Fights First step of the Fight phase.
+
+### Firing Deck X
+
+When this transport shoots with units embarked, pick up to X embarked models whose units haven't shot this phase, and
+one ranged weapon of each (not a [ONE SHOT] one); the transport fires those weapons along with its own. The embarked
+units can't shoot that turn.
 
 ### Hazardous
 
-After the unit shoots or fights with it, roll a D6 for each Hazardous weapon used: on a 1, a model carrying one is
-destroyed (a CHARACTER, MONSTER or VEHICLE suffers 3 mortal wounds instead).
+After the unit shoots or fights, it makes one hazard roll for each [HAZARDOUS] weapon it used: on a 1-2 the unit
+suffers 1 mortal wound (3 if every model is a monster or vehicle).
 
 ### Heavy
 
-Add 1 to hit rolls if the unit Remained Stationary this turn.
+In your Shooting phase, +1 to hit if the unit isn't engaged, wasn't set up this turn and no model moved more than 3".
+
+### Hover
+
+When this unit takes to the skies, its maximum distance isn't reduced by 2".
 
 ### Ignores Cover
 
-The target gets no Benefit of Cover against these attacks.
+The target can't have the Benefit of Cover against these attacks, whatever gives it.
 
 ### Indirect Fire
 
-Can target units the attacker can't see. When it does, subtract 1 from the hit roll and the target has the Benefit
-of Cover.
+A unit that didn't Advance and isn't engaged can fire these weapons at units it can't see (indirect shooting). The
+target has the Benefit of Cover, hit rolls can't be re-rolled, and an unmodified 1-5 misses (1-3 if the unit stayed
+stationary and a friendly unit can see the target).
+
+### Infiltrators
+
+When every model in the unit has this ability, it can deploy anywhere more than 8" horizontally from the enemy's
+deployment zone and from all enemy units.
 
 ### Lance
 
-Add 1 to wound rolls if the bearer's unit made a Charge move this turn.
++1 to wound if the attacking unit made a charge move this turn.
+
+### Leader
+
+The unit can be attached to one of the units its datasheet names, forming an attached unit.
 
 ### Lethal Hits
 
-A Critical Hit wounds the target automatically.
+A critical hit can wound the target automatically (no wound roll, so it can't become a critical wound).
+
+### Lone Operative
+
+Unless it is part of an attached unit, enemy models more than 12" away can't see it, and [INDIRECT FIRE] weapons
+can't target it from further than 12". Lone Operative X" uses X" instead of 12".
 
 ### Melta X
 
-Add X to the Damage of attacks against a target within half range.
+Against a target within half range, add X to the weapon's Damage.
 
 ### One Shot
 
-The weapon can be fired once per battle.
+The weapon can make attacks once per battle.
 
 ### Pistol
 
-Can shoot while its unit is in Engagement Range, but only at units it is engaged with, and then the unit's other
-guns can't shoot (MONSTERS and VEHICLES excepted).
+The same as [CLOSE-QUARTERS], under its older name.
 
 ### Precision
 
-When an attack hits a unit with an attached CHARACTER the attacker can see, the attacker can have it allocated to
-that CHARACTER.
+When the attacks hit a unit with a visible character, the attacker can make that character's models the ones that
+take the attacks first.
 
 ### Psychic
 
-A psychic attack or ability; some rules only affect PSYKER units or psychic attacks.
+A psychic attack: it ignores any modifiers to its BS or WS and to the hit roll.
 
 ### Rapid Fire X
 
-Add X to the attack count against a target within half range.
+Add X attacks against a target within half range.
+
+### Scouts X
+
+Before the battle, a unit whose every model has this ability can either set up wholly within your deployment zone
+from strategic reserves, or move up to X" if it is wholly within your deployment zone, ending more than 8" from all
+enemy units. A dedicated transport carrying only Scouts units can make that move instead.
+
+### Stealth
+
+When every model in the unit has this ability, it has the Benefit of Cover against ranged attacks.
+
+### Super-heavy Walker
+
+When it makes a normal, advance or fall-back move, it can move through models (except titanic ones) and terrain up to
+4" tall. Before moving it can count as MOBILE for that move; if it does, roll a D6 afterwards: on a 1 it is
+battle-shocked.
+
+### Support
+
+The unit can be attached to one of the units its datasheet names as support, alongside a leader.
 
 ### Sustained Hits X
 
-A Critical Hit scores X extra hits.
+A critical hit scores X extra hits.
 
 ### Torrent
 
-Hits automatically; no hit roll is made.
+The attack hits automatically.
 
 ### Twin-linked
 
-Re-roll the wound roll.
+You can re-roll the wound roll.

@@ -93,8 +93,8 @@
   ("Roll 10 attacks, hitting on 3+"; abilities that add attacks are not counted).
 - Rule explanations: a `glossary` record in `core` (one `###` per term, in our own words) explains weapon abilities and
   core abilities. Tapping a tag or core ability on a rulebook datasheet or in the builder's play view opens it (native
-  popover). The starter glossary covers the weapon abilities, Feel No Pain and Deadly Demise; core abilities that
-  changed in 11th edition (Deep Strike, Scouts, Stealth, Lone Operative, Infiltrators) wait for the core rules.
+  popover). The glossary covers the 11th edition core abilities and weapon abilities (35 entries), checked against the
+  core rules PDF and summarised in our own words.
   Relays and release manifests accept any record kind, so new kinds need no relay update.
 - Play view in the builder: tapping a unit's name opens it (`?unit=`, so back closes it) as it was built: stats with
   invulnerable save and base size (models with the same stats share a row), what each model type carries, only the
@@ -168,8 +168,8 @@
   detachments granting keywords (Beserks gain BATTLELINE); enhancements that need a weapon; splitting a unit across
   transports at deployment. These are written as notes in the records for now.
 
-- The glossary needs checking against the 11th edition core rules, and the 11th edition core abilities adding. The
-  editor can't create or edit glossary records yet.
+- The editor can't create or edit glossary records yet. Datasheet-level terms that aren't core abilities (HUNTER,
+  CONVERSION, OVERCHARGE, Damaged X, MOBILE) have no glossary entries.
 
 ## Next
 
