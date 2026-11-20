@@ -88,3 +88,9 @@ export const LINK_HASH = 'link';
 
 /** scrypt cost (log2 N) of the key in a device link: strong enough for a short code, fast enough on a phone. */
 export const LINK_KEY_LOGN = 16;
+
+/** How long the "unit added" message stays up, in milliseconds. */
+export const ADDED_TOAST_MS = 2_500;
+
+/** How long an add button shows its tick after a press, in milliseconds. */
+export const ADDED_TICK_MS = 600;
