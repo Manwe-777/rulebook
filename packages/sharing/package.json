@@ -10,7 +10,8 @@
     "./keys": "./src/utils/ownerKeyHex.ts",
     "./project": "./src/projectSettings.ts",
     "./relays": "./src/relays/index.ts",
-    "./identity": "./src/identity/index.ts"
+    "./identity": "./src/identity/index.ts",
+    "./sync": "./src/sync/index.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

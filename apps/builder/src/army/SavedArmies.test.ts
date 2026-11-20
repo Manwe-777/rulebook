@@ -42,7 +42,7 @@ describe('SavedArmies', () => {
   });
 
   it('removing an army keeps the others', () => {
-    const saved = SavedArmies.empty().put('a', army('Alpha'), 1).put('b', army('Bravo'), 2).remove('a');
+    const saved = SavedArmies.empty().put('a', army('Alpha'), 1).put('b', army('Bravo'), 2).remove('a', 3);
 
     expect(saved.all.map((a) => a.id)).toEqual(['b']);
   });
@@ -71,5 +71,67 @@ describe('SavedArmies', () => {
   it('data that is not a list of armies is not read at all', () => {
     expect(SavedArmies.fromSave({ name: 'old single list' })).toBeNull();
     expect(SavedArmies.fromSave(null)).toBeNull();
+  });
+
+  it('a deletion is remembered through a save and reload, and saving the army again forgets it', () => {
+    const removed = SavedArmies.empty().put('a', army('Alpha'), 1).remove('a', 5);
+    const reloaded = SavedArmies.fromSave(JSON.parse(JSON.stringify(removed)))!;
+
+    expect(reloaded.synced).toEqual([{ id: 'a', updatedAt: 5, list: null }]);
+    expect(reloaded.put('a', army('Back'), 6).synced.map((e) => e.list === null)).toEqual([false]);
+  });
+});
+
+describe('SavedArmies.merge (sync between devices)', () => {
+  const list = (name: string) => army(name).toJSON();
+
+  it("armies from another device are added, and this device's own are sent", () => {
+    const here = SavedArmies.empty().put('mine', army('Mine'), 1);
+    const { saved, send } = here.merge([{ id: 'theirs', updatedAt: 2, list: list('Theirs') }]);
+
+    expect(saved.all.map((a) => a.list.name)).toEqual(['Theirs', 'Mine']);
+    expect(send.map((e) => e.id)).toEqual(['mine']);
+  });
+
+  it('for the same army the newer change wins, from either side', () => {
+    const here = SavedArmies.empty().put('a', army('Edited here'), 10).put('b', army('Old here'), 1);
+
+    const { saved, send } = here.merge([
+      { id: 'a', updatedAt: 5, list: list('Older there') },
+      { id: 'b', updatedAt: 7, list: list('Newer there') },
+    ]);
+
+    expect(saved.draft('a')?.list.name).toBe('Edited here');
+    expect(saved.draft('b')?.list.name).toBe('Newer there');
+    expect(send.map((e) => e.id)).toEqual(['a']);
+  });
+
+  it('a newer deletion from another device removes the army here; an older one is undone by sending it back', () => {
+    const here = SavedArmies.empty().put('a', army('Alpha'), 5).put('b', army('Bravo'), 20);
+
+    const { saved, send } = here.merge([
+      { id: 'a', updatedAt: 9, list: null },
+      { id: 'b', updatedAt: 9, list: null },
+    ]);
+
+    expect(saved.all.map((a) => a.id)).toEqual(['b']);
+    expect(send.map((e) => e.id)).toEqual(['b']);
+  });
+
+  it('a deletion here is sent, and nothing changes when both sides already agree', () => {
+    const here = SavedArmies.empty().put('a', army('Alpha'), 1).remove('a', 4);
+
+    expect(here.merge([{ id: 'a', updatedAt: 1, list: list('Alpha') }]).send).toEqual([
+      { id: 'a', updatedAt: 4, list: null },
+    ]);
+
+    expect(here.merge([{ id: 'a', updatedAt: 4, list: null }]).send).toEqual([]);
+  });
+
+  it("a synced list this version can't read is left alone", () => {
+    const here = SavedArmies.empty().put('a', army('Alpha'), 1);
+    const { saved } = here.merge([{ id: 'a', updatedAt: 9, list: { units: 3 } }]);
+
+    expect(saved.draft('a')?.list.name).toBe('Alpha');
   });
 });

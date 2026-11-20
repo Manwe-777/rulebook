@@ -1,4 +1,5 @@
 import type { ArmyList } from '@rulebook/rules';
+import type { SyncedList } from '@rulebook/sharing/sync';
 
 import { ArmyDraft } from './ArmyDraft';
 
@@ -9,14 +10,22 @@ export interface SavedArmy {
   list: ArmyList;
 }
 
+/** An army deleted on this device, remembered so the deletion reaches the other synced devices. */
+export interface DeletedArmy {
+  id: string;
+  deletedAt: number;
+}
+
 /**
  * Every army saved in this browser. Changes return a new instance (React state stays immutable). Armies whose list
- * can't be read are kept aside in `unreadable` so a bad save never takes the others down with it.
+ * can't be read are kept aside in `unreadable` so a bad save never takes the others down with it. Deleted armies are
+ * remembered by id and time, so sync can tell a deletion from an army this device never had.
  */
 export class SavedArmies {
   private constructor(
     private readonly armies: SavedArmy[],
     readonly unreadable: unknown[] = [],
+    private readonly deleted: DeletedArmy[] = [],
   ) {}
 
   static empty(): SavedArmies {
@@ -40,12 +49,12 @@ export class SavedArmies {
       else unreadable.push(item);
     }
 
-    return new SavedArmies(armies, unreadable);
+    return new SavedArmies(armies, unreadable, readDeleted((raw as { deleted?: unknown }).deleted));
   }
 
   /** Unreadable armies are written back as they were, so a fix in a later version can still read them. */
-  toJSON(): { armies: unknown[] } {
-    return { armies: [...this.armies, ...this.unreadable] };
+  toJSON(): { armies: unknown[]; deleted: DeletedArmy[] } {
+    return { armies: [...this.armies, ...this.unreadable], deleted: this.deleted };
   }
 
   /** Newest first. */
@@ -71,6 +80,7 @@ export class SavedArmies {
     return new SavedArmies(
       exists ? this.armies.map((a) => (a.id === id ? army : a)) : [...this.armies, army],
       this.unreadable,
+      this.deleted.filter((d) => d.id !== id),
     );
   }
 
@@ -81,10 +91,64 @@ export class SavedArmies {
     return draft ? this.put(newId, draft.rename(`${draft.list.name} (copy)`), now) : this;
   }
 
-  remove(id: string): SavedArmies {
+  /** Deletes an army, remembering when so the deletion syncs. */
+  remove(id: string, now: number): SavedArmies {
     return new SavedArmies(
       this.armies.filter((a) => a.id !== id),
       this.unreadable,
+      [...this.deleted.filter((d) => d.id !== id), { id, deletedAt: now }],
     );
   }
+
+  /** Every army and deletion as sync sends them. */
+  get synced(): SyncedList[] {
+    return [
+      ...this.armies.map(({ id, updatedAt, list }) => ({ id, updatedAt, list })),
+      ...this.deleted.map(({ id, deletedAt }) => ({ id, updatedAt: deletedAt, list: null })),
+    ];
+  }
+
+  /**
+   * Merges the armies synced from other devices: for each army the newest change wins, a deletion included. Returns
+   * the merged armies and what this device has that is newer than (or missing from) the synced copy, to send.
+   * Synced lists this version can't read are left alone.
+   */
+  merge(remote: SyncedList[]): { saved: SavedArmies; send: SyncedList[] } {
+    const local = new Map(this.synced.map((e) => [e.id, e]));
+    const theirs = new Map(remote.map((e) => [e.id, e]));
+    const newer = [...theirs.values()].filter((e) => !local.has(e.id) || e.updatedAt > local.get(e.id)!.updatedAt);
+    const saved = newer.reduce<SavedArmies>((armies, entry) => armies.apply(entry), this);
+
+    const send = [...local.values()].filter((e) => {
+      const other = theirs.get(e.id);
+
+      return !other || e.updatedAt > other.updatedAt;
+    });
+
+    return { saved, send };
+  }
+
+  /** Takes one synced army or deletion as it is, keeping its time. */
+  private apply(entry: SyncedList): SavedArmies {
+    if (entry.list === null) return this.remove(entry.id, entry.updatedAt);
+
+    const draft = ArmyDraft.fromSave(entry.list);
+
+    if (!draft) return this;
+
+    const army: SavedArmy = { id: entry.id, updatedAt: entry.updatedAt, list: draft.list };
+
+    return new SavedArmies(
+      [...this.armies.filter((a) => a.id !== entry.id), army],
+      this.unreadable,
+      this.deleted.filter((d) => d.id !== entry.id),
+    );
+  }
+}
+
+/** Deletions as saved, leaving out anything that isn't one. */
+function readDeleted(raw: unknown): DeletedArmy[] {
+  if (!Array.isArray(raw)) return [];
+
+  return raw.filter((d): d is DeletedArmy => typeof d?.id === 'string' && typeof d?.deletedAt === 'number');
 }

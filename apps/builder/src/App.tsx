@@ -85,7 +85,7 @@ export default function App() {
           onOpen={open}
           onCreate={create}
           onDuplicate={(id) => change((s) => s.duplicate(id, newArmyId(), Date.now()))}
-          onDelete={(id) => change((s) => s.remove(id))}
+          onDelete={(id) => change((s) => s.remove(id, Date.now()))}
         />
       )}
       <footer className="mt-auto text-xs text-text/60">
