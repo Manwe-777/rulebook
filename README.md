@@ -1,6 +1,7 @@
 # Rulebook
 
 ![CI](https://github.com/Manwe-777/rulebook/actions/workflows/ci.yml/badge.svg)
+![License: AGPL-3.0](https://img.shields.io/badge/license-AGPL--3.0-blue.svg)
 
 Community-written Warhammer 40,000 rules: a datasheet reader and editor, a list builder, and the relay that shares the rules.
 
