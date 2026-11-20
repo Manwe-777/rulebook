@@ -22,7 +22,19 @@
 }
 
 @layer base {
+  /* Native controls (dropdown lists, number spinners, checkboxes) drawn for a dark page, so their text stays readable. */
+  :root {
+    color-scheme: dark;
+    accent-color: var(--color-bar);
+  }
+
   body {
     background-color: var(--color-bg);
+  }
+
+  option,
+  optgroup {
+    background-color: var(--color-panel);
+    color: var(--color-text);
   }
 }

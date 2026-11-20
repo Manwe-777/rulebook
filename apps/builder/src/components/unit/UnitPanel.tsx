@@ -39,6 +39,7 @@ export default function UnitPanel({ library, list, entry, unit, showAll, role }:
         <StatBlock profiles={unit.profiles} />
       </header>
       <ul className="flex flex-col gap-1 px-3 py-2 text-sm">
+        {entry.wargear.length === 0 && <li className="text-text/70">No wargear options taken: datasheet wargear.</li>}
         {loadoutLines(unit, loadout).map((line) => (
           <li key={line} className="rounded bg-black/20 px-2 py-1">
             {line}

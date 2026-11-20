@@ -81,11 +81,23 @@ describe('form options', () => {
     );
   });
 
-  it('offers enhancements and upgrades from the chosen detachments only', () => {
-    expect(itemOptions(draft.list, library, 'model').map((e) => e.id)).toEqual(['banner-of-resolve', 'old-campaigner']);
+  it('offers the enhancements and upgrades of the chosen detachments that the unit can take', () => {
+    const unit = (id: string) => library.unit('demo-host', id)!.unit;
 
-    expect(itemOptions(draft.list, library, 'unit').map((e) => e.id)).toEqual([
-      'overcharged-engines',
+    const ids = (target: 'model' | 'unit', id: string, current?: string) =>
+      itemOptions(draft.list, library, target, unit(id), current).map((e) => e.id);
+
+    expect(ids('model', 'field-captain')).toEqual(['banner-of-resolve', 'old-campaigner']);
+    expect(ids('model', 'standard-bearer')).toEqual(['old-campaigner']);
+    expect(ids('model', 'line-troopers')).toEqual([]);
+    expect(ids('unit', 'armoured-carrier')).toEqual(['overcharged-engines', 'reinforced-plating']);
+    expect(ids('unit', 'line-troopers')).toEqual([]);
+  });
+
+  it('keeps offering the item a unit already has, even when it no longer fits', () => {
+    const troopers = library.unit('demo-host', 'line-troopers')!.unit;
+
+    expect(itemOptions(draft.list, library, 'unit', troopers, 'reinforced-plating').map((e) => e.id)).toEqual([
       'reinforced-plating',
     ]);
   });

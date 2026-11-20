@@ -25,10 +25,10 @@ export default function RuleTerm({ term, children }: { term: string; children?: 
       <div
         id={id}
         popover="auto"
-        className="m-auto max-w-sm rounded-lg bg-parchment p-0 font-sans text-base text-ink normal-case shadow-2xl backdrop:bg-black/40"
+        className="m-auto w-[min(32rem,calc(100vw-2rem))] rounded-lg bg-parchment p-0 text-left font-sans text-lg font-normal tracking-normal whitespace-normal text-ink normal-case shadow-2xl backdrop:bg-black/40"
       >
-        <p className="bg-bar px-3 py-1.5 font-bold tracking-wide text-white uppercase">{entry.term}</p>
-        <div className="px-3 py-2">
+        <p className="bg-bar px-4 py-2 text-xl font-bold tracking-wide text-white uppercase">{entry.term}</p>
+        <div className="px-4 py-3">
           <Markdown>{entry.text}</Markdown>
         </div>
       </div>

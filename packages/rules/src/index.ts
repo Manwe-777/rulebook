@@ -29,6 +29,7 @@ export { slugify } from './utils/slugify';
 export { tally } from './utils/tally';
 export { wargearName } from './utils/wargearName';
 export { detachmentPoints } from './validate/detachmentPoints';
+export { itemIneligibility } from './validate/itemIneligibility';
 export { listPoints } from './validate/listPoints';
 export { validateList } from './validate/validateList';
 export { wargearAllowance } from './validate/wargearAllowance';

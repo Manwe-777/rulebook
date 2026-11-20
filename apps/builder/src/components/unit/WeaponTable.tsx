@@ -1,5 +1,6 @@
 import type { Library, MeleeWeapon, RangedWeapon } from '@rulebook/rules';
 
+import { attackDice } from '../../utils/attackDice';
 import type { WeaponRow } from '../../utils/weaponRows';
 import RuleTerms from './RuleTerms';
 
@@ -13,7 +14,10 @@ interface Props {
 const HEAD = 'px-1 py-1 text-center font-bold';
 const CELL = 'px-1 py-1 text-center align-top';
 
-/** Weapons with how many the unit carries; weapons it doesn't carry (shown with "show all") are dimmed. */
+/**
+ * Weapons with how many the unit carries and the dice to roll for them; weapons it doesn't carry (shown with "show
+ * all") are dimmed.
+ */
 export default function WeaponTable({ library, title, skill, rows }: Props) {
   if (!rows.length) return null;
 
@@ -44,6 +48,11 @@ export default function WeaponTable({ library, title, skill, rows }: Props) {
               {weapon.tags.length > 0 && (
                 <span className="block text-xs text-text/70 uppercase">
                   [<RuleTerms library={library} terms={weapon.tags} />]
+                </span>
+              )}
+              {count > 0 && (
+                <span className="block text-xs font-semibold text-text/80">
+                  {attackDice(weapon.A, 'BS' in weapon ? weapon.BS : weapon.WS, count)}
                 </span>
               )}
             </td>

@@ -1,34 +1,14 @@
-import type { Enhancement, Issue, Role, Unit } from '../types';
+import type { Issue } from '../types';
 import { findEnhancement } from './findEnhancement';
-import { hasKeywords } from './hasKeywords';
 import { issue } from './issue';
+import { itemIneligibility } from './itemIneligibility';
 import type { Resolved, ValidationContext } from './types';
 
 type Kind = 'enhancement' | 'upgrade';
 
-/** Why a unit can't take an item, or null when it can. */
-function ineligible(item: Enhancement, unit: Unit, roles: Role[], excludeRoles: Role[]): string | null {
-  if (roles.length && !roles.some((r) => unit.roles.includes(r))) return `needs a ${roles.join(' or ')} unit`;
-  if (!hasKeywords(unit, item.keywords)) return `needs ${item.keywords.join(', ')}`;
-
-  if (item.anyKeywords.length && !hasKeywords(unit, item.anyKeywords, true)) {
-    return `needs ${item.anyKeywords.join(' or ')}`;
-  }
-
-  if (item.excludeKeywords.length && hasKeywords(unit, item.excludeKeywords, true)) {
-    return `can't go on ${item.excludeKeywords.join(' or ')} units`;
-  }
-
-  if ([...item.excludeRoles, ...excludeRoles].some((r) => unit.roles.includes(r)))
-    return "can't go on this kind of unit";
-
-  return null;
-}
-
 function bearerIssues(ctx: ValidationContext, kind: Kind, { entry, unit }: Resolved, id: string): Issue[] {
   const item = findEnhancement(ctx, id);
   const target = kind === 'enhancement' ? 'model' : 'unit';
-  const rules = kind === 'enhancement' ? ctx.limits.enhancements : { roles: [], excludeRoles: [] };
 
   if (!item) return [issue(`unknown-${kind}`, `"${id}" is not an ${kind} of a chosen detachment.`, [entry.id])];
 
@@ -38,7 +18,7 @@ function bearerIssues(ctx: ValidationContext, kind: Kind, { entry, unit }: Resol
     ];
   }
 
-  const problem = ineligible(item, unit, rules.roles, rules.excludeRoles);
+  const problem = itemIneligibility(item, unit, { ...ctx.muster, enhancements: ctx.limits.enhancements });
 
   return problem ? [issue(`${kind}-bearer`, `${unit.name} can't take ${item.name}: it ${problem}.`, [entry.id])] : [];
 }

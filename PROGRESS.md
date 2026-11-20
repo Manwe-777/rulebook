@@ -51,6 +51,11 @@
   limits 2 / 4. `anyLoneDetachment` in the muster record covers the announced "any single detachment" rule. The builder
   shows each detachment's DP, disposition and tags, a DP counter and the disposition picker; the rulebook and the
   army sheet show DP and disposition. Local relay and browser data were reset (no migration: nothing was deployed).
+- Readability: both apps tell the browser they are dark pages (`color-scheme: dark`), so dropdown lists, spinners and
+  checkboxes are drawn dark with readable text; rule explanations wrap and open larger. The builder only offers the
+  enhancements and upgrades a unit can take (the validator's check, shared) and hides the picker when there are none.
+  The play view says when a unit took no wargear options and shows the dice to roll under each weapon it carries
+  ("Roll 10 attacks, hitting on 3+"; abilities that add attacks are not counted).
 - Rule explanations: a `glossary` record in `core` (one `###` per term, in our own words) explains weapon abilities and
   core abilities. Tapping a tag or core ability on a rulebook datasheet or in the builder's play view opens it (native
   popover). The starter glossary covers the weapon abilities, Feel No Pain and Deadly Demise; core abilities that

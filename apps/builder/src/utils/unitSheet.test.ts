@@ -2,6 +2,7 @@ import { entryLoadout, Library, type ListEntry } from '@rulebook/rules';
 import { describe, expect, it } from 'vitest';
 
 import { loadBundledFiles } from '../sources/loadBundledFiles';
+import { attackDice, totalAttacks } from './attackDice';
 import { carriedWargearRules } from './carriedWargearRules';
 import { combinedUnit } from './combinedUnit';
 import { loadoutLines } from './loadoutLines';
@@ -80,5 +81,21 @@ describe('the play view of a unit', () => {
     }
 
     expect(combinedUnit(list, 'missing')).toBeNull();
+  });
+});
+
+describe('attack dice', () => {
+  it('multiplies the attacks by how many models carry the weapon, dice included', () => {
+    expect(totalAttacks('1', 10)).toBe('10');
+    expect(totalAttacks('D3', 10)).toBe('10D3');
+    expect(totalAttacks('D6+1', 1)).toBe('D6+1');
+    expect(totalAttacks('D3+1', 3)).toBe('3D3+3');
+    expect(totalAttacks('2D6', 2)).toBe('4D6');
+  });
+
+  it('says what to roll and what hits; a weapon with no hit roll hits automatically', () => {
+    expect(attackDice('2', '3+', 5)).toBe('Roll 10 attacks, hitting on 3+');
+    expect(attackDice('1', '4+', 1)).toBe('Roll 1 attack, hitting on 4+');
+    expect(attackDice('D6', 'N/A', 2)).toBe('Roll 2D6 attacks, hitting automatically');
   });
 });
