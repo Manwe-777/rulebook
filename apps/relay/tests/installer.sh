@@ -49,8 +49,10 @@ install() {
   for _ in $(seq 30); do [ "$(starts)" -gt "$before" ] && return 0; sleep 1; done
   fail "relay didn't start after install.sh $*"
 }
-checks_owner() { journal | tail -1 | grep -q "Checking writes against owner $OWNER_HEX"; }
-open_store() { journal | tail -1 | grep -q "open store"; }
+# The newest start's owner line (later lines report the relay network).
+owner_line() { journal | grep -E "Checking writes|open store" | tail -1; }
+checks_owner() { owner_line | grep -q "Checking writes against owner $OWNER_HEX"; }
+open_store() { owner_line | grep -q "open store"; }
 
 echo "== install with no options uses the built-in owner"
 install
