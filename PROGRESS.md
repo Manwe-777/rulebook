@@ -54,6 +54,9 @@
 - Wargear priced per item carried (`itemPoints`, e.g. a Repulsor's default Heavy Laser Destroyer +10), shown on
   datasheets and next to builder choices. The same upgrade can go on several units (as real lists do), unless the
   muster rules set `upgrades.once`.
+- `npm run appoint -w @rulebook/relay`: the owner appoints or removes maintainers per faction (or `all`) from the
+  terminal with the password-protected owner key file, so the owner key never goes into a browser. Checked against the
+  local relays with a throwaway key (appoint, wrong password, remove).
 - Relay discovery: `project.json` lists only bootstrap relays (relay.damus.io, nos.lol, relay.primal.net). A relay
   with `RELAY_PUBLIC_URL` announces itself hourly under `relay/<its key>`, signed with its own key, and copies the
   topic's data from the bootstrap and announced relays (a new relay fills itself; checked with two local relays: 206

@@ -99,3 +99,20 @@ it needs Docker:
 ```sh
 apps/relay/tests/installer.sh
 ```
+
+## Owner and maintainers
+
+`npm run owner-key -w @rulebook/relay -- <file outside the repository>` makes the owner key once: the secret key is
+saved only password-protected, and the public key goes into `project.json`. Keep the file and its password apart, each
+with a backup.
+
+The owner key only appoints maintainers, from the terminal, so it never goes into a browser:
+
+```sh
+npm run appoint -w @rulebook/relay -- <npub or hex key> <faction…|all> [--remove] [--key owner.ncryptsec]
+```
+
+It asks for the password, checks the file holds the project owner's key, and adds the key to (or removes it from)
+each faction's maintainers on the bootstrap and announced relays. `all` means `core` and every released faction; the
+key file defaults to `~/rulebook-owner.ncryptsec`. Maintainers then work with their own browser key or a Nostr signer
+extension.

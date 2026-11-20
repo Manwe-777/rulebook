@@ -1,12 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
 import { PROJECT, projectSettings } from './projectSettings';
+import { ownerKeyHex } from './utils/ownerKeyHex';
 
 const KEY = 'a'.repeat(64);
 
 describe('projectSettings', () => {
   it('uses project.json when a build sets nothing, or sets empty values', () => {
-    const expected = { owner: PROJECT.owner, relays: PROJECT.relays };
+    const expected = { owner: PROJECT.owner ? ownerKeyHex(PROJECT.owner) : '', relays: PROJECT.relays };
 
     expect(projectSettings({})).toEqual(expected);
     expect(projectSettings({ owner: ' ', relays: '' })).toEqual(expected);

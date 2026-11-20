@@ -9,7 +9,8 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "publish": "tsx src/publish.ts",
-    "owner-key": "tsx src/ownerKey.ts"
+    "owner-key": "tsx src/ownerKey.ts",
+    "appoint": "tsx src/appoint.ts"
   },
   "dependencies": {
     "@rulebook/sharing": "*",

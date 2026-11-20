@@ -65,4 +65,10 @@ Open the rulebook, pick a faction, choose **Edit or contribute** and ask to cont
 the first time you write (protect it with a password on the Account page). Once a maintainer of that faction accepts
 you, you can propose changes; maintainers review and release them.
 
+The project owner appoints maintainers from the terminal, with the password-protected owner key file:
+
+```sh
+npm run appoint -w @rulebook/relay -- <npub of the maintainer> core blood-angels   # or: all; --remove to take back
+```
+
 Deploying the apps: `docs/hosting.md`. Rules format: `docs/data-model.md`.

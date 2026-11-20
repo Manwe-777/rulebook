@@ -1,10 +1,10 @@
 import { existsSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join, resolve } from 'node:path';
-import { createInterface } from 'node:readline';
-import { Writable } from 'node:stream';
 
 import { encryptSecretKey, generateSecretKey, getPublicKey, npubEncode } from 'tool-db';
+
+import { askHidden } from './askHidden';
 
 /**
  * Makes the project's owner key. Prints the public key and saves the secret key only password-protected (NIP-49) in
@@ -22,23 +22,11 @@ if (file.startsWith(resolve(import.meta.dirname, '../../..'))) {
   process.exit(1);
 }
 
-// readline echoes what is typed through its output; this one drops the echo so passwords stay off the screen.
-const silent = new Writable({ write: (_chunk, _encoding, done) => done() });
-const prompt = createInterface({ input: process.stdin, output: silent, terminal: Boolean(process.stdin.isTTY) });
-const lines = prompt[Symbol.asyncIterator]();
-
-/** Asks a question and reads one line without showing it; works when typed or piped. */
-async function ask(question: string): Promise<string> {
-  process.stdout.write(question);
-
-  return ((await lines.next()).value as string | undefined) ?? '';
-}
-
-const password = await ask('Password for the owner key (at least 12 characters): ');
-const again = await ask('\nSame password again: ');
+const prompt = askHidden();
+const password = await prompt.ask('Password for the owner key (at least 12 characters): ');
+const again = await prompt.ask('Same password again: ');
 
 prompt.close();
-process.stdout.write('\n');
 
 if (password.length < 12 || password !== again) {
   console.error('The passwords are shorter than 12 characters or do not match.');
