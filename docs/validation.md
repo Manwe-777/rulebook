@@ -31,7 +31,9 @@ Run in this order; every check runs even when an earlier one fails.
 2. **Faction.** Every unit comes from the army's faction or a faction it includes (an entry can name another faction's
    unit as `faction/id`), and has the army's faction keyword, unless a constraint allows it. Allies are written that
    way: an `allow: faction` constraint selecting them, with a points `max`.
-3. **Unit size.** The model count matches one of the unit's `points` sizes and each model type's `min`/`max`.
+3. **Unit size.** The model count matches one of the unit's `points` sizes and each model type's `min`/`max`. When the
+   entry gives `counts`, they match a size's model types; without them it takes the first size with its number of
+   models. Points, default wargear and wargear limits use that size's models.
 4. **Wargear.** Each option is taken by no more models than its `per` allows, and chosen lists exist.
 5. **Points.** Units, wargear options, wargear priced per item carried (`itemPoints`), enhancements and upgrades are
    summed; a datasheet's later copies add its

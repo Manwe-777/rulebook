@@ -1,4 +1,5 @@
 import type { ListEntry, Unit } from '../types';
+import { entrySize } from './entrySize';
 import { modelCounts } from './modelCounts';
 
 /** What one model type in a unit carries in total: `{ type: 'Hesyr', count: 1, items: [{ id: 'teleport-crest', count: 1 }] }`. */
@@ -27,7 +28,9 @@ const room = (carried: Carried, count: number, replace: string[]) =>
  * replaces, rank and file (the last types) first.
  */
 export function entryLoadout(unit: Unit, entry: ListEntry): ModelLoadout[] {
-  const groups = modelCounts(unit, entry.models).map(({ type, count }) => {
+  const counts = entrySize(unit, entry)?.counts ?? modelCounts(unit, entry.models);
+
+  const groups = counts.map(({ type, count }) => {
     const carried: Carried = new Map();
 
     for (const id of unit.composition.wargear[type] ?? []) add(carried, id, count);

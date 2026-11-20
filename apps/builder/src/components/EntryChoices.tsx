@@ -1,7 +1,8 @@
-import type { Library, ListEntry, Unit } from '@rulebook/rules';
+import { entrySize, type Library, type ListEntry, sizeLabel, type Unit, unitSizes } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
 import { itemOptions } from '../utils/itemOptions';
+import { sizeCounts } from '../utils/sizeCounts';
 import AttachControl from './AttachControl';
 import SelectField from './SelectField';
 
@@ -24,6 +25,7 @@ export default function EntryChoices({ draft, library, entry, unit, onChange }: 
       label: `${e.name} (${e.points} pts)`,
     }));
 
+  const sizes = unitSizes(unit);
   const enhancements = items('model');
   const upgrades = items('unit');
 
@@ -31,12 +33,9 @@ export default function EntryChoices({ draft, library, entry, unit, onChange }: 
     <div className="flex flex-wrap gap-3">
       <SelectField
         label="Models"
-        value={String(entry.models)}
-        options={unit.composition.points.map((p) => ({
-          value: String(p.models),
-          label: `${p.models} (${p.points} pts)`,
-        }))}
-        onChange={(v) => onChange(draft.setModels(entry.id, Number(v)))}
+        value={String(sizes.indexOf(entrySize(unit, entry)!))}
+        options={sizes.map((s, i) => ({ value: String(i), label: `${sizeLabel(s)} (${s.points} pts)` }))}
+        onChange={(v) => onChange(draft.setModels(entry.id, sizes[Number(v)].models, sizeCounts(sizes[Number(v)])))}
       />
       {enhancements.length > 0 && (
         <SelectField

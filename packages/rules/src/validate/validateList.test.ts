@@ -83,8 +83,8 @@ describe('validateList: unit size and wargear', () => {
     const troopers = demoLibrary.unit('demo-host', 'line-troopers')!.unit;
     const option = { ...troopers.wargearOptions[0], per: { every: 5, count: 2 } };
 
-    expect(wargearAllowance(troopers, 10, option)).toBe(4);
-    expect(wargearAllowance(troopers, 20, option)).toBe(8);
+    expect(wargearAllowance(troopers, { models: 10 }, option)).toBe(4);
+    expect(wargearAllowance(troopers, { models: 20 }, option)).toBe(8);
   });
 
   it('the same option taken in two rows counts all of its models', () => {

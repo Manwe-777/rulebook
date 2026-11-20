@@ -1,4 +1,5 @@
 import { entryLoadout } from '../utils/entryLoadout';
+import { entrySize } from '../utils/entrySize';
 import { findEnhancement } from './findEnhancement';
 import type { Resolved, ValidationContext } from './types';
 
@@ -7,9 +8,9 @@ import type { Resolved, ValidationContext } from './types';
  * options, wargear that costs extra for each one carried, and its enhancement or upgrade.
  */
 export function entryPoints(ctx: ValidationContext, { entry, unit, copy }: Resolved): number {
-  const { points, copies } = unit.composition;
+  const { copies } = unit.composition;
   const surcharge = copies && copy >= copies.from ? copies.points : 0;
-  const size = (points.find((p) => p.models === entry.models)?.points ?? 0) + surcharge;
+  const size = (entrySize(unit, entry)?.points ?? 0) + surcharge;
 
   const wargear = entry.wargear.reduce((sum, w) => {
     const option = unit.wargearOptions.find((o) => o.id === w.option);

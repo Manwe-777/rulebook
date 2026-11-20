@@ -29,7 +29,7 @@ function entryIssues(entry: ListEntry, unit: Unit): Issue[] {
   for (const [id, models] of taken) {
     const allowed = wargearAllowance(
       unit,
-      entry.models,
+      entry,
       unit.wargearOptions.find((o) => o.id === id)!,
     );
 

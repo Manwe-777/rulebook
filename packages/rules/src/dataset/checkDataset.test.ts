@@ -112,6 +112,27 @@ describe('checkDataset', () => {
     ).toEqual([['unknown-reference', 'error', 'demo-host/standard-bearer']]);
   });
 
+  it('reports a size whose model counts are unknown types or do not add up to the size', () => {
+    expect(
+      checkEdited(
+        'veteran-squad.md',
+        '{ models: 10, points: 180 }',
+        '{ models: 10, points: 180, counts: { Veteran: 9 } }',
+      ),
+    ).toEqual([['size-counts', 'error', 'demo-host/veteran-squad']]);
+
+    expect(
+      checkEdited(
+        'veteran-squad.md',
+        '{ models: 10, points: 180 }',
+        '{ models: 10, points: 180, counts: { Hound: 10 } }',
+      ),
+    ).toEqual([
+      ['unknown-model', 'error', 'demo-host/veteran-squad'],
+      ['size-counts', 'error', 'demo-host/veteran-squad'],
+    ]);
+  });
+
   it('reports missing muster rules, and warns when no datasheet limit applies by default', () => {
     expect(checkDataset(Library.fromFiles(loadDemoFiles().filter((f) => !f.path.includes('core/'))))).toEqual([
       expect.objectContaining({ code: 'no-muster-rules', severity: 'error' }),

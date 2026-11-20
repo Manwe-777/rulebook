@@ -117,8 +117,9 @@ export class ArmyDraft {
     return this.with({ units, warlord: this.list.warlord === id ? undefined : this.list.warlord });
   }
 
-  setModels(id: string, models: number): ArmyDraft {
-    return this.withEntry(id, (e) => ({ ...e, models }));
+  /** Sets a unit's size, with its models by type when the datasheet's size names them. */
+  setModels(id: string, models: number, counts?: Record<string, number>): ArmyDraft {
+    return this.withEntry(id, (e) => ({ ...e, models, counts }));
   }
 
   /** Sets how many models take a wargear option and which list they take; 0 models removes the option. */

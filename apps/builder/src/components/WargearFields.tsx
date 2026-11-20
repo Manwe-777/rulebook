@@ -21,7 +21,7 @@ export default function WargearFields({ draft, entry, unit, onChange }: Props) {
 
   return unit.wargearOptions.map((option) => {
     const rows = entry.wargear.filter((w) => w.option === option.id);
-    const max = wargearAllowance(unit, entry.models, option);
+    const max = wargearAllowance(unit, entry, option);
     const used = rows.reduce((sum, w) => sum + w.models, 0);
     const countOf = (choice: string[]) => rows.find((w) => w.choice.join(',') === choice.join(','))?.models ?? 0;
 

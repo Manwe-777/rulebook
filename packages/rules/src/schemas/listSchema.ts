@@ -10,6 +10,8 @@ const entry = z.strictObject({
   id: text,
   unit: unitRef,
   models: z.int().min(1),
+  /** Models of each type, when the unit's sizes say which models they have. */
+  counts: z.record(z.string(), z.int().min(0)).optional(),
   wargear: z.array(z.strictObject({ option: slug, models: z.int().min(1), choice: z.array(slug).min(1) })).default([]),
   enhancement: slug.optional(),
   upgrade: slug.optional(),

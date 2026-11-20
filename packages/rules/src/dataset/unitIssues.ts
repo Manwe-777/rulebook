@@ -1,5 +1,6 @@
 import type { Constraint, Faction, Issue, Unit } from '../types';
 import { keywordKey } from '../utils/keywordKey';
+import { unitSizes } from '../utils/unitSizes';
 import { constraintIssues } from './constraintIssues';
 
 const error = (code: string, message: string, ref: string): Issue => ({
@@ -52,10 +53,32 @@ function compositionIssues(unit: Unit, ref: string): Issue[] {
     }
   }
 
-  if (new Set(sizes).size !== sizes.length)
+  const keys = unitSizes(unit).map((s) => JSON.stringify(s.counts));
+
+  if (new Set(keys).size !== keys.length)
     issues.push(error('size-twice', `${unit.name} lists a unit size twice.`, ref));
 
-  return issues;
+  return [...issues, ...sizeCountIssues(unit, ref)];
+}
+
+/** Sizes that name their model types: known types, within each type's limits, adding up to the size. */
+function sizeCountIssues(unit: Unit, ref: string): Issue[] {
+  const { models } = unit.composition;
+
+  return unit.composition.points.flatMap(({ models: size, counts }) => {
+    if (!counts) return [];
+
+    const unknown = Object.keys(counts).filter((type) => !models.some((m) => m.name === type));
+    const outside = models.filter((m) => (counts[m.name] ?? 0) < m.min || (counts[m.name] ?? 0) > m.max);
+    const total = Object.values(counts).reduce((sum, n) => sum + n, 0);
+
+    return [
+      ...unknown.map((type) => error('unknown-model', `${unit.name} has no model type "${type}".`, ref)),
+      ...(outside.length > 0 || total !== size
+        ? [error('size-counts', `${unit.name}'s ${size} model size doesn't fit its model types.`, ref)]
+        : []),
+    ];
+  });
 }
 
 function attachIssues(faction: Faction, unit: Unit, ref: string): Issue[] {

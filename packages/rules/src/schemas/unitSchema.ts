@@ -61,8 +61,11 @@ const wargearOption = z.strictObject({
 
 const composition = z.strictObject({
   models: z.array(z.strictObject({ name: text, min: count, max: z.int().min(1) })).min(1),
-  /** Cost by unit size, counting every model. */
-  points: z.array(z.strictObject({ models: z.int().min(1), points })).min(1),
+  /**
+   * Cost by unit size, counting every model. `counts` says how many of each model type the size has (types left out
+   * have none), for units whose cost depends on which models they have, not only how many.
+   */
+  points: z.array(z.strictObject({ models: z.int().min(1), points, counts: z.record(text, count).optional() })).min(1),
   /** From the `from`th copy of this datasheet in an army, each copy costs `points` more. */
   copies: z.strictObject({ from: z.int().min(2), points }).optional(),
   /** Wargear that costs extra, by id: each one the unit carries (by default or by choice) adds its points. */

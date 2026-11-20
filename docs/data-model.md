@@ -87,6 +87,8 @@ composition:
     - { name: Field Captain, min: 1, max: 1 }
   points: # cost by unit size, total models
     - { models: 1, points: 70 }
+    # when the cost depends on which models, a size names them (types left out have none), and several sizes can have
+    # the same number of models: - { models: 6, points: 170, counts: { Wolf Guard Headtaker: 6 } }
   copies: { from: 3, points: 10 } # optional: from the 3rd copy in an army, each costs 10 more
   itemPoints: { grenade-launcher: 5 } # optional: each one carried (by default or chosen) costs this much more
   wargear: # default wargear per model type
@@ -278,7 +280,7 @@ units:
     attachedTo: u2 # the bodyguard this leader or support unit joins
   - id: u2
     unit: line-troopers
-    models: 10
+    models: 10 # counts: { Sergeant: 1, Trooper: 9 } picks a size that names its model types
     upgrade: reinforced-plating # unit upgrades use `upgrade`
 formation: # optional, checked when given
   reserves: [u3]
