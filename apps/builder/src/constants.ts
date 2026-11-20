@@ -68,3 +68,23 @@ export const STRATAGEMS_PARAM = 'stratagems';
 
 /** Query parameter that also shows the core stratagems among them (`?core=1`); hidden by default. */
 export const CORE_STRATAGEMS_PARAM = 'core';
+
+/** localStorage key that is `'1'` while this device syncs its lists through the relays. */
+export const SYNC_KEY = 'rulebook:sync';
+
+/** How often a syncing device checks the relays for changes from other devices, in milliseconds. */
+export const SYNC_INTERVAL_MS = 60_000;
+
+/** How long after a change on this device it is sent, in milliseconds, so typing doesn't send every keystroke. */
+export const SYNC_DEBOUNCE_MS = 2_000;
+
+/** Characters of the code that unlocks a device link: no 0/O, 1/I/L, so it is easy to read out and type. */
+export const LINK_CODE_ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+
+export const LINK_CODE_LENGTH = 6;
+
+/** Address hash that carries a device link: `#link=<ncryptsec>`. */
+export const LINK_HASH = 'link';
+
+/** scrypt cost (log2 N) of the key in a device link: strong enough for a short code, fast enough on a phone. */
+export const LINK_KEY_LOGN = 16;

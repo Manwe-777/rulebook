@@ -57,6 +57,9 @@
 - Live: the repository is on GitHub (Manwe-777/rulebook), the apps on GitHub Pages
   (manwe-777.github.io/rulebook/), relay release v1.0.0 with the owner key built in, and the first relay "Rulebook
   NYC" at `wss://192-241-132-246.sslip.io` (DigitalOcean droplet, Caddy for TLS), announced on the bootstrap relays.
+- List sync between devices: armies are encrypted to the user's own key and kept in their namespace on the relays;
+  a device links another with a QR code and a six-character code (works in an Android PWA, no extension needed).
+  Newest change per army wins; deletions sync. Devices that sign with a browser extension can't sync.
 - Local test content (gitignored `local-content/`, unpublished): 18 factions, 371 datasheets and 93 detachments,
   from 40k.app with rules in our own words: Leagues of Votann, Emperor's Children, Tyranids, Orks, T'au Empire, Grey
   Knights, the shared Space Marines bundle (69 datasheets, 16 detachments) and 11 chapters including it (Blood Angels,

@@ -47,7 +47,7 @@ by `/`, since tool-db keeps `.` for user namespaces (`:<p>.<key>`). The topic is
 | `hidden`                | Owner                 | `{ keys: [key…], blobs: [h…], reason }`                         |
 | `:<p>.proposal/<f>/<n>` | That user (namespace) | `{ kind, id, base?: h, blob: h, note }`                         |
 | `:<p>.request/<f>`      | That user (namespace) | `{ message }`: asks to become a contributor                     |
-| `:<p>.list/<n>`         | That user (namespace) | A saved army list                                               |
+| `:<p>.list/<n>`         | That user (namespace) | A saved army, encrypted to the user's own key (sync)            |
 | `relay/<p>`             | That relay node (`p`) | `{ url, name, updated }`: where the relay can be reached        |
 
 The owner's public key is not data: it is committed in `project.json`, so the apps, the relay and the relay installer
@@ -101,6 +101,17 @@ default and accepted, unreleased changes on request.
 **Building a list.** The builder loads the newest trusted release of the faction and the core release it names,
 fetches the blobs by hash, and validates locally. A saved list keeps both release hashes. When a newer release exists,
 the builder offers to move the list and shows what the move changes (points, removed entries, new issues).
+
+**Syncing lists.** With sync on, the builder writes each saved army to `:<p>.list/<id>` as `{ c }`, where `c` is
+the army (`{ id, updatedAt, list }`, `list: null` for a deleted one) encrypted with NIP-44 between the user's key and
+itself, so only devices holding that key can read it. Each device reads its namespace on start, every minute, when the
+page is shown again and after its own changes, and keeps the newest version of every army; it sends what it has that
+is newer. The builder and the rulebook share one identity in `localStorage` (`rulebook:identity`), so on the same site
+the sync key is the Rulebook account key.
+
+**Linking a device.** The builder shows a QR code for its own address with `#link=<ncryptsec>`: the key encrypted
+(NIP-49) with a new six-character code that is shown next to it, never put in the link. The other device opens the
+link, asks for the code, stores the key and turns sync on. The hash never reaches a server.
 
 **Hiding.** The owner adds keys or blob hashes to `hidden`. Every client checks the list on each read, including values
 it cached earlier, and the relays running the write rules refuse new writes to hidden keys. Releases that need a hidden

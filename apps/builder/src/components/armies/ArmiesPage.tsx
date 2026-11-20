@@ -1,9 +1,11 @@
 import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { SavedArmies } from '../../army/SavedArmies';
+import type { ArmySync } from '../../hooks/useArmySync';
 import type { BuilderRules } from '../../hooks/useBuilderLibrary';
 import { useNow } from '../../hooks/useNow';
 import { PANEL, PANEL_TITLE } from '../styles';
+import SyncPanel from '../sync/SyncPanel';
 import ArmyCard from './ArmyCard';
 import NewArmyForm from './NewArmyForm';
 import RulesPanel from './RulesPanel';
@@ -11,14 +13,15 @@ import RulesPanel from './RulesPanel';
 interface Props {
   saved: SavedArmies;
   rules: BuilderRules;
+  sync: ArmySync;
   onOpen: (id: string, play?: boolean) => void;
   onCreate: (faction: string) => void;
   onDuplicate: (id: string) => void;
   onDelete: (id: string) => void;
 }
 
-/** Every army saved on this device, newest first, and a form to start a new one. */
-export default function ArmiesPage({ saved, rules, onOpen, onCreate, onDuplicate, onDelete }: Props) {
+/** Every army saved on this device, newest first, a form to start a new one, and sync between devices. */
+export default function ArmiesPage({ saved, rules, sync, onOpen, onCreate, onDuplicate, onDelete }: Props) {
   const now = useNow();
   const { library, releases } = rules;
   const releaseOf = (faction: string): ReleaseInfo | undefined => releases.find((r) => r.faction === faction);
@@ -50,8 +53,11 @@ export default function ArmiesPage({ saved, rules, onOpen, onCreate, onDuplicate
           ))}
         </ul>
       )}
+      <SyncPanel sync={sync} now={now} />
       <RulesPanel library={library} releases={releases} status={rules.status} checkedAt={rules.checkedAt} now={now} />
-      <p className="text-xs text-text/60">Armies and photos are saved on this device only.</p>
+      <p className="text-xs text-text/60">
+        Photos are saved on this device only. Armies too, unless sync between devices is on.
+      </p>
     </div>
   );
 }

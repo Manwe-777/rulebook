@@ -1,11 +1,15 @@
+import { loadStoredIdentity } from '@rulebook/sharing/identity';
 import { useMemo } from 'react';
 
 import { ArmyDraft } from './army/ArmyDraft';
 import ArmiesPage from './components/armies/ArmiesPage';
 import BuilderPage from './components/BuilderPage';
+import AcceptLinkDialog from './components/sync/AcceptLinkDialog';
 import { ICON_CREDIT, RULEBOOK_URL, SITE_NAME } from './constants';
 import { useArmyRoute } from './hooks/useArmyRoute';
+import { useArmySync } from './hooks/useArmySync';
 import { type BuilderSource, useBuilderLibrary } from './hooks/useBuilderLibrary';
+import { useIncomingLink } from './hooks/useIncomingLink';
 import { useSavedArmies } from './hooks/useSavedArmies';
 import { newArmyId } from './utils/newArmyId';
 
@@ -26,6 +30,9 @@ export default function App() {
   const rules = useBuilderLibrary();
   const { library, status, releases } = rules;
   const [saved, change] = useSavedArmies();
+  const sync = useArmySync(saved, change);
+  // A link from another device, opened from its QR code: `#link=…`.
+  const [incoming, closeLink] = useIncomingLink();
   const [armyId, open] = useArmyRoute();
   const draft = useMemo(() => (armyId ? saved.draft(armyId) : null), [saved, armyId]);
 
@@ -82,10 +89,22 @@ export default function App() {
         <ArmiesPage
           saved={saved}
           rules={rules}
+          sync={sync}
           onOpen={open}
           onCreate={create}
           onDuplicate={(id) => change((s) => s.duplicate(id, newArmyId(), Date.now()))}
           onDelete={(id) => change((s) => s.remove(id, Date.now()))}
+        />
+      )}
+      {incoming && (
+        <AcceptLinkDialog
+          ncryptsec={incoming}
+          hasOwnKey={loadStoredIdentity() !== null}
+          onLinked={(secret) => {
+            sync.adopt(secret);
+            closeLink();
+          }}
+          onClose={closeLink}
         />
       )}
       <footer className="mt-auto text-xs text-text/60">
