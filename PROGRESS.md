@@ -162,7 +162,7 @@
 
 - Format gaps found with Blood Angels: detachment restrictions on other Chapters' units (Encarmine Speartip) aren't
   checked; leaders that can only lead units missing from the data drop their Leader ability (Techmarine); 11th edition
-  core terms (CLOSE-QUARTERS, CLEAVE, HUNTER, Damaged X, psychic levels, combat doctrines) have no glossary entries yet.
+  terms (HUNTER, Damaged X, psychic levels, combat doctrines) have no glossary entries yet.
 - Format gaps found with Leagues of Votann: "no duplicates", "one of these per model" and "replace X or Y" option rules;
   model types whose models carry different gear (E-COGs); passengers taking no transport space (by model type);
   detachments granting keywords (Beserks gain BATTLELINE); enhancements that need a weapon; splitting a unit across
