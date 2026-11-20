@@ -3,13 +3,5 @@
   "printWidth": 120,
   "trailingComma": "all",
   "plugins": ["prettier-plugin-tailwindcss"],
-  "tailwindStylesheet": "./apps/rulebook/src/styles.css",
-  "overrides": [
-    {
-      "files": "apps/builder/**",
-      "options": {
-        "tailwindStylesheet": "./apps/builder/src/styles.css"
-      }
-    }
-  ]
+  "tailwindStylesheet": "./apps/rulebook/src/styles.css"
 }

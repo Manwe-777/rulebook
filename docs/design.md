@@ -20,8 +20,7 @@ their own words, and a list builder that checks whether an army is legal.
 | ------------------ | -------------------- | ------------------------------------------------------------------------------ |
 | `packages/rules`   | `@rulebook/rules`    | Record schemas, Markdown parsing, dataset checks and list validation. Pure TS. |
 | `packages/sharing` | `@rulebook/sharing`  | tool-db keys, write rules (verificators), roles, proposals and releases.       |
-| `apps/rulebook`    | `@rulebook/rulebook` | Reader, editor, review queue and release publishing.                           |
-| `apps/builder`     | `@rulebook/builder`  | List builder and list validation.                                              |
+| `apps/rulebook`    | `@rulebook/rulebook` | Reader, editor, review queue, release publishing, and the list builder.        |
 | `apps/relay`       | `@rulebook/relay`    | ToolDB relay node: durable storage and the same write rules as the clients.    |
 
 `packages/rules` and `packages/sharing` are used by both apps and the relay, so every place that reads data checks it
@@ -117,8 +116,9 @@ The project shares game data and players' own explanations of rules. It never sh
 - Faction data never contains code. Faction-specific army rules use the declarative constraints in
   [validation.md](validation.md).
 - Every problem found in a list or a dataset is reported with a message and the entry it concerns; nothing throws.
-- The list builder is an installable app (PWA) that works offline with the releases cached on the device. It keeps any
-  number of armies on the device; the open army is part of the address (`?army=<id>`).
+- The rulebook and the list builder are one installable app (PWA), with one header, one connection and one copy of the
+  rules in memory; it works offline with the releases cached on the device. The builder (`/builder`) keeps any number
+  of armies on the device; the open army is part of the address (`?army=<id>`).
 - The builder prints an army through the rulebook's print page: the list travels in the URL fragment (`#army=`), so
   it never reaches a server. The sheet has the roster and, as the player picks, army rules, detachment rules with the
   enhancements taken, stratagems and the army's datasheets.

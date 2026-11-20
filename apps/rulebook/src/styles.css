@@ -16,6 +16,7 @@
 
 @theme {
   --color-bg: #1b1d1a;
+  --color-panel: #252822;
   /* Stratagem colours, as codices print them: used in your turn, your opponent's turn, or either. */
   --color-turn-your: #2a4f82;
   --color-turn-opponent: #9b2c22;
@@ -29,8 +30,22 @@
   --color-bar-dark: #2c3619;
   --color-rule: #8d8c84;
   --color-stat-box: #f4f3ee;
+  /* List builder: a legal or broken list, and the warlord. */
+  --color-legal: #4f7a2e;
+  --color-illegal: #9b2c22;
+  --color-warlord: #d4a537;
   --font-sans: 'Barlow Semi Condensed', system-ui, sans-serif;
   --font-mono: 'Share Tech Mono', ui-monospace, monospace;
+
+  /* A short pop for confirmations (the "unit added" message and the add button's tick). */
+  --animate-pop: pop 180ms ease-out;
+
+  @keyframes pop {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem) scale(0.96);
+    }
+  }
 }
 
 @layer base {

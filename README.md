@@ -11,19 +11,17 @@ and loaded from the community's relays. This is not official Games Workshop mate
 
 | Folder             | Contents                                           |
 | ------------------ | -------------------------------------------------- |
-| `apps/rulebook`    | Reader and editor for faction rules                |
+| `apps/rulebook`    | Rules reader and editor, and the list builder      |
 | `packages/rules`   | Rules format, parsing and demo content             |
 | `packages/sharing` | Storage and permissions on tool-db                 |
 | `apps/relay`       | Relay node that stores and checks the shared rules |
-| `apps/builder`     | List builder                                       |
 | `docs/`            | Design, content format and hosting                 |
 
 ## Run
 
 ```sh
 npm install
-npm run dev     # rulebook on http://localhost:5190
-npm run dev -w @rulebook/builder   # list builder on http://localhost:5191
+npm run dev     # the app on http://localhost:5190 (list builder at /builder)
 npm start -w @rulebook/relay   # relay on ws://localhost:8080, checking writes against project.json's owner
 ```
 
@@ -51,7 +49,7 @@ npm test        # tests only
 ## Build
 
 ```sh
-npm run build   # static sites in apps/rulebook/dist/ and apps/builder/dist/
+npm run build   # static site in apps/rulebook/dist/
 node apps/relay/scripts/package.mjs 1.0.0   # relay release in apps/relay/release/
 ```
 

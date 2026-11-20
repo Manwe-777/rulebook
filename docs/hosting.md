@@ -2,8 +2,8 @@
 
 ## Apps on GitHub Pages
 
-The CI workflow deploys both apps to GitHub Pages on every push to `main` after the check job passes: the rulebook at
-the site root, the list builder under `builder/`.
+The CI workflow deploys the app to GitHub Pages on every push to `main` after the check job passes: the rulebook at the
+site root, the list builder at `builder/` in the same app.
 
 Setup, once per repository:
 

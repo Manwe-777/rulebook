@@ -15,6 +15,7 @@ function pageName(library: Library, factionId: string, rest: string[]): string |
 /** Pages that aren't factions, by their path. */
 const FIXED_PAGES: Record<string, string> = {
   account: 'Account',
+  builder: 'List builder',
   print: 'Army sheet',
   stratagems: 'Core stratagems',
 };

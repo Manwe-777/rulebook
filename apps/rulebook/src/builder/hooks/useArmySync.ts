@@ -2,8 +2,9 @@ import { loadStoredIdentity, saveStoredIdentity, type StoredIdentity } from '@ru
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { decryptSecretKey, generateSecretKey } from 'tool-db';
 
+import { RELAYS } from '../../constants';
 import type { SavedArmies } from '../army/SavedArmies';
-import { RELAYS, SYNC_DEBOUNCE_MS, SYNC_INTERVAL_MS } from '../constants';
+import { SYNC_DEBOUNCE_MS, SYNC_INTERVAL_MS } from '../constants';
 import { createLink } from '../sync/createLink';
 import { loadSyncSetting } from '../sync/loadSyncSetting';
 import { saveSyncSetting } from '../sync/saveSyncSetting';
@@ -33,7 +34,7 @@ export interface ArmySync {
 
 type Change = (change: (saved: SavedArmies) => SavedArmies) => void;
 
-const BASE = () => `${window.location.origin}${import.meta.env.BASE_URL}`;
+const BASE = () => `${window.location.origin}${import.meta.env.BASE_URL}builder/`;
 
 /** The key to sync with: stored in the browser, or opened with its password this visit. */
 const usableSecret = (identity: StoredIdentity | null, unlocked: string | null) =>

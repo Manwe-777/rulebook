@@ -14,6 +14,10 @@ const escapeHtml = (text) =>
 // Pages that don't exist at build time (e.g. uploaded rules) load the client app from 404.html.
 writeFileSync(join(dist, '404.html'), template);
 
+// The list builder renders in the browser only (its armies live there); its address loads the app shell.
+mkdirSync(join(dist, 'builder'), { recursive: true });
+writeFileSync(join(dist, 'builder', 'index.html'), template);
+
 for (const path of paths) {
   const { html, title } = render(path);
 

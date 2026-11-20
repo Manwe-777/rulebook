@@ -18,11 +18,13 @@
     "@nanoseeds/wh40k-icon": "^0.4.1",
     "@rulebook/rules": "*",
     "@rulebook/sharing": "*",
+    "idb-keyval": "^6.3.0",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-markdown": "^10.1.0",
     "react-router": "^8.5.2",
     "tool-db": "3.0.0",
+    "uqr": "^0.1.2",
     "zod": "^4.6.7"
   },
   "devDependencies": {
@@ -32,6 +34,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.3.0",
+    "fake-indexeddb": "^6.2.8",
     "jsdom": "^31.0.1",
     "tailwindcss": "^4.3.5",
     "vite": "^8.3.8",

@@ -26,7 +26,8 @@ export default defineConfig(({ isSsrBuild }) => ({
           id: base,
           name: 'Rulebook',
           short_name: 'Rulebook',
-          description: 'Community-written Warhammer 40,000 rules: datasheets, detachments and stratagems.',
+          description:
+            'Community-written Warhammer 40,000 rules and a list builder: datasheets, detachments, stratagems.',
           start_url: '.',
           scope: '.',
           display: 'standalone',
@@ -42,8 +43,6 @@ export default defineConfig(({ isSsrBuild }) => ({
           // The app shell, not the thousands of prerendered pages: any page opens from index.html offline.
           globPatterns: ['**/*.{js,css,woff2,svg,png}', 'index.html'],
           navigateFallback: 'index.html',
-          // The list builder lives under this site's address but is a separate app with its own service worker.
-          navigateFallbackDenylist: [new RegExp(`^${base}builder/`)],
           maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         },
       }),

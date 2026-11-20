@@ -1,7 +1,7 @@
 import { entryLoadout, Library, type ListEntry } from '@rulebook/rules';
 import { describe, expect, it } from 'vitest';
 
-import { loadBundledFiles } from '../sources/loadBundledFiles';
+import { loadBundledFiles } from '../../sources/loadBundledFiles';
 import { attackDice, totalAttacks } from './attackDice';
 import { carriedWargearRules } from './carriedWargearRules';
 import { combinedUnit } from './combinedUnit';

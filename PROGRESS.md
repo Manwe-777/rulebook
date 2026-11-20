@@ -172,6 +172,10 @@
   notes as the card's tooltip). The list builder's rules data table is gone.
 - The Admin page is gone: the connection badge in the rulebook header opens a Connection popup with what this browser
   can do now (and a link to the account) and the relay list. `/admin` goes to the home page.
+- One app: the list builder moved into `apps/rulebook` (`src/builder/`, route `/builder`, loaded when opened) and
+  `apps/builder` is gone. It uses the rulebook's header, footer, rules (no second download) and release info; the print
+  link opens the app's own print page. GitHub Pages deploys the one app; `builder/index.html` is the app shell, so old
+  builder links still open, and the old builder's service worker goes away when its script is no longer found.
 
 ## Known issues
 

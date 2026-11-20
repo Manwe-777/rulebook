@@ -1,7 +1,7 @@
 import { Library, listSchema } from '@rulebook/rules';
 import { describe, expect, it } from 'vitest';
 
-import { loadBundledFiles } from '../sources/loadBundledFiles';
+import { loadBundledFiles } from '../../sources/loadBundledFiles';
 import { bodyguardLabel } from './bodyguardLabel';
 
 const library = Library.fromFiles(loadBundledFiles());

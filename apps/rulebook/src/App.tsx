@@ -9,7 +9,7 @@ import FactionPage from './components/pages/FactionPage';
 import HomePage from './components/pages/HomePage';
 import NotFoundPage from './components/pages/NotFoundPage';
 import UnitPage from './components/pages/UnitPage';
-import { BUILDER_URL, DATA_SOURCE, ICON_CREDIT, SITE_NAME } from './constants';
+import { DATA_SOURCE, ICON_CREDIT, SITE_NAME } from './constants';
 import { useDocumentTitle } from './hooks/useDocumentTitle';
 import { useLibrary } from './hooks/useLibrary';
 import { titleForPath } from './library/titleForPath';
@@ -20,6 +20,8 @@ const navClass = ({ isActive }: { isActive: boolean }) => (isActive ? CURRENT : 
 
 // Pages for contributors load when opened, so readers never download the editor.
 const AccountPage = lazy(() => import('./components/account/AccountPage'));
+// The list builder loads when opened, so readers of the rules never download it.
+const BuilderApp = lazy(() => import('./builder/BuilderApp'));
 const FactionWorkspace = lazy(() => import('./components/editor/FactionWorkspace'));
 const RecordEditor = lazy(() => import('./components/editor/RecordEditor'));
 // The army sheet the list builder links to.
@@ -30,8 +32,8 @@ export default function App() {
   const library = useLibrary();
 
   const path = useLocation().pathname;
-  // Every page but the account page is part of the rulebook itself.
-  const inRulebook = !/^\/account\b/.test(path);
+  // Every page but the account page and the list builder is part of the rulebook itself.
+  const inRulebook = !/^\/(account|builder)\b/.test(path);
 
   useDocumentTitle(titleForPath(library, path));
 
@@ -41,17 +43,14 @@ export default function App() {
         <Link to="/" className="text-3xl font-extrabold tracking-wide uppercase">
           {SITE_NAME}
         </Link>
-        {/* The same links, in the same order, as the list builder's. */}
         <nav className="flex flex-wrap items-center gap-x-4 gap-y-1">
           <ConnectionBadge />
           <Link to="/" className={inRulebook ? CURRENT : LINK} aria-current={inRulebook ? 'page' : undefined}>
             Rulebook
           </Link>
-          {BUILDER_URL && (
-            <a href={BUILDER_URL} className={LINK}>
-              List builder
-            </a>
-          )}
+          <NavLink to="/builder" className={navClass}>
+            List builder
+          </NavLink>
           <NavLink to="/account" className={navClass}>
             Account
           </NavLink>
@@ -60,6 +59,7 @@ export default function App() {
       <Suspense fallback={<p className="text-text/70">Loading…</p>}>
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/builder" element={<BuilderApp />} />
           <Route path="/stratagems" element={<CoreStratagemsPage />} />
           <Route path="/:faction" element={<FactionPage />} />
           <Route path="/:faction/:unit" element={<UnitPage />} />

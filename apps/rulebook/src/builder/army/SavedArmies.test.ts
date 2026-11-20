@@ -1,7 +1,7 @@
 import { Library } from '@rulebook/rules';
 import { describe, expect, it } from 'vitest';
 
-import { loadBundledFiles } from '../sources/loadBundledFiles';
+import { loadBundledFiles } from '../../sources/loadBundledFiles';
 import { ArmyDraft } from './ArmyDraft';
 import { SavedArmies } from './SavedArmies';
 

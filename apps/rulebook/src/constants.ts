@@ -38,9 +38,6 @@ export const OWNER_KEY: string = PROJECT.owner;
 /** scrypt cost for password-protected keys (2^16: about 100 ms and 64 MB). */
 export const KEY_PROTECTION_LOGN = 16;
 
-/** Address of the list builder, set with `VITE_BUILDER_URL`. Empty hides the link. */
-export const BUILDER_URL: string = import.meta.env.VITE_BUILDER_URL ?? '';
-
 /** localStorage key of the print page's include options (a per-browser convenience). */
 export const PRINT_OPTIONS_KEY = 'rulebook:print-options';
 

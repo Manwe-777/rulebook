@@ -1,10 +1,10 @@
 import { Library } from '@rulebook/rules';
 import { afterEach, describe, expect, it } from 'vitest';
 
+import { loadBundledFiles } from '../../sources/loadBundledFiles';
 import { ArmyDraft } from '../army/ArmyDraft';
 import { SavedArmies } from '../army/SavedArmies';
 import { ARMIES_BACKUP_KEY, ARMIES_KEY, LEGACY_LIST_KEY } from '../constants';
-import { loadBundledFiles } from '../sources/loadBundledFiles';
 import { attachTargets } from './attachTargets';
 import { itemOptions } from './itemOptions';
 import { loadSavedArmies } from './loadSavedArmies';

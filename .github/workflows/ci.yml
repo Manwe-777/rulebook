@@ -35,7 +35,7 @@ jobs:
       - run: npm ci
       - run: apps/relay/tests/installer.sh
 
-  # Both apps on GitHub Pages: the rulebook at the site root, the list builder under builder/.
+  # The app on GitHub Pages (the rulebook, with the list builder under builder/).
   pages:
     needs: check
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -58,18 +58,11 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      - name: Build the rulebook
-        run: BASE_PATH=$BASE VITE_BUILDER_URL=${BASE}builder/ npm run build -w @rulebook/rulebook
-      - name: Build the list builder
-        run: BASE_PATH=${BASE}builder/ VITE_RULEBOOK_URL=$BASE npm run build -w @rulebook/builder
-      - name: Put both in one site
-        run: |
-          mkdir _site
-          cp -r apps/rulebook/dist/. _site/
-          cp -r apps/builder/dist _site/builder
+      - name: Build the app
+        run: BASE_PATH=$BASE npm run build -w @rulebook/rulebook
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: _site
+          path: apps/rulebook/dist
       - id: deploy
         uses: actions/deploy-pages@v4
 

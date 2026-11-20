@@ -1,4 +1,4 @@
-import FactionIcon from '../FactionIcon';
+import FactionIcon from '../../../components/icons/FactionIcon';
 
 interface Props {
   name: string;
