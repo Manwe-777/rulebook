@@ -374,6 +374,14 @@ describe('validateList: constraints', () => {
     expect(codes(base, library({ when: { has: { units: { ids: ['veteran-squad'] } } }, max: 0 }))).toEqual(['c']);
   });
 
+  it('an enhancement selector without ids picks every entry with any enhancement', () => {
+    expect(codes(base, library({ select: { enhancements: {} }, max: 0 }))).toEqual(['c']);
+
+    expect(codes(base, library({ select: { enhancements: {}, units: { ids: ['veteran-squad'] } }, max: 0 }))).toEqual(
+      [],
+    );
+  });
+
   it("unless switches a constraint off while its condition holds, and faction tests the army's faction", () => {
     expect(codes(base, library({ max: 0, unless: { detachment: 'shield-wall' } }))).toEqual([]);
     expect(codes(base, library({ max: 0, unless: { faction: 'other-host' } }))).toEqual(['c']);

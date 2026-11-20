@@ -13,8 +13,10 @@ export const unitFilter = z.strictObject({
 /** Picks list entries. Every given field must match. */
 export const selectorSchema = z.strictObject({
   units: unitFilter.optional(),
-  enhancements: z.strictObject({ ids: z.array(slug) }).optional(),
-  upgrades: z.strictObject({ ids: z.array(slug) }).optional(),
+  /** Entries carrying one of these enhancements, or any enhancement when `ids` is left out. */
+  enhancements: z.strictObject({ ids: z.array(slug).optional() }).optional(),
+  /** Entries carrying one of these upgrades, or any upgrade when `ids` is left out. */
+  upgrades: z.strictObject({ ids: z.array(slug).optional() }).optional(),
   attached: unitFilter.optional(),
   /** `true` picks only the warlord's entry, `false` every other entry. */
   warlord: z.boolean().optional(),
