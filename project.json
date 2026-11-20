@@ -1,4 +1,4 @@
 {
   "owner": "npub1v44xh9hc25vd3nap3m70ydpwu7r9rhke6yee0ezwtqzyjmr5vfrqhjx8yl",
-  "relays": ["wss://relay.damus.io", "wss://nos.lol", "wss://relay.primal.net"]
+  "relays": ["wss://nostr.mom", "wss://nos.lol", "wss://relay.primal.net"]
 }

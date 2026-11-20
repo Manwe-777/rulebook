@@ -24,12 +24,15 @@ npm start -w @rulebook/relay   # relay on ws://localhost:8080, checking writes a
 ```
 
 The apps read the owner key and relays from `project.json`; with none set they show the demo faction. `VITE_RELAYS`
-(comma separated) and `VITE_RULEBOOK_OWNER` override them for a local run. To publish a content folder:
+(comma separated) and `VITE_RULEBOOK_OWNER` override them for a local run. To publish a content folder (one folder per faction, plus `core`) as a maintainer, with the key file saved from the
+rulebook's Account page:
 
 ```sh
-RULEBOOK_OWNER=<hex> RULEBOOK_SECRET=<maintainer secret, hex> RELAYS=ws://localhost:8080 \
-  npm run publish -w @rulebook/relay -- packages/rules/content 2026-11
+npm run publish -w @rulebook/relay -- packages/rules/content 2026-11 --key ~/rulebook-key.ncryptsec --notes "…"
 ```
+
+It asks for the key's password, uploads every record to the project's relays, releases each faction and reads the
+release back to check every record was stored. `RELAYS=ws://localhost:8080` publishes to a local relay instead.
 
 ## Test
 

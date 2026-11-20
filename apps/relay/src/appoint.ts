@@ -1,11 +1,10 @@
-import { readFileSync } from 'node:fs';
+import { CORE, RulebookClient } from '@rulebook/sharing';
+import { projectSettings } from '@rulebook/sharing/project';
+import { getPublicKey } from 'tool-db';
 
-import { CORE, loadRelayAnnouncements, RulebookClient, TOPIC } from '@rulebook/sharing';
-import { PROJECT, projectSettings } from '@rulebook/sharing/project';
-import { decryptSecretKey, getPublicKey, ToolDb } from 'tool-db';
-
-import { askHidden } from './askHidden';
+import { connectProject } from './connectProject';
 import { parseAppointArgs } from './parseAppointArgs';
+import { readSecret } from './readSecret';
 
 /**
  * Makes a key a maintainer of factions (or removes it), signed with the owner key from its password-protected file, so
@@ -18,12 +17,7 @@ if ('error' in request) {
   process.exit(1);
 }
 
-const prompt = askHidden();
-const password = await prompt.ask(`Password for ${request.keyFile}: `);
-
-prompt.close();
-
-const secret = await decryptSecretKey(readFileSync(request.keyFile, 'utf8').trim(), password).catch(() => null);
+const secret = await readSecret(request.keyFile, {});
 
 if (!secret) {
   console.error('Wrong password, or not an owner key file.');
@@ -39,18 +33,7 @@ if (owner !== projectOwner) {
   process.exit(1);
 }
 
-const bootstrap = process.env.RELAYS?.split(',').filter(Boolean) ?? PROJECT.relays;
-const announced = (await loadRelayAnnouncements(bootstrap, owner).catch(() => [])).map((r) => r.url);
-const relays = [...new Set([...bootstrap, ...announced])];
-const db = new ToolDb({ relays, topic: TOPIC });
-
-await db.ready;
-if (!db.isConnected) await new Promise<void>((resolve) => (db.onConnect = () => resolve()));
-
-// A write only reaches the relays connected at that moment: give the others a few seconds.
-for (let waited = 0; db.relays.connected < relays.length && waited < 5000; waited += 250) {
-  await new Promise((resolve) => setTimeout(resolve, 250));
-}
+const { db, relays } = await connectProject(owner, process.env);
 
 await db.keysSignIn(secret);
 

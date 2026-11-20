@@ -57,6 +57,9 @@
 - Live: the repository is on GitHub (Manwe-777/rulebook), the apps on GitHub Pages
   (manwe-777.github.io/rulebook/), relay release v1.0.0 with the owner key built in, and the first relay "Rulebook
   NYC" at `wss://192-241-132-246.sslip.io` (DigitalOcean droplet, Caddy for TLS), announced on the bootstrap relays.
+- `npm run publish -w @rulebook/relay -- <folder> <version> --key <file>` signs with a password-protected key file
+  (the Account page's backup), on project.json's relays plus the announced ones; RULEBOOK_SECRET still works for
+  scripts. The bootstrap relays are nostr.mom, nos.lol and relay.primal.net (relay.damus.io connected too slowly).
 - `npm run appoint -w @rulebook/relay`: the owner appoints or removes maintainers per faction (or `all`) from the
   terminal with the password-protected owner key file, so the owner key never goes into a browser. Checked against the
   local relays with a throwaway key (appoint, wrong password, remove).

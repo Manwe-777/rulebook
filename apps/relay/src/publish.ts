@@ -1,37 +1,52 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
-import { RulebookClient, TOPIC } from '@rulebook/sharing';
-import { getPublicKey, ToolDb } from 'tool-db';
+import { RulebookClient } from '@rulebook/sharing';
+import { projectSettings } from '@rulebook/sharing/project';
+import { getPublicKey } from 'tool-db';
+
+import { connectProject } from './connectProject';
+import { parsePublishArgs } from './parsePublishArgs';
+import { readSecret } from './readSecret';
 
 /**
- * Publishes a content folder (`<faction>/<record>.md`, plus `core/`) to the relays and releases every faction in it.
- * Usage: RULEBOOK_OWNER=<hex> RULEBOOK_SECRET=<hex> RELAYS=ws://… npm run publish -w @rulebook/relay -- <folder> <version>
+ * Publishes a content folder (`<faction>/<record>.md`, plus `core/`) to the project's relays and releases every
+ * faction in it, signed with a maintainer's key: from a password-protected key file (`--key`, as the rulebook's Account
+ * page saves it) or RULEBOOK_SECRET. The owner comes from project.json (or RULEBOOK_OWNER), the relays from project.json
+ * plus the announced ones (or RELAYS).
  */
-const [folder, version] = process.argv.slice(2);
-const { RULEBOOK_OWNER: owner, RULEBOOK_SECRET: secret, RELAYS: relays = 'ws://localhost:8080' } = process.env;
+const request = parsePublishArgs(process.argv.slice(2));
 
-if (!folder || !version || !owner || !secret) {
-  console.error('Usage: RULEBOOK_OWNER=<hex> RULEBOOK_SECRET=<hex> [RELAYS=ws://…] publish <folder> <version>');
+if ('error' in request) {
+  console.error(request.error);
   process.exit(1);
 }
 
-const db = new ToolDb({ relays: relays.split(','), topic: TOPIC });
+const owner = projectSettings({ owner: process.env.RULEBOOK_OWNER }).owner;
+const secret = await readSecret(request.keyFile, process.env);
 
-await db.ready;
-if (!db.isConnected) await new Promise<void>((resolve) => (db.onConnect = () => resolve()));
+if (!owner || !secret) {
+  console.error(
+    owner ? 'Wrong password, or no key: pass --key <file> or set RULEBOOK_SECRET.' : 'No project owner set.',
+  );
+
+  process.exit(1);
+}
+
+const { db, relays } = await connectProject(owner, process.env);
+
 await db.keysSignIn(secret);
 
 const client = new RulebookClient(db, owner);
 
-console.log(`Publishing as ${getPublicKey(secret)}`);
+console.log(`Publishing as ${getPublicKey(secret)} to ${db.relays.connected} of ${relays.length} relays`);
 
-for (const faction of readdirSync(folder, { withFileTypes: true }).filter((d) => d.isDirectory())) {
-  const files = readdirSync(join(folder, faction.name))
+for (const faction of readdirSync(request.folder, { withFileTypes: true }).filter((d) => d.isDirectory())) {
+  const files = readdirSync(join(request.folder, faction.name))
     .filter((name) => name.endsWith('.md'))
-    .map((name) => ({ name, source: readFileSync(join(folder, faction.name, name), 'utf8') }));
+    .map((name) => ({ name, source: readFileSync(join(request.folder, faction.name, name), 'utf8') }));
 
-  const hash = await client.publishFolder(faction.name, files, version);
+  const hash = await client.publishFolder(faction.name, files, request.version, request.notes);
   // A relay refuses records its own rules can't read (for example an older relay and a newer field), without telling
   // the writer; reading the release back shows what was really stored.
   const stored = await client.releaseFiles(faction.name, hash);
