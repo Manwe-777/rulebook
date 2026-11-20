@@ -13,6 +13,9 @@ export const MAX_BLOB_BYTES = 48_000;
  */
 export const READ_TIMEOUT_MS = 8000;
 
+/** Factions loaded from the relays at the same time; more at once makes reads time out. */
+export const PARALLEL_FACTIONS = 6;
+
 /** How long role and hidden lists are cached by the write rules, in milliseconds. */
 export const ROLE_CACHE_MS = 30_000;
 

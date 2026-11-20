@@ -1,7 +1,7 @@
 import { parseRecord, type RulesFile } from '@rulebook/rules';
 import type { ToolDb } from 'tool-db';
 
-import { KEYS, READ_TIMEOUT_MS, RELAY_STALE_MS } from './constants';
+import { KEYS, PARALLEL_FACTIONS, READ_TIMEOUT_MS, RELAY_STALE_MS } from './constants';
 import { parseKey } from './rules/parseKey';
 import { Roles } from './rules/Roles';
 import { registerWriteRules } from './rules/writeRules';
@@ -19,6 +19,7 @@ import {
   reviewSchema,
 } from './schemas';
 import { canonicalJson } from './utils/canonicalJson';
+import { mapInBatches } from './utils/mapInBatches';
 import { sha256Hex } from './utils/sha256Hex';
 
 type Kind = Proposal['kind'];
@@ -229,8 +230,11 @@ export class RulebookClient {
 
   /** Every trusted release of a faction, newest first. */
   async releases(faction: string): Promise<(Manifest & { hash: string })[]> {
-    const keys = await this.db.queryKeys(KEYS.releasePrefix(faction), false, READ_TIMEOUT_MS);
+    return this.manifests(await this.db.queryKeys(KEYS.releasePrefix(faction), false, READ_TIMEOUT_MS));
+  }
 
+  /** The trusted releases stored under these release keys, newest first. */
+  private async manifests(keys: string[]): Promise<(Manifest & { hash: string })[]> {
     const found = await Promise.all(
       keys.map(async (key) => ({
         hash: parseKey(key).parts[2],
@@ -276,20 +280,26 @@ export class RulebookClient {
 
   /** The newest trusted release of every released faction (core included): its files and what the release is. */
   async latestReleases(): Promise<ReleasedRules> {
-    const factions = await this.releasedFactions();
+    // One search finds every faction's release keys; searching per faction is slow and times out when run together.
+    const keys = await this.db.queryKeys('release/', false, READ_TIMEOUT_MS);
+    const byFaction = new Map<string, string[]>();
 
-    const found = await Promise.all(
-      factions.map(async (faction) => {
-        const [newest] = await this.releases(faction);
+    for (const key of keys) {
+      const faction = parseKey(key).parts[1];
 
-        if (!newest) return null;
+      byFaction.set(faction, [...(byFaction.get(faction) ?? []), key]);
+    }
 
-        const { version, date, hash, notes, records } = newest;
-        const info: ReleaseInfo = { faction, version, date, hash, notes, records: Object.keys(records).length };
+    const found = await mapInBatches([...byFaction], PARALLEL_FACTIONS, async ([faction, factionKeys]) => {
+      const [newest] = await this.manifests(factionKeys);
 
-        return { info, files: await this.releaseFiles(faction, hash) };
-      }),
-    );
+      if (!newest) return null;
+
+      const { version, date, hash, notes, records } = newest;
+      const info: ReleaseInfo = { faction, version, date, hash, notes, records: Object.keys(records).length };
+
+      return { info, files: await this.releaseFiles(faction, hash) };
+    });
 
     const releases = found.filter((f) => f !== null);
 
