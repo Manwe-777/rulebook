@@ -121,3 +121,9 @@ blob load without that record.
 
 Clients store everything they verified in IndexedDB. Blobs and releases never change, so they are cached for good;
 roles, heads and the hidden list are refreshed on every visit and kept live with subscriptions.
+
+The apps keep the released rules they last read in IndexedDB and show them at once on the next start. They then ask the
+relays for each faction's newest release and download files only for releases that changed; each faction is shown and
+saved as soon as it is read in full, so an interrupted load keeps what arrived. A faction counts only when every record
+of its release arrived (hidden ones excepted), gets one retry when it didn't, and otherwise keeps its saved release; a
+faction the relays didn't return is kept as saved.

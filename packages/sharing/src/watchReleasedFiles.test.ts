@@ -122,4 +122,41 @@ describe('watchReleasedFiles', () => {
 
     expect(t.seen).toEqual([]);
   });
+
+  it('the relays are asked with what is cached, so unchanged releases are not downloaded again', async () => {
+    const load = vi.fn(async () => NEW);
+
+    watchReleasedFiles({
+      load,
+      cache: { read: async () => ({ rules: OLD, savedAt: SAVED_AT }), write: async () => undefined },
+      onChange: () => undefined,
+      now: () => NOW,
+    });
+
+    await settle();
+
+    expect(load).toHaveBeenCalledWith(OLD, expect.any(Function));
+  });
+
+  it('factions are shown as they arrive, and what arrived is kept and saved when the load then fails', async () => {
+    const orks: ReleasedRules = { files: [{ path: 'orks/faction.md', source: 'orks' }], releases: [] };
+    const seen: (string[] | undefined)[] = [];
+    const write = vi.fn(async () => undefined);
+
+    watchReleasedFiles({
+      load: async (_have, onProgress) => {
+        onProgress(orks);
+        throw new Error('connection dropped');
+      },
+      cache: { read: async () => ({ rules: OLD, savedAt: SAVED_AT }), write },
+      onChange: (rules) => seen.push(rules?.files.map((f) => f.source).sort()),
+      now: () => NOW,
+    });
+
+    await settle();
+    await settle();
+
+    expect(seen).toEqual([['old'], ['old', 'orks'], ['old', 'orks']]);
+    expect(write).toHaveBeenLastCalledWith(expect.objectContaining({ files: expect.arrayContaining(orks.files) }), NOW);
+  });
 });

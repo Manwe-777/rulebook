@@ -4,7 +4,7 @@ export { loadRelayAnnouncements } from './loadRelayAnnouncements';
 export { loadRemoteReleases } from './loadRemoteReleases';
 export { copyTopicEvents } from './relays/copyTopicEvents';
 export { type KnownRelay, KnownRelays } from './relays/KnownRelays';
-export { type ProposalEntry, RulebookClient } from './RulebookClient';
+export { type LatestOptions, type ProposalEntry, RulebookClient } from './RulebookClient';
 export { type Lookup, Roles } from './rules/Roles';
 export { registerWriteRules, type Write, type WriteRule, writeRules } from './rules/writeRules';
 export * from './schemas';

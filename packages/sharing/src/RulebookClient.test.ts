@@ -345,6 +345,20 @@ describe('releases', () => {
     expect(files.filter((f) => f.path.startsWith(`${FACTION}/`))).toHaveLength(info!.records);
   });
 
+  it('releases the reader already has come without files, and each faction is reported as it is read', async () => {
+    const all = await stranger.latestReleases();
+    const reported: string[] = [];
+
+    const again = await stranger.latestReleases({
+      have: all.releases,
+      onRelease: (r) => reported.push(...r.releases.map((i) => i.faction)),
+    });
+
+    expect(again.releases.map((r) => r.hash).sort()).toEqual(all.releases.map((r) => r.hash).sort());
+    expect(again.files).toEqual([]);
+    expect(reported.sort()).toEqual(all.releases.map((r) => r.faction).sort());
+  });
+
   it('readers list trusted releases, newest first', async () => {
     const releases = await eventually(
       () => stranger.releases(FACTION),

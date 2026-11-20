@@ -43,7 +43,11 @@ export function useBuilderLibrary(): BuilderRules {
 
       stop = watchReleasedFiles({
         // Relays that announced themselves are checked in the background and remembered for the next visit.
-        load: () => loadRemoteReleases(RELAYS, OWNER_KEY, (announced) => void rememberRelays(announced, FIXED_RELAYS)),
+        load: (have, onProgress) =>
+          loadRemoteReleases(RELAYS, OWNER_KEY, (announced) => void rememberRelays(announced, FIXED_RELAYS), {
+            have: have?.releases,
+            onRelease: onProgress,
+          }),
         cache: new ReleaseCache(OWNER_KEY),
         onChange: (remote, status, checkedAt) =>
           setRules((current) =>
