@@ -7,3 +7,4 @@ dist-ssr
 apps/relay/data
 apps/relay/release
 local-content
+local-lists
