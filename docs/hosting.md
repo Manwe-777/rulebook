@@ -46,7 +46,8 @@ curl -fsSL https://github.com/Manwe-777/rulebook/releases/latest/download/instal
 The relay then announces itself every hour, signed with its own key, and copies the project's data from the other
 relays, so it fills itself on the first start. Browsers on HTTPS pages only connect to `wss://` addresses with a valid
 certificate, so the address needs a domain name: a dynamic DNS name works when the IP changes, with a TLS proxy in
-front (below). Moving the relay is a matter of running the installer again with the new `--public-url`; nothing in the
+front (below). Without a domain, `<ip-with-dashes>.sslip.io` (for example `192-0-2-10.sslip.io`) points at the IP with
+no signup, and Caddy gets a certificate for it. Moving the relay is a matter of running the installer again with the new `--public-url`; nothing in the
 repository changes. Anyone can run a relay this way and join.
 
 No options are needed. The release build writes the owner from `project.json` (or the `RULEBOOK_OWNER` variable) into

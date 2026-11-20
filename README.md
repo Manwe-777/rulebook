@@ -49,7 +49,8 @@ node apps/relay/scripts/package.mjs 1.0.0   # relay release in apps/relay/releas
 
 Relays store and share the rules. Anyone can run one; it finds the others, copies their data and announces itself so the
 apps find it. It needs Linux with systemd, Node.js 22 or newer, and a domain name with TLS (browsers only connect to
-`wss://` from HTTPS pages; a dynamic DNS name works on a home connection).
+`wss://` from HTTPS pages; a dynamic DNS name works on a home connection, and `<ip-with-dashes>.sslip.io` works with no
+domain at all).
 
 ```sh
 curl -fsSL https://github.com/Manwe-777/rulebook/releases/latest/download/install.sh | sudo sh -s -- \

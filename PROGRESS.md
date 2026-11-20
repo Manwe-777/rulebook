@@ -54,6 +54,9 @@
 - Wargear priced per item carried (`itemPoints`, e.g. a Repulsor's default Heavy Laser Destroyer +10), shown on
   datasheets and next to builder choices. The same upgrade can go on several units (as real lists do), unless the
   muster rules set `upgrades.once`.
+- Live: the repository is on GitHub (Manwe-777/rulebook), the apps on GitHub Pages
+  (manwe-777.github.io/rulebook/), relay release v1.0.0 with the owner key built in, and the first relay "Rulebook
+  NYC" at `wss://192-241-132-246.sslip.io` (DigitalOcean droplet, Caddy for TLS), announced on the bootstrap relays.
 - `npm run appoint -w @rulebook/relay`: the owner appoints or removes maintainers per faction (or `all`) from the
   terminal with the password-protected owner key file, so the owner key never goes into a browser. Checked against the
   local relays with a throwaway key (appoint, wrong password, remove).
@@ -144,8 +147,7 @@
   head or release a client cached before its signer was removed stays trusted in that client until its storage is
   cleared. Hidden content is checked on every read.
 
-- `project.json` has no owner key yet; it must be filled in before the Pages build is useful. A relay address needs a
-  domain name with TLS for browsers on HTTPS pages.
+- No content is published yet; the owner must appoint a maintainer before anything can be released.
 - The relay installer job in CI (systemd in Docker on GitHub's runners) hasn't run there yet; it passes locally.
 - First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
   the whole rules library.
