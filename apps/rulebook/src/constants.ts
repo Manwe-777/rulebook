@@ -1,4 +1,5 @@
 import { projectSettings } from '@rulebook/sharing/project';
+import { loadKnownRelays } from '@rulebook/sharing/relays';
 
 import type { FactionTheme } from './types';
 
@@ -25,7 +26,11 @@ export const ICON_CREDIT = {
  */
 const PROJECT = projectSettings({ owner: import.meta.env.VITE_RULEBOOK_OWNER, relays: import.meta.env.VITE_RELAYS });
 
-export const RELAYS: string[] = PROJECT.relays;
+/** The project's relays (project.json or the build's), always used. */
+export const FIXED_RELAYS: string[] = PROJECT.relays;
+
+/** The project's relays plus the ones this browser found announced and that still answer. */
+export const RELAYS: string[] = [...new Set([...PROJECT.relays, ...loadKnownRelays().urls])];
 
 /** Must match the relays' owner key. */
 export const OWNER_KEY: string = PROJECT.owner;

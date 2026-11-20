@@ -1,9 +1,16 @@
 import { TOPIC } from './constants';
 import { RulebookClient } from './RulebookClient';
-import type { ReleasedRules } from './schemas';
+import type { RelayAnnouncement, ReleasedRules } from './schemas';
 
-/** The newest release of every faction on the relays (files and release info), read with a short-lived connection. */
-export async function loadRemoteReleases(relays: string[], owner: string): Promise<ReleasedRules> {
+/**
+ * The newest release of every faction on the relays (files and release info), read with a short-lived connection.
+ * Relays that announced themselves are passed to `onRelays`, read on the same connection.
+ */
+export async function loadRemoteReleases(
+  relays: string[],
+  owner: string,
+  onRelays?: (announced: RelayAnnouncement[]) => void,
+): Promise<ReleasedRules> {
   const { ToolDb } = await import('tool-db');
   const db = new ToolDb({ relays, topic: TOPIC });
 
@@ -17,7 +24,12 @@ export async function loadRemoteReleases(relays: string[], owner: string): Promi
       });
     }
 
-    return await new RulebookClient(db, owner).latestReleases();
+    const client = new RulebookClient(db, owner);
+    const rules = await client.latestReleases();
+
+    if (onRelays) onRelays(await client.relays().catch(() => []));
+
+    return rules;
   } finally {
     await db.close();
   }

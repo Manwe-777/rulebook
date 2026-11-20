@@ -1,8 +1,9 @@
 import { Library, mergeFiles } from '@rulebook/rules';
 import type { ReleaseInfo, ReleaseSource } from '@rulebook/sharing';
+import { rememberRelays } from '@rulebook/sharing/relays';
 import { useEffect, useState } from 'react';
 
-import { OWNER_KEY, RELAYS } from '../constants';
+import { FIXED_RELAYS, OWNER_KEY, RELAYS } from '../constants';
 import { loadBundledFiles } from '../sources/loadBundledFiles';
 
 const bundled = Library.fromFiles(loadBundledFiles());
@@ -41,7 +42,8 @@ export function useBuilderLibrary(): BuilderRules {
       if (cancelled) return;
 
       stop = watchReleasedFiles({
-        load: () => loadRemoteReleases(RELAYS, OWNER_KEY),
+        // Relays that announced themselves are checked in the background and remembered for the next visit.
+        load: () => loadRemoteReleases(RELAYS, OWNER_KEY, (announced) => void rememberRelays(announced, FIXED_RELAYS)),
         cache: new ReleaseCache(OWNER_KEY),
         onChange: (remote, status, checkedAt) =>
           setRules((current) =>

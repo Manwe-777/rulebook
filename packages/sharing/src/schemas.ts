@@ -24,6 +24,17 @@ export const manifestSchema = z.strictObject({
   notes: z.string().default(''),
 });
 
+/** `relay/<p>`: a relay node saying where it can be reached, signed with that relay's own key. */
+export const relaySchema = z.strictObject({
+  url: z.string().regex(/^wss?:\/\/\S+$/, 'must be a ws:// or wss:// address'),
+  name: z.string().max(60).default(''),
+  /** When the relay last announced itself, ISO 8601. */
+  updated: z.string().min(1),
+});
+
+/** A relay as the apps list it: its key (the relay's public key) and its announcement. */
+export type RelayAnnouncement = z.output<typeof relaySchema> & { key: string };
+
 /** `review.<f>.<proposal>`. */
 export const reviewSchema = z.strictObject({
   status: z.enum(['accepted', 'rejected']),

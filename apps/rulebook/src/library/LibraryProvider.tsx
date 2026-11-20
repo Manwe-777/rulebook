@@ -1,7 +1,8 @@
 import { Library, mergeFiles } from '@rulebook/rules';
+import { rememberRelays } from '@rulebook/sharing/relays';
 import { type ReactNode, useEffect, useState } from 'react';
 
-import { OWNER_KEY, RELAYS } from '../constants';
+import { FIXED_RELAYS, OWNER_KEY, RELAYS } from '../constants';
 import { loadBundledFiles } from '../sources/loadBundledFiles';
 import { bundledLibrary } from './bundledLibrary';
 import { FilesContext } from './FilesContext';
@@ -29,7 +30,8 @@ export default function LibraryProvider({ children }: { children: ReactNode }) {
       if (cancelled) return;
 
       stop = watchReleasedFiles({
-        load: () => loadRemoteReleases(RELAYS, OWNER_KEY),
+        // Relays that announced themselves are checked in the background and remembered for the next visit.
+        load: () => loadRemoteReleases(RELAYS, OWNER_KEY, (announced) => void rememberRelays(announced, FIXED_RELAYS)),
         cache: new ReleaseCache(OWNER_KEY),
         onChange: (remote, source) => {
           if (remote) {

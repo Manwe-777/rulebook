@@ -2,7 +2,15 @@ import { recordKind } from '@rulebook/rules';
 import type { z } from 'zod';
 
 import { MAX_BLOB_BYTES } from '../constants';
-import { headSchema, manifestSchema, proposalSchema, requestSchema, reviewSchema, roleListSchema } from '../schemas';
+import {
+  headSchema,
+  manifestSchema,
+  proposalSchema,
+  relaySchema,
+  requestSchema,
+  reviewSchema,
+  roleListSchema,
+} from '../schemas';
 import { canonicalJson } from '../utils/canonicalJson';
 import { sha256Hex } from '../utils/sha256Hex';
 import { parseKey } from './parseKey';
@@ -22,7 +30,7 @@ export interface WriteRule {
 }
 
 /** First part of every shared (not namespaced) key the project uses. */
-const SHARED_TYPES = ['maintainers', 'contributors', 'blob', 'head', 'release', 'review'];
+const SHARED_TYPES = ['maintainers', 'contributors', 'blob', 'head', 'release', 'review', 'relay'];
 
 const fits = (schema: z.ZodType, value: unknown) => schema.safeParse(value).success;
 
@@ -99,6 +107,15 @@ export function writeRules(roles: Roles): WriteRule[] {
       },
     },
     { prefix: 'blob/', check: async ({ k, v }) => validBlob(parseKey(k).parts[1], v) },
+    {
+      // A relay announces only itself: the key names the relay, and only its own key can sign it.
+      prefix: 'relay/',
+      check: async ({ k, a, v }) => {
+        const { parts } = parseKey(k);
+
+        return parts.length === 2 && parts[1] === a && fits(relaySchema, v);
+      },
+    },
     { prefix: ':', check: (w) => validNamespaced(roles, w) },
   ];
 }

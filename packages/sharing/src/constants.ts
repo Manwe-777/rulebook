@@ -24,7 +24,21 @@ export const KEYS = {
   proposal: (f: string, n: string) => `proposal/${f}/${n}`,
   request: (f: string) => `request/${f}`,
   list: (n: string) => `list/${n}`,
+  relay: (p: string) => `relay/${p}`,
+  relayPrefix: 'relay/',
 } as const;
+
+/** A relay re-announces its address this often, in milliseconds. */
+export const RELAY_ANNOUNCE_MS = 6 * 60 * 60 * 1000;
+
+/** Announcements older than this are ignored: the relay has stopped saying it is there. */
+export const RELAY_STALE_MS = 2 * 24 * 60 * 60 * 1000;
+
+/** A known relay that fails this many checks in a row is dropped until it announces itself again. */
+export const RELAY_MAX_FAILURES = 3;
+
+/** localStorage key of the relays a browser has found, shared by both apps on one site. */
+export const KNOWN_RELAYS_KEY = 'rulebook:relays';
 
 /** IndexedDB database the browser apps keep released rules in. */
 export const CACHE_DB = 'rulebook-cache';

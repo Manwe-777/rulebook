@@ -7,7 +7,8 @@
     ".": "./src/index.ts",
     "./relay": "./src/relay/RulebookRelay.ts",
     "./keys": "./src/utils/ownerKeyHex.ts",
-    "./project": "./src/projectSettings.ts"
+    "./project": "./src/projectSettings.ts",
+    "./relays": "./src/relays/index.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

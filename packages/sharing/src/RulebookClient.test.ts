@@ -242,6 +242,35 @@ describe('proposals and reviews', () => {
   });
 });
 
+describe('relay announcements', () => {
+  it('a relay announces where it can be reached, signed with its own key, and readers list it', async () => {
+    await maintainer.announceRelay('wss://relay.example', 'Example');
+
+    const relays = await eventually(
+      () => stranger.relays(),
+      (r) => r.some((x) => x.key === maintainer.me),
+    );
+
+    expect(relays.find((r) => r.key === maintainer.me)).toMatchObject({ url: 'wss://relay.example', name: 'Example' });
+  });
+
+  it("nobody can announce on another relay's behalf, and stale announcements are left out", async () => {
+    await intruderDb.putData(KEYS.relay(maintainer.me), {
+      url: 'wss://evil',
+      name: '',
+      updated: new Date().toISOString(),
+    });
+
+    await contributor.announceRelay('wss://old.example', '', new Date(Date.now() - 10 * 24 * 3600 * 1000));
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
+    const relays = await stranger.relays();
+
+    expect(relays.find((r) => r.key === maintainer.me)?.url).toBe('wss://relay.example');
+    expect(relays.some((r) => r.key === contributor.me)).toBe(false);
+  });
+});
+
 describe('releases', () => {
   let hash: string;
 

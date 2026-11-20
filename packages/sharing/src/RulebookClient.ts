@@ -1,7 +1,7 @@
 import { parseRecord, type RulesFile } from '@rulebook/rules';
 import type { ToolDb } from 'tool-db';
 
-import { KEYS } from './constants';
+import { KEYS, RELAY_STALE_MS } from './constants';
 import { parseKey } from './rules/parseKey';
 import { Roles } from './rules/Roles';
 import { registerWriteRules } from './rules/writeRules';
@@ -11,6 +11,8 @@ import {
   manifestSchema,
   type Proposal,
   proposalSchema,
+  type RelayAnnouncement,
+  relaySchema,
   type ReleasedRules,
   type ReleaseInfo,
   requestSchema,
@@ -233,6 +235,25 @@ export class RulebookClient {
     return found
       .flatMap(({ hash, parsed }) => (parsed.success ? [{ ...parsed.data, hash }] : []))
       .sort((a, b) => b.date.localeCompare(a.date));
+  }
+
+  /** Relay nodes only: says where this relay can be reached, signed with the relay's own key. */
+  async announceRelay(url: string, name = '', now = new Date()): Promise<void> {
+    await this.put(KEYS.relay(this.me), { url, name, updated: now.toISOString() });
+  }
+
+  /** Relays that announced themselves recently, newest first. Older announcements are left out. */
+  async relays(now = Date.now()): Promise<RelayAnnouncement[]> {
+    const keys = await this.db.queryKeys(KEYS.relayPrefix);
+
+    const found = await Promise.all(
+      keys.map(async (key) => ({ key: parseKey(key).parts[1], parsed: relaySchema.safeParse(await this.get(key)) })),
+    );
+
+    return found
+      .flatMap(({ key, parsed }) => (parsed.success ? [{ ...parsed.data, key }] : []))
+      .filter((r) => now - Date.parse(r.updated) < RELAY_STALE_MS)
+      .sort((a, b) => b.updated.localeCompare(a.updated));
   }
 
   /** Every faction (and `core`) that has at least one release. */
