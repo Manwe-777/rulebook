@@ -24,21 +24,24 @@ export default function ArmyHeader({ draft, points, issues, icon, playing, onPla
 
   return (
     <header className="flex flex-wrap items-center gap-3">
-      {icon && (
-        <span className="flex size-11 items-center justify-center rounded bg-bar text-white">
-          <FactionIcon name={icon} className="text-3xl leading-none" />
-        </span>
-      )}
-      {playing ? (
-        <h2 className="min-w-0 flex-1 text-2xl font-extrabold">{draft.list.name}</h2>
-      ) : (
-        <input
-          aria-label="List name"
-          className={`${INPUT} min-w-0 flex-1 text-xl font-bold`}
-          value={draft.list.name}
-          onChange={(e) => onChange(draft.rename(e.target.value))}
-        />
-      )}
+      {/* Icon and name share a full line on phones, so a long name doesn't squeeze the points and buttons. */}
+      <div className="flex w-full min-w-0 items-center gap-3 sm:w-auto sm:flex-1">
+        {icon && (
+          <span className="flex size-11 shrink-0 items-center justify-center rounded bg-bar text-white">
+            <FactionIcon name={icon} className="text-3xl leading-none" />
+          </span>
+        )}
+        {playing ? (
+          <h2 className="min-w-0 flex-1 text-xl font-extrabold sm:text-2xl">{draft.list.name}</h2>
+        ) : (
+          <input
+            aria-label="List name"
+            className={`${INPUT} min-w-0 flex-1 text-xl font-bold`}
+            value={draft.list.name}
+            onChange={(e) => onChange(draft.rename(e.target.value))}
+          />
+        )}
+      </div>
       <span className="rounded bg-panel px-3 py-1 text-xl font-extrabold">
         {points.total}
         {points.limit !== null && <span className="text-text/60"> / {points.limit} pts</span>}
