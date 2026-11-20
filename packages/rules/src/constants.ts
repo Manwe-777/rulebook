@@ -30,3 +30,34 @@ export const DETACHMENT_SECTIONS = {
 
 /** The `## ` headings a muster file may use. */
 export const MUSTER_SECTIONS = { description: 'description', stratagems: 'stratagems' } as const;
+
+/** Widest an icon glyph may be, in em: wider ones are drawn smaller so they fit the same square as the rest. */
+export const ICON_MAX_WIDTH_EM = 1.3;
+
+/** Widths in em of the wh40k-icon glyphs wider than {@link ICON_MAX_WIDTH_EM}; every other glyph fits. */
+export const WIDE_ICONS: Record<string, number> = {
+  'adeptus-astartes': 1.46,
+  'adeptus-terra': 2.34,
+  'aeronautica-imperialis': 1.54,
+  'angels-of-absolution': 1.56,
+  'angels-of-redemption': 1.73,
+  'angels-of-retribution': 1.56,
+  'apothecarium-01': 2.43,
+  'astra-militarum': 2.94,
+  'blood-ravens': 1.94,
+  'dark-brotherhood': 1.66,
+  'death-eagles': 2.29,
+  'deathskulls-clan': 1.52,
+  'forge-world-graia': 1.69,
+  'high-lords-of-terra': 2.34,
+  'imperial-aquila': 2.73,
+  'imperial-aquila-02': 2.7,
+  'imperial-navy': 1.77,
+  jokaero: 2.06,
+  'librarian-codicier': 1.82,
+  'librarian-lexicanum': 2.89,
+  'rogue-trader': 2.06,
+  'solar-auxilia': 1.61,
+  'sons-of-malice': 1.92,
+  tyranids: 1.63,
+};

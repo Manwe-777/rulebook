@@ -1,9 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
+import { ICON_MAX_WIDTH_EM, WIDE_ICONS } from '../constants';
 import { Library } from '../library/Library';
 import { loadDemoFiles } from '../testing/loadDemoFiles';
 import { detachmentTags } from './detachmentTags';
 import { glossaryKey } from './glossaryKey';
+import { iconScale } from './iconScale';
 import { keywordKey } from './keywordKey';
 import { recordPath } from './recordPath';
 import { slugify } from './slugify';
@@ -104,5 +106,13 @@ describe('glossaryKey and Library.explain', () => {
     expect(library.explain('ANTI-INFANTRY 4+')?.term).toBe('Anti-keyword X+');
     expect(library.explain('Twin-linked')?.text).toContain('re-roll the wound roll');
     expect(library.explain('Made-up rule')).toBeUndefined();
+  });
+});
+
+describe('iconScale', () => {
+  it('shrinks wide glyphs to the widest allowed, and leaves the rest alone', () => {
+    expect(iconScale('astra-militarum') * WIDE_ICONS['astra-militarum']).toBeCloseTo(ICON_MAX_WIDTH_EM);
+    expect(iconScale('tyranids')).toBeLessThan(1);
+    expect(iconScale('orks')).toBe(1);
   });
 });

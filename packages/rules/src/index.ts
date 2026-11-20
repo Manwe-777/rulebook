@@ -22,6 +22,7 @@ export { entrySize } from './utils/entrySize';
 export { formatAgo } from './utils/formatAgo';
 export { glossaryKey } from './utils/glossaryKey';
 export { type EntryGroup, groupEntries } from './utils/groupEntries';
+export { iconScale } from './utils/iconScale';
 export { keywordKey } from './utils/keywordKey';
 export { mergeFiles } from './utils/mergeFiles';
 export { modelCounts } from './utils/modelCounts';
