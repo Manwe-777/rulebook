@@ -14,6 +14,9 @@
 #   --open        don't check writes: keep any signed data on the topic
 #   --port N      port to listen on (default 8080)
 #   --host ADDR   address to listen on (default 0.0.0.0)
+#   --public-url URL  where apps reach this relay (wss://…); the relay announces
+#                 it so apps find it without anything hard-coded
+#   --name NAME   a short name shown in the apps' relay list
 #   --uninstall   stop and remove the service; keeps the data and settings
 #   --purge       with --uninstall, also delete the data and settings
 #
@@ -36,13 +39,15 @@ UNIT=/etc/systemd/system/rulebook-relay.service
 
 fail() { echo "rulebook-relay install: $*" >&2; exit 1; }
 
-OWNER= OPEN= PORT= HOST= UNINSTALL= PURGE=
+OWNER= OPEN= PORT= HOST= PUBLIC_URL= NAME= UNINSTALL= PURGE=
 while [ $# -gt 0 ]; do
   case $1 in
     --owner) OWNER=${2:?--owner needs a key}; shift 2 ;;
     --open) OPEN=1; shift ;;
     --port) PORT=${2:?--port needs a number}; shift 2 ;;
     --host) HOST=${2:?--host needs an address}; shift 2 ;;
+    --public-url) PUBLIC_URL=${2:?--public-url needs an address}; shift 2 ;;
+    --name) NAME=${2:?--name needs a name}; shift 2 ;;
     --uninstall) UNINSTALL=1; shift ;;
     --purge) PURGE=1; shift ;;
     *) fail "unknown option $1 (the options are listed at the top of install.sh)" ;;
@@ -97,6 +102,8 @@ elif [ -z "$OWNER" ]; then
 fi
 PORT=${PORT:-$(setting PORT)}
 HOST=${HOST:-$(setting HOST)}
+PUBLIC_URL=${PUBLIC_URL:-$(setting RELAY_PUBLIC_URL)}
+NAME=${NAME:-$(setting RELAY_NAME)}
 SECRET=$(setting RELAY_SECRET_KEY)
 case $PORT in '' ) PORT=8080 ;; *[!0-9]*) fail "--port must be a number" ;; esac
 HOST=${HOST:-0.0.0.0}
@@ -123,7 +130,7 @@ WANT=$(awk '$2 == "rulebook-relay.tar.gz" || $2 == "*rulebook-relay.tar.gz" { pr
 tar -xzf "$TMP/rulebook-relay.tar.gz" -C "$TMP"
 
 # Check the settings with the new build before touching the running one.
-RULEBOOK_OWNER=$OWNER PORT=$PORT "$NODE" "$TMP/rulebook-relay/relay.mjs" --check-config ||
+RULEBOOK_OWNER=$OWNER PORT=$PORT RELAY_PUBLIC_URL=$PUBLIC_URL "$NODE" "$TMP/rulebook-relay/relay.mjs" --check-config ||
   fail "settings rejected, nothing changed"
 
 rm -rf "$APP.new"
@@ -136,10 +143,13 @@ mkdir -p "$CONF_DIR"
 umask 077
 cat > "$CONF" <<CONF
 # Rulebook relay settings. Change them by running install.sh again with
-# --owner, --port or --host, or edit this file and restart the service.
+# --owner, --port, --host, --public-url or --name, or edit this file and
+# restart the service.
 RULEBOOK_OWNER=$OWNER
 PORT=$PORT
 HOST=$HOST
+RELAY_PUBLIC_URL=$PUBLIC_URL
+RELAY_NAME=$NAME
 RELAY_SECRET_KEY=$SECRET
 CONF
 umask 022
@@ -184,6 +194,11 @@ if [ -n "$OWNER" ]; then
   echo "  checks writes against owner $OWNER"
 else
   echo "  open store: keeps any signed data (apps do the checking); --owner KEY turns checks on"
+fi
+if [ -n "$PUBLIC_URL" ]; then
+  echo "  announces itself as $PUBLIC_URL, so apps find it"
+else
+  echo "  not announced: --public-url wss://… lets apps find it"
 fi
 echo "  logs:     journalctl -u rulebook-relay -f"
 echo "  settings: $CONF"

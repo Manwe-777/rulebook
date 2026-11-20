@@ -7,21 +7,24 @@ const OWNER = 'a'.repeat(64);
 
 describe('readConfig', () => {
   it("needs no settings at all: it checks writes against project.json's owner", () => {
-    expect(readConfig({}, OWNER)).toMatchObject({ owner: OWNER });
+    expect(readConfig({}, { owner: OWNER, relays: [] })).toMatchObject({ owner: OWNER });
   });
 
   it('with no owner key anywhere the relay is an open store', () => {
-    expect(readConfig({}, '')).toEqual({
+    expect(readConfig({}, { owner: '', relays: [] })).toEqual({
       owner: null,
       port: 8080,
       host: '0.0.0.0',
       dataDir: './data',
       secretKey: undefined,
+      publicUrl: undefined,
+      name: '',
+      bootstrap: [],
     });
   });
 
   it('an empty or blank owner key setting means an open store, whatever project.json says', () => {
-    expect(readConfig({ RULEBOOK_OWNER: '  ' }, OWNER)).toMatchObject({ owner: null });
+    expect(readConfig({ RULEBOOK_OWNER: '  ' }, { owner: OWNER, relays: [] })).toMatchObject({ owner: null });
   });
 
   it('accepts the owner key as an npub and stores it as hex', () => {
@@ -56,5 +59,26 @@ describe('readConfig', () => {
     const result = readConfig({ RULEBOOK_OWNER: 'npub1xyz', PORT: '99999', RELAY_SECRET_KEY: 'short' });
 
     expect('errors' in result && result.errors).toHaveLength(3);
+  });
+
+  it("announces and copies through project.json's relays unless told otherwise; empty means none", () => {
+    const project = { owner: '', relays: ['wss://public.example'] };
+
+    expect(readConfig({}, project)).toMatchObject({ bootstrap: ['wss://public.example'] });
+    expect(readConfig({ RELAY_BOOTSTRAP: '' }, project)).toMatchObject({ bootstrap: [] });
+
+    expect(readConfig({ RELAY_BOOTSTRAP: 'wss://a, wss://b' }, project)).toMatchObject({
+      bootstrap: ['wss://a', 'wss://b'],
+    });
+  });
+
+  it('a public address must be a WebSocket address', () => {
+    expect(readConfig({ RELAY_PUBLIC_URL: 'wss://relay.example.org', RELAY_NAME: ' Home ' })).toMatchObject({
+      publicUrl: 'wss://relay.example.org',
+      name: 'Home',
+    });
+
+    expect(readConfig({ RELAY_PUBLIC_URL: 'http://relay.example.org' })).toHaveProperty('errors');
+    expect(readConfig({ RELAY_BOOTSTRAP: 'nope' })).toHaveProperty('errors');
   });
 });

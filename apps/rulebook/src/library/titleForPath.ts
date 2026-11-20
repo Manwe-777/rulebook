@@ -13,7 +13,7 @@ function pageName(library: Library, factionId: string, rest: string[]): string |
 }
 
 /** Pages that aren't factions, by their path. */
-const FIXED_PAGES: Record<string, string> = { account: 'Account', print: 'Army sheet' };
+const FIXED_PAGES: Record<string, string> = { account: 'Account', print: 'Army sheet', admin: 'Admin' };
 
 /** Browser tab title for a page path: `Boyz · Orks · Rulebook`, `Orks · Rulebook`, or the site name. */
 export function titleForPath(library: Library, path: string): string {

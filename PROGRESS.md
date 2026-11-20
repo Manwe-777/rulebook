@@ -54,7 +54,14 @@
 - Wargear priced per item carried (`itemPoints`, e.g. a Repulsor's default Heavy Laser Destroyer +10), shown on
   datasheets and next to builder choices. The same upgrade can go on several units (as real lists do), unless the
   muster rules set `upgrades.once`.
-- `project.json` (committed) holds the owner's public key and the relay list. The apps, the relay and its installer
+- Relay discovery: `project.json` lists only bootstrap relays (relay.damus.io, nos.lol, relay.primal.net). A relay
+  with `RELAY_PUBLIC_URL` announces itself hourly under `relay/<its key>`, signed with its own key, and copies the
+  topic's data from the bootstrap and announced relays (a new relay fills itself; checked with two local relays: 206
+  of 206 messages, all factions readable from the new one). Browsers read announcements when loading the rules, test
+  each known relay, remember the ones that answer and drop one after three failed checks. The rulebook's Admin page
+  lists the relays with name, key, last announcement, use and response time. The installer takes `--public-url` and
+  `--name`. Client reads wait up to 8 s (tool-db's 1 s default dropped answers when many reads ran at once).
+- `project.json` (committed) holds the owner's public key and the bootstrap relays. The apps, the relay and its installer
   default to it, and forks keep it, so they read the same data; build variables only override it.
 - Shared datasheets: a faction can `include` others (a chapter including `space-marines`), with `excludes` for
   shared records it can't use. Lists, validation, the builder's unit and detachment pickers and the army sheet use
@@ -134,7 +141,8 @@
   head or release a client cached before its signer was removed stays trusted in that client until its storage is
   cleared. Hidden content is checked on every read.
 
-- `project.json` has no owner key or relays yet; both must be filled in before the Pages build is useful.
+- `project.json` has no owner key yet; it must be filled in before the Pages build is useful. A relay address needs a
+  domain name with TLS for browsers on HTTPS pages.
 - The relay installer job in CI (systemd in Docker on GitHub's runners) hasn't run there yet; it passes locally.
 - First load is ~620 kB in the rulebook and ~460 kB in the builder (react-dom, zod, yaml, markdown); every page ships
   the whole rules library.

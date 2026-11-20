@@ -1,8 +1,8 @@
 import type { Library } from '@rulebook/rules';
+import { formatAgo } from '@rulebook/rules';
 import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { BuilderSource } from '../../hooks/useBuilderLibrary';
-import { formatAgo } from '../../utils/formatAgo';
 import { rulesFreshness } from '../../utils/rulesFreshness';
 import { PANEL, PANEL_TITLE } from '../styles';
 

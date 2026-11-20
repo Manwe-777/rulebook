@@ -18,6 +18,7 @@ export { decodeListLink } from './utils/decodeListLink';
 export { detachmentTags } from './utils/detachmentTags';
 export { encodeListLink } from './utils/encodeListLink';
 export { entryLoadout, type ModelLoadout } from './utils/entryLoadout';
+export { formatAgo } from './utils/formatAgo';
 export { glossaryKey } from './utils/glossaryKey';
 export { type EntryGroup, groupEntries } from './utils/groupEntries';
 export { keywordKey } from './utils/keywordKey';

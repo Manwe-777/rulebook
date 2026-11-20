@@ -1,5 +1,6 @@
+import { formatAgo } from '@rulebook/rules';
+
 import type { BuilderSource } from '../hooks/useBuilderLibrary';
-import { formatAgo } from './formatAgo';
 
 /** One line on how current the rules are: where they come from and when the relays last gave them. */
 export function rulesFreshness(

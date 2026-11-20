@@ -1,6 +1,5 @@
+import { formatAgo } from '@rulebook/rules';
 import type { ReleaseInfo } from '@rulebook/sharing';
-
-import { formatAgo } from '../../utils/formatAgo';
 
 interface Props {
   /** The release the faction is on now. */

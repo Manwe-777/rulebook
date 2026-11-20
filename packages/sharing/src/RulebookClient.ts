@@ -1,7 +1,7 @@
 import { parseRecord, type RulesFile } from '@rulebook/rules';
 import type { ToolDb } from 'tool-db';
 
-import { KEYS, RELAY_STALE_MS } from './constants';
+import { KEYS, READ_TIMEOUT_MS, RELAY_STALE_MS } from './constants';
 import { parseKey } from './rules/parseKey';
 import { Roles } from './rules/Roles';
 import { registerWriteRules } from './rules/writeRules';
@@ -47,7 +47,7 @@ export class RulebookClient {
     owner: string,
     roleCacheMs?: number,
   ) {
-    this.roles = new Roles(owner, (key) => db.getData(key), roleCacheMs);
+    this.roles = new Roles(owner, (key) => db.getData(key, false, READ_TIMEOUT_MS), roleCacheMs);
     registerWriteRules(db, this.roles);
   }
 
@@ -66,7 +66,7 @@ export class RulebookClient {
 
     if (hidden.keys.includes(key) || (parts[0] === 'blob' && hidden.blobs.includes(parts[1]))) return null;
 
-    return this.db.getData<T>(key);
+    return this.db.getData<T>(key, false, READ_TIMEOUT_MS);
   }
 
   private async put(key: string, value: unknown, namespaced = false): Promise<void> {
@@ -106,7 +106,9 @@ export class RulebookClient {
 
   /** Open contributor requests for a faction, from people who are not contributors yet. */
   async requests(faction: string): Promise<{ author: string; message: string }[]> {
-    const keys = (await this.db.queryKeys(':')).filter((k) => parseKey(k).parts.join('/') === KEYS.request(faction));
+    const keys = (await this.db.queryKeys(':', false, READ_TIMEOUT_MS)).filter(
+      (k) => parseKey(k).parts.join('/') === KEYS.request(faction),
+    );
 
     const found = await Promise.all(
       keys.map(async (key) => ({ author: parseKey(key).owner!, value: requestSchema.safeParse(await this.get(key)) })),
@@ -134,7 +136,11 @@ export class RulebookClient {
   /** Every proposal for a faction from its contributors, with its review if it has one. */
   async proposals(faction: string): Promise<ProposalEntry[]> {
     const prefix = `proposal/${faction}/`;
-    const keys = (await this.db.queryKeys(':')).filter((k) => parseKey(k).parts.join('/').startsWith(prefix));
+
+    const keys = (await this.db.queryKeys(':', false, READ_TIMEOUT_MS)).filter((k) =>
+      parseKey(k).parts.join('/').startsWith(prefix),
+    );
+
     const entries = await Promise.all(keys.map((key) => this.proposal(faction, key)));
 
     return entries.filter((e): e is ProposalEntry => e !== null);
@@ -182,7 +188,7 @@ export class RulebookClient {
 
   /** Every accepted record of a faction, as `kind/id` to the hash of its text. */
   async heads(faction: string): Promise<Record<string, string>> {
-    const keys = await this.db.queryKeys(KEYS.headPrefix(faction));
+    const keys = await this.db.queryKeys(KEYS.headPrefix(faction), false, READ_TIMEOUT_MS);
     const records: Record<string, string> = {};
 
     for (const key of keys) {
@@ -223,7 +229,7 @@ export class RulebookClient {
 
   /** Every trusted release of a faction, newest first. */
   async releases(faction: string): Promise<(Manifest & { hash: string })[]> {
-    const keys = await this.db.queryKeys(KEYS.releasePrefix(faction));
+    const keys = await this.db.queryKeys(KEYS.releasePrefix(faction), false, READ_TIMEOUT_MS);
 
     const found = await Promise.all(
       keys.map(async (key) => ({
@@ -244,7 +250,7 @@ export class RulebookClient {
 
   /** Relays that announced themselves recently, newest first. Older announcements are left out. */
   async relays(now = Date.now()): Promise<RelayAnnouncement[]> {
-    const keys = await this.db.queryKeys(KEYS.relayPrefix);
+    const keys = await this.db.queryKeys(KEYS.relayPrefix, false, READ_TIMEOUT_MS);
 
     const found = await Promise.all(
       keys.map(async (key) => ({ key: parseKey(key).parts[1], parsed: relaySchema.safeParse(await this.get(key)) })),
@@ -258,7 +264,7 @@ export class RulebookClient {
 
   /** Every faction (and `core`) that has at least one release. */
   async releasedFactions(): Promise<string[]> {
-    const keys = await this.db.queryKeys('release/');
+    const keys = await this.db.queryKeys('release/', false, READ_TIMEOUT_MS);
 
     return [...new Set(keys.map((k) => parseKey(k).parts[1]))].sort();
   }

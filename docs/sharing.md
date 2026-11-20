@@ -6,20 +6,30 @@ write rules; the apps and the relay all register the same rules, so bad data is 
 
 ## Relays
 
-- The relay list is in `project.json` at the repository root, next to the owner key, so forks use the same relays and
-  the same data unless they change it. A build can override it (`VITE_RELAYS`).
-- Clients connect to every relay in the list, publish each write to all of them and read from whichever answer. Data
-  survives as long as one relay that stored it is up.
+- `project.json` lists bootstrap relays only: big public Nostr relays that don't move. No project relay's address is
+  in the repository. A build can override the list (`VITE_RELAYS`).
+- Every relay node has its own key. A relay given a public address (`RELAY_PUBLIC_URL`) announces itself every hour
+  under `relay/<its key>`, signed with that key, on the bootstrap relays and on itself: `{ url, name, updated }`. Only
+  that key can write the announcement, so nobody can announce for another relay, and an operator who moves just
+  changes the setting. Announcements older than two days are ignored.
+- Any relay may announce itself; nothing needs approving. The apps check every value they read, so a relay can at
+  worst be slow, empty or down, never trusted with bad data.
+- Clients connect to the bootstrap relays plus the relays they remembered, publish each write to all of them and read
+  from whichever answer. When they load the rules they also read the announcements, check each relay they know with a
+  connection test, and remember the ones that answer for the next visit. A relay that fails three checks in a row is
+  dropped until it announces itself again.
+- Relay nodes copy data from each other: every hour a relay reads the announcements, tests the bootstrap and announced
+  relays, and copies every message of the topic from the ones that answer. Messages keep their original signatures,
+  and the receiving relay applies its own write rules to each, so a new relay fills itself from the others.
 - Browsers can't serve each other: every client needs at least one reachable relay. A client that loaded the rules
   before keeps its cached copy and works offline; a first-time visitor sees only the demo until a relay answers.
-- Relays don't copy data between each other. A relay added to the list holds what is written after that, plus what is
-  copied into it from another relay.
 - `apps/relay` runs `RulebookRelay` (from `@rulebook/sharing/relay`): a `ToolDbRelay` with LevelDB storage and the
   write rules, reading role lists from its own store. It keeps every record for good, so data survives public relays
   dropping old events.
-- Anyone can run another copy of `apps/relay` and add it to their client's list.
 - Records are kept under the relays' message size limit (NIP-11); one record is one unit, detachment or similar, never a
   whole faction.
+- The rulebook's Admin page lists every relay it knows of: name, address, key, when it last announced itself, whether
+  this browser uses it, and how long it takes to answer.
 
 ## Keys
 
@@ -38,6 +48,7 @@ by `/`, since tool-db keeps `.` for user namespaces (`:<p>.<key>`). The topic is
 | `:<p>.proposal/<f>/<n>` | That user (namespace) | `{ kind, id, base?: h, blob: h, note }`                         |
 | `:<p>.request/<f>`      | That user (namespace) | `{ message }`: asks to become a contributor                     |
 | `:<p>.list/<n>`         | That user (namespace) | A saved army list                                               |
+| `relay/<p>`             | That relay node (`p`) | `{ url, name, updated }`: where the relay can be reached        |
 
 The owner's public key is not data: it is committed in `project.json`, so the apps, the relay and the relay installer
 use it, and so do forks unless they replace it. A build can override it (`VITE_RULEBOOK_OWNER`, `RULEBOOK_OWNER`). A

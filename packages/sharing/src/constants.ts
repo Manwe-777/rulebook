@@ -7,6 +7,12 @@ export const CORE = 'core';
 /** Largest record text accepted, in bytes, to stay under public relays' message limits. */
 export const MAX_BLOB_BYTES = 48_000;
 
+/**
+ * How long a read waits for the relays, in milliseconds. A read ends as soon as every relay answered, so this only
+ * matters for slow ones; tool-db's own default (1 s) drops answers when many reads run at once.
+ */
+export const READ_TIMEOUT_MS = 8000;
+
 /** How long role and hidden lists are cached by the write rules, in milliseconds. */
 export const ROLE_CACHE_MS = 30_000;
 

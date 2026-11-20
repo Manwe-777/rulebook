@@ -19,6 +19,7 @@ const FactionWorkspace = lazy(() => import('./components/editor/FactionWorkspace
 const RecordEditor = lazy(() => import('./components/editor/RecordEditor'));
 // The army sheet the list builder links to.
 const PrintPage = lazy(() => import('./components/print/PrintPage'));
+const AdminPage = lazy(() => import('./components/admin/AdminPage'));
 
 /** Page layout and routes. The router and library provider are set up by the client or server entry. */
 export default function App() {
@@ -39,6 +40,9 @@ export default function App() {
               List builder
             </a>
           )}
+          <Link to="/admin" className="text-sm font-semibold tracking-wide uppercase hover:underline">
+            Admin
+          </Link>
           <Link to="/account" className="text-sm font-semibold tracking-wide uppercase hover:underline">
             Account
           </Link>
@@ -52,6 +56,7 @@ export default function App() {
           <Route path="/:faction/detachment/:detachment" element={<DetachmentPage />} />
           <Route path="/account" element={<AccountPage />} />
           <Route path="/print" element={<PrintPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/:faction/edit" element={<FactionWorkspace />} />
           <Route path="/:faction/edit/:kind/:id" element={<RecordEditor />} />
           <Route path="*" element={<NotFoundPage />} />

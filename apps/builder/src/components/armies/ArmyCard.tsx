@@ -1,10 +1,10 @@
 import type { Library } from '@rulebook/rules';
+import { formatAgo } from '@rulebook/rules';
 import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { SavedArmy } from '../../army/SavedArmies';
 import { armySummary } from '../../utils/armySummary';
 import { factionTint } from '../../utils/factionTint';
-import { formatAgo } from '../../utils/formatAgo';
 import { BUTTON, BUTTON_QUIET } from '../styles';
 import ArmyBanner from './ArmyBanner';
 import ArmyRulesLine from './ArmyRulesLine';

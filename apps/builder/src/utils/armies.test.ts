@@ -1,10 +1,9 @@
-import { Library } from '@rulebook/rules';
+import { formatAgo, Library } from '@rulebook/rules';
 import { describe, expect, it } from 'vitest';
 
 import { ArmyDraft } from '../army/ArmyDraft';
 import { loadBundledFiles } from '../sources/loadBundledFiles';
 import { armySummary } from './armySummary';
-import { formatAgo } from './formatAgo';
 import { rulesFreshness } from './rulesFreshness';
 
 const library = Library.fromFiles(loadBundledFiles());

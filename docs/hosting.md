@@ -14,16 +14,17 @@ Setup, once per repository:
 { "owner": "npub1…", "relays": ["wss://relay.example.org"] }
 ```
 
-`owner` is the public key printed by `npm run owner-key -w @rulebook/relay`; `relays` are the relays the apps read
-from and write to. Both are public and committed, so forks read the same data by default.
+`owner` is the public key printed by `npm run owner-key -w @rulebook/relay`; `relays` are the bootstrap relays, big
+public Nostr relays the apps start from. Project relays don't go here: they announce themselves (see below). Both are
+public and committed, so forks read the same data by default.
 
 3. Optionally, Settings → Secrets and variables → Actions → **Variables**:
 
-| Variable          | Value                                                                  |
-| ----------------- | ---------------------------------------------------------------------- |
-| `RULEBOOK_OWNER`  | Overrides `project.json`'s owner (npub or hex), for a separate project |
-| `RULEBOOK_RELAYS` | Overrides `project.json`'s relays, comma separated (`wss://…`)         |
-| `PAGES_BASE_PATH` | `/` for a custom domain; defaults to `/<repository name>/`             |
+| Variable          | Value                                                                    |
+| ----------------- | ------------------------------------------------------------------------ |
+| `RULEBOOK_OWNER`  | Overrides `project.json`'s owner (npub or hex), for a separate project   |
+| `RULEBOOK_RELAYS` | Overrides `project.json`'s bootstrap relays, comma separated (`wss://…`) |
+| `PAGES_BASE_PATH` | `/` for a custom domain; defaults to `/<repository name>/`               |
 
 ## Relay
 
@@ -34,6 +35,19 @@ installed system-wide.
 ```sh
 curl -fsSL https://github.com/Manwe-777/rulebook/releases/latest/download/install.sh | sudo sh
 ```
+
+To let the apps find the relay, give it its public address and a name:
+
+```sh
+curl -fsSL https://github.com/Manwe-777/rulebook/releases/latest/download/install.sh | sudo sh -s -- \
+  --public-url wss://relay.example.org --name "Example relay"
+```
+
+The relay then announces itself every hour, signed with its own key, and copies the project's data from the other
+relays, so it fills itself on the first start. Browsers on HTTPS pages only connect to `wss://` addresses with a valid
+certificate, so the address needs a domain name: a dynamic DNS name works when the IP changes, with a TLS proxy in
+front (below). Moving the relay is a matter of running the installer again with the new `--public-url`; nothing in the
+repository changes. Anyone can run a relay this way and join.
 
 No options are needed. The release build writes the owner from `project.json` (or the `RULEBOOK_OWNER` variable) into
 `install.sh`, so the relay
@@ -71,7 +85,7 @@ relay.example.org {
 }
 ```
 
-with the relay installed with `--host 127.0.0.1`. Then add `wss://relay.example.org` to `relays` in `project.json`.
+with the relay installed with `--host 127.0.0.1`. Then install the relay with `--public-url wss://relay.example.org`.
 
 ## Releases
 

@@ -1,4 +1,4 @@
 {
   "owner": "",
-  "relays": []
+  "relays": ["wss://relay.damus.io", "wss://nos.lol", "wss://relay.primal.net"]
 }
