@@ -115,7 +115,8 @@ they all hold.
 `allow` with no limit.
 
 **`allow`** turns a constraint into an exception for a core check on the selected entries, limited by the comparison:
-`faction` (units without the faction keyword), `datasheet-limit`, `attachments` (more than one leader per bodyguard).
+`faction` (units without the faction keyword), `datasheet-limit`, `attachments` (selected leader and support units
+don't count toward a bodyguard's limits, and a selected bodyguard takes one more leader).
 When the comparison fails, the core check applies again and its issue names the constraint.
 
 Rules that can't be expressed this way are written in the record's text, and the builder shows them as reminders on the

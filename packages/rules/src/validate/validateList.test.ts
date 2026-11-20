@@ -382,6 +382,26 @@ describe('validateList: constraints', () => {
     );
   });
 
+  it('a leader an allow: attachments rule selects joins a unit that already has a leader', () => {
+    const twoCaptains = withUnits({ id: 'captain2', unit: 'field-captain', attachedTo: 'troopers' });
+    const allowCaptains = library({ allow: 'attachments', select: { units: { ids: ['field-captain'] } }, max: 5 });
+
+    expect(codes(twoCaptains)).toEqual(['too-many-leaders']);
+    expect(codes(twoCaptains, allowCaptains)).toEqual([]);
+  });
+
+  it('a bodyguard an allow: attachments rule selects takes one more leader, and no more', () => {
+    const captains = (n: number, to: string) =>
+      Array.from({ length: n }, (_, i) => ({ id: `c${i}`, unit: 'field-captain', attachedTo: to }));
+
+    const allowTroopers = library({ allow: 'attachments', select: { units: { ids: ['line-troopers'] } }, max: 5 });
+
+    expect(codes(withUnits(...captains(1, 'troopers')), allowTroopers)).toEqual([]);
+    expect(codes(withUnits(...captains(2, 'troopers')), allowTroopers)).toEqual(['too-many-leaders']);
+    expect(codes(withUnits(...captains(1, 'vets')), allowTroopers)).toEqual([]);
+    expect(codes(withUnits(...captains(2, 'vets')), allowTroopers)).toEqual(['too-many-leaders']);
+  });
+
   it("unless switches a constraint off while its condition holds, and faction tests the army's faction", () => {
     expect(codes(base, library({ max: 0, unless: { detachment: 'shield-wall' } }))).toEqual([]);
     expect(codes(base, library({ max: 0, unless: { faction: 'other-host' } }))).toEqual(['c']);

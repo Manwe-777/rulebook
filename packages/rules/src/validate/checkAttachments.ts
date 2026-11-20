@@ -64,38 +64,51 @@ function fillSlots(ctx: ValidationContext, issues: Issue[]): Map<string, Slots> 
   for (const r of flexible) {
     const slot = slots(r.entry.attachedTo!);
 
-    slot[slot.leader.length < ctx.muster.attachments.leadersPerBodyguard ? 'leader' : 'support'].push(r.entry.id);
+    const leaders = slot.leader.filter((id) => !ctx.allowed.attachments.has(id)).length;
+
+    slot[leaders < limits(ctx, r.entry.attachedTo!).leader ? 'leader' : 'support'].push(r.entry.id);
   }
 
   return joined;
 }
 
-/** Leader and support units join only bodyguards on their datasheet, within the per-bodyguard limits. */
+/**
+ * How many leader and support units a bodyguard takes: the muster limits, one more leader when an `allow: attachments`
+ * constraint selects the bodyguard itself.
+ */
+function limits(ctx: ValidationContext, bodyguard: string): Record<Role, number> {
+  const { leadersPerBodyguard, supportPerBodyguard } = ctx.muster.attachments;
+
+  return {
+    leader: leadersPerBodyguard + (ctx.allowed.attachments.has(bodyguard) ? 1 : 0),
+    support: supportPerBodyguard,
+  };
+}
+
+/**
+ * Leader and support units join only bodyguards on their datasheet, within the per-bodyguard limits. Units an
+ * `allow: attachments` constraint selects ("can join a unit that already has a Leader") don't count toward them.
+ */
 export const checkAttachments: Check = (ctx) => {
   const issues: Issue[] = [];
   const joined = fillSlots(ctx, issues);
-  const { leadersPerBodyguard, supportPerBodyguard } = ctx.muster.attachments;
 
-  for (const [bodyguard, { leader, support }] of joined) {
+  for (const [bodyguard, slots] of joined) {
     const name = ctx.byId.get(bodyguard)!.unit.name;
-    const exempt = [...leader, ...support].every((id) => ctx.allowed.attachments.has(id));
+    const max = limits(ctx, bodyguard);
 
-    if (!exempt && leader.length > leadersPerBodyguard) {
+    for (const role of ['leader', 'support'] as const) {
+      const counted = slots[role].filter((id) => !ctx.allowed.attachments.has(id));
+
+      if (counted.length <= max[role]) continue;
+
+      const [code, what] = role === 'leader' ? ['too-many-leaders', 'leaders'] : ['too-many-support', 'support units'];
+
       issues.push(
-        issue('too-many-leaders', `${name} has ${leader.length} leaders; at most ${leadersPerBodyguard} can join.`, [
+        issue(code, `${name} has ${counted.length} ${what}; at most ${max[role]} can join.`, [
           bodyguard,
-          ...leader,
+          ...slots[role],
         ]),
-      );
-    }
-
-    if (!exempt && support.length > supportPerBodyguard) {
-      issues.push(
-        issue(
-          'too-many-support',
-          `${name} has ${support.length} support units; at most ${supportPerBodyguard} can join.`,
-          [bodyguard, ...support],
-        ),
       );
     }
   }
