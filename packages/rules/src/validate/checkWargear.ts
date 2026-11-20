@@ -2,6 +2,7 @@ import type { Issue, ListEntry, Unit } from '../types';
 import { issue } from './issue';
 import type { Check } from './types';
 import { wargearAllowance } from './wargearAllowance';
+import { wargearGroup } from './wargearGroup';
 
 const sameList = (a: string[], b: string[]) => a.length === b.length && a.every((id, i) => id === b[i]);
 
@@ -43,5 +44,34 @@ function entryIssues(entry: ListEntry, unit: Unit): Issue[] {
   return issues;
 }
 
-/** Each wargear choice exists, picks one of its lists, and is taken by no more models than allowed. */
-export const checkWargear: Check = (ctx) => ctx.entries.flatMap(({ entry, unit }) => entryIssues(entry, unit));
+/** Options of one group taken together by more models than the group allows. */
+function groupIssues(entry: ListEntry, unit: Unit): Issue[] {
+  const groups = [...new Set(unit.wargearOptions.flatMap((o) => (o.group ? [o.group] : [])))];
+
+  return groups.flatMap((id) => {
+    const { options, allowed } = wargearGroup(
+      unit,
+      entry,
+      unit.wargearOptions.find((o) => o.group === id)!,
+    );
+
+    const models = entry.wargear
+      .filter((w) => options.some((o) => o.id === w.option))
+      .reduce((n, w) => n + w.models, 0);
+
+    if (models <= allowed) return [];
+
+    const names = options.map((o) => `"${o.id}"`).join(' or ');
+
+    return [
+      issue('wargear-group', `${unit.name}: ${models} models take ${names}; at most ${allowed} can.`, [entry.id]),
+    ];
+  });
+}
+
+/**
+ * Each wargear choice exists, picks one of its lists, and is taken by no more models than allowed, alone and with the
+ * other options of its group.
+ */
+export const checkWargear: Check = (ctx) =>
+  ctx.entries.flatMap(({ entry, unit }) => [...entryIssues(entry, unit), ...groupIssues(entry, unit)]);

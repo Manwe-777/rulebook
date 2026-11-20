@@ -9,6 +9,7 @@ import { checkDetachments } from './checkDetachments';
 import { checkFaction } from './checkFaction';
 import { checkFormation } from './checkFormation';
 import { checkPoints } from './checkPoints';
+import { checkSwaps } from './checkSwaps';
 import { checkUnitSize } from './checkUnitSize';
 import { checkWargear } from './checkWargear';
 import { checkWarlord } from './checkWarlord';
@@ -19,6 +20,7 @@ const CHECKS: Check[] = [
   checkFaction,
   checkUnitSize,
   checkWargear,
+  checkSwaps,
   checkPoints,
   checkDetachments,
   checkDatasheetLimits,

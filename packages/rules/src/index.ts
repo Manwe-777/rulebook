@@ -38,3 +38,4 @@ export { itemIneligibility } from './validate/itemIneligibility';
 export { listPoints } from './validate/listPoints';
 export { validateList } from './validate/validateList';
 export { wargearAllowance } from './validate/wargearAllowance';
+export { wargearRoom } from './validate/wargearRoom';

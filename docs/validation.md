@@ -34,7 +34,9 @@ Run in this order; every check runs even when an earlier one fails.
 3. **Unit size.** The model count matches one of the unit's `points` sizes and each model type's `min`/`max`. When the
    entry gives `counts`, they match a size's model types; without them it takes the first size with its number of
    models. Points, default wargear and wargear limits use that size's models.
-4. **Wargear.** Each option is taken by no more models than its `per` allows, and chosen lists exist.
+4. **Wargear.** Each option is taken by no more models than its `per` allows, options of one `group` together by no
+   more than the most any of them allows, and chosen lists exist. Every swap must find enough models still carrying
+   what it replaces: options for a named model type are applied first, then the others in list order.
 5. **Points.** Units, wargear options, wargear priced per item carried (`itemPoints`), enhancements and upgrades are
    summed; a datasheet's later copies add its
    `copies` surcharge, counted in list order. Over the battle size's limit is an error. Detachments don't cost

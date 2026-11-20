@@ -57,6 +57,11 @@ const wargearOption = z.strictObject({
   with: z.array(z.array(slug).min(1)).min(1),
   /** Cost per model taking it. */
   points: points.default(0),
+  /**
+   * Options sharing a group are alternatives for the same models ("one or the other"): together they can be taken by no
+   * more models than the most any one of them allows.
+   */
+  group: slug.optional(),
 });
 
 const composition = z.strictObject({

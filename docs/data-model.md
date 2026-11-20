@@ -102,6 +102,7 @@ wargearOptions:
     replace: [service-pistol]
     with: [[grenade-launcher]] # pick one list of weapon or equipment ids
     points: 0 # optional cost per model taking it
+    group: sidearm # optional: options sharing a group are "one or the other"; together no more models than the most any one allows
 leader: # optional: Leader ability
   bodyguards: [line-troopers, veteran-squad] # unit ids this unit can lead
 support: # optional: Support ability, same shape as leader

@@ -1,4 +1,4 @@
-import { type ListEntry, type Unit, wargearAllowance, wargearName } from '@rulebook/rules';
+import { type ListEntry, type Unit, wargearAllowance, wargearName, wargearRoom } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
 import { choicePoints } from '../utils/choicePoints';
@@ -13,8 +13,8 @@ interface Props {
 }
 
 /**
- * One block per wargear option, with a count for each of its choices. The choices share the option's limit, so two
- * models can take different weapons from the same list.
+ * One block per wargear option, with a count for each of its choices. The choices share the option's limit (and its
+ * group's, for "one or the other" options), so two models can take different weapons from the same list.
  */
 export default function WargearFields({ draft, entry, unit, onChange }: Props) {
   const names = (ids: string[]) => ids.map((id) => wargearName(unit, id)).join(' + ');
@@ -22,7 +22,7 @@ export default function WargearFields({ draft, entry, unit, onChange }: Props) {
   return unit.wargearOptions.map((option) => {
     const rows = entry.wargear.filter((w) => w.option === option.id);
     const max = wargearAllowance(unit, entry, option);
-    const used = rows.reduce((sum, w) => sum + w.models, 0);
+    const free = wargearRoom(unit, entry, option);
     const countOf = (choice: string[]) => rows.find((w) => w.choice.join(',') === choice.join(','))?.models ?? 0;
 
     return (
@@ -36,7 +36,7 @@ export default function WargearFields({ draft, entry, unit, onChange }: Props) {
         </legend>
         {option.with.map((choice) => {
           const count = countOf(choice);
-          const room = max - used + count;
+          const room = free + count;
 
           return (
             <label key={choice.join(',')} className="flex items-center gap-2">
