@@ -1,6 +1,7 @@
 import type { Unit } from '@rulebook/rules';
 
 import { useUnitRoute } from '../hooks/useUnitRoute';
+import CrownIcon from './CrownIcon';
 import UnitPhoto from './photos/UnitPhoto';
 
 interface Props {
@@ -10,11 +11,12 @@ interface Props {
   unit: Unit | undefined;
   unitId: string;
   points: number;
+  warlord: boolean;
   onRemove: () => void;
 }
 
-/** The title bar of a unit card: photo, name (opening the unit's play view), cost and a remove button. */
-export default function EntryHeader({ faction, entryId, unit, unitId, points, onRemove }: Props) {
+/** The title bar of a unit card: photo, name (opening the unit's play view), warlord badge, cost and a remove button. */
+export default function EntryHeader({ faction, entryId, unit, unitId, points, warlord, onRemove }: Props) {
   const name = unit?.name ?? `Unknown unit "${unitId}"`;
   const [, openUnit] = useUnitRoute();
 
@@ -30,6 +32,11 @@ export default function EntryHeader({ faction, entryId, unit, unitId, points, on
           name
         )}
       </h3>
+      {warlord && (
+        <span className="rounded bg-warlord px-2 py-0.5 text-sm font-bold tracking-wide text-ink uppercase">
+          <CrownIcon /> Warlord
+        </span>
+      )}
       <span className="font-extrabold">{points} pts</span>
       <button
         type="button"

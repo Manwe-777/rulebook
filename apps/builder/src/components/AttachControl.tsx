@@ -2,6 +2,7 @@ import type { Library, ListEntry, Unit } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
 import { attachTargets } from '../utils/attachTargets';
+import { bodyguardLabel } from '../utils/bodyguardLabel';
 import SelectField from './SelectField';
 import { BUTTON_QUIET, LABEL } from './styles';
 
@@ -39,7 +40,7 @@ export default function AttachControl({ draft, library, entry, unit, onChange }:
       <div className={LABEL}>
         {verb}
         <span className="flex items-center gap-2 normal-case">
-          <span className="font-bold text-text">{name(joined.unit)}</span>
+          <span className="font-bold text-text">{bodyguardLabel(draft.list, library, joined, entry.id)}</span>
           <button type="button" className={`${BUTTON_QUIET} py-0 text-sm`} onClick={() => attach(undefined)}>
             Detach
           </button>
@@ -66,7 +67,7 @@ export default function AttachControl({ draft, library, entry, unit, onChange }:
       label="Attach to"
       value=""
       none="Not attached"
-      options={targets.map((e) => ({ value: e.id, label: name(e.unit) }))}
+      options={targets.map((e) => ({ value: e.id, label: bodyguardLabel(draft.list, library, e) }))}
       onChange={attach}
     />
   );

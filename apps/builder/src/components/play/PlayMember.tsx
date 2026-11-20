@@ -1,8 +1,9 @@
 import { type Enhancement, entryLoadout, type ListEntry, type Unit } from '@rulebook/rules';
 
 import { gearSummary } from '../../utils/gearSummary';
+import CrownIcon from '../CrownIcon';
 import UnitPhoto from '../photos/UnitPhoto';
-import CompactStats from './CompactStats';
+import PlayStats from './PlayStats';
 
 interface Props {
   faction: string;
@@ -17,7 +18,7 @@ interface Props {
 
 /** One unit on a play card: photo, name, role, points, stats and what it carries. */
 export default function PlayMember({ faction, entry, unit, points, items, warlord, role }: Props) {
-  const tags = [role, warlord && 'Warlord', ...items.map((i) => i.name)].filter(Boolean);
+  const tags = [role, ...items.map((i) => i.name)].filter(Boolean);
 
   return (
     <span className="flex gap-3 px-3 py-2">
@@ -32,10 +33,17 @@ export default function PlayMember({ faction, entry, unit, points, items, warlor
           </span>
           <span className="shrink-0 text-sm text-text/70">{points} pts</span>
         </span>
-        {tags.length > 0 && (
-          <span className="block text-xs font-bold tracking-wide text-text/80 uppercase">{tags.join(' · ')}</span>
+        {(warlord || tags.length > 0) && (
+          <span className="flex flex-wrap items-center gap-2 text-xs font-bold tracking-wide text-text/80 uppercase">
+            {warlord && (
+              <span className="rounded bg-warlord px-1.5 py-0.5 text-ink">
+                <CrownIcon /> Warlord
+              </span>
+            )}
+            {tags.join(' · ')}
+          </span>
         )}
-        <CompactStats profiles={unit.profiles} />
+        <PlayStats profiles={unit.profiles} />
         <span className="block text-sm text-text/80">{gearSummary(unit, entryLoadout(unit, entry)).join(' · ')}</span>
       </span>
     </span>

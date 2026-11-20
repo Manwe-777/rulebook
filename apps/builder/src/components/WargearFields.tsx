@@ -3,7 +3,8 @@ import { type ListEntry, type Unit, wargearAllowance, wargearName, wargearRoom }
 import type { ArmyDraft } from '../army/ArmyDraft';
 import { choicePoints } from '../utils/choicePoints';
 import { optionLabel } from '../utils/optionLabel';
-import { INPUT, LABEL } from './styles';
+import NumberStepper from './NumberStepper';
+import { LABEL } from './styles';
 
 interface Props {
   draft: ArmyDraft;
@@ -39,18 +40,12 @@ export default function WargearFields({ draft, entry, unit, onChange }: Props) {
           const room = free + count;
 
           return (
-            <label key={choice.join(',')} className="flex items-center gap-2">
-              <input
-                type="number"
-                min={0}
-                max={room}
-                className={`${INPUT} w-16`}
+            <div key={choice.join(',')} className="flex items-center gap-2">
+              <NumberStepper
                 value={count}
-                onChange={(e) => {
-                  const n = Math.min(room, Math.max(0, Number(e.target.value) || 0));
-
-                  onChange(draft.setWargear(entry.id, option.id, n, choice));
-                }}
+                max={room}
+                label={names(choice)}
+                onChange={(n) => onChange(draft.setWargear(entry.id, option.id, n, choice))}
               />
               <span>
                 {names(choice)}
@@ -58,7 +53,7 @@ export default function WargearFields({ draft, entry, unit, onChange }: Props) {
                   <span className="text-text/60"> (+{choicePoints(unit, choice)} pts each)</span>
                 )}
               </span>
-            </label>
+            </div>
           );
         })}
       </fieldset>
