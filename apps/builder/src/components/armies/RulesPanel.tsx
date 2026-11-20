@@ -4,6 +4,7 @@ import type { ReleaseInfo } from '@rulebook/sharing';
 
 import type { BuilderSource } from '../../hooks/useBuilderLibrary';
 import { rulesFreshness } from '../../utils/rulesFreshness';
+import { rulesRows } from '../../utils/rulesRows';
 import { PANEL, PANEL_TITLE } from '../styles';
 
 const DOT = { good: 'bg-emerald-400', pending: 'animate-pulse bg-amber-300', bad: 'bg-red-400', muted: 'bg-text/40' };
@@ -20,10 +21,7 @@ interface Props {
 export default function RulesPanel({ library, releases, status, checkedAt, now }: Props) {
   const freshness = rulesFreshness(status, checkedAt, now);
 
-  const rows = [
-    ...library.factions.map((f) => ({ id: f.id, name: f.name })),
-    ...(library.muster ? [{ id: 'core', name: 'Core rules' }] : []),
-  ];
+  const rows = rulesRows(library, releases);
 
   return (
     <section className={PANEL}>
@@ -43,9 +41,7 @@ export default function RulesPanel({ library, releases, status, checkedAt, now }
             </tr>
           </thead>
           <tbody>
-            {rows.map(({ id, name }) => {
-              const release = releases.find((r) => r.faction === id);
-
+            {rows.map(({ id, name, release }) => {
               return (
                 <tr key={id} className="border-t border-white/10" title={release?.notes || undefined}>
                   <td className="py-1 font-semibold">{name}</td>
