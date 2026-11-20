@@ -79,6 +79,13 @@ describe('checkDataset', () => {
     ]);
   });
 
+  it("doesn't warn about a unit without the keyword when the faction's own rules let it in as an ally", () => {
+    const ally =
+      'factionKeywords: [OTHER HOST]\nconstraints:\n  - { id: ally, allow: faction, select: { units: { ids: [veteran-squad] } }, message: Allies. }';
+
+    expect(checkEdited('veteran-squad.md', 'factionKeywords: [DEMO HOST]', ally)).toEqual([]);
+  });
+
   it('warns about enhancements and stratagems without text', () => {
     expect(checkEdited('armoured-column.md', 'Upgrade. Add 2" to this unit\'s Move characteristic.', '')).toEqual([
       ['missing-text', 'warning', 'demo-host/armoured-column'],

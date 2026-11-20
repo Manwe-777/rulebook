@@ -1,6 +1,7 @@
 import type { Constraint, Faction, Issue, Unit } from '../types';
 import { keywordKey } from '../utils/keywordKey';
 import { unitSizes } from '../utils/unitSizes';
+import { matchesUnit } from '../validate/matchesUnit';
 import { constraintIssues } from './constraintIssues';
 
 const error = (code: string, message: string, ref: string): Issue => ({
@@ -110,7 +111,6 @@ function attachIssues(faction: Faction, unit: Unit, ref: string): Issue[] {
   return issues;
 }
 
-/** Problems in one unit's data: unknown weapons and model types, impossible sizes, and attachment mistakes. */
 /** A leader or support condition, checked for unknown references like a constraint named after its role. */
 function attachConditions(unit: Unit): Constraint[] {
   return (['leader', 'support'] as const).flatMap((role) => {
@@ -122,9 +122,29 @@ function attachConditions(unit: Unit): Constraint[] {
   });
 }
 
+/**
+ * Whether one of the faction's own `allow: faction` rules (on the faction, its detachments or its datasheets) selects
+ * this unit: an ally kept in the faction's folder on purpose, like daemons a detachment lets in.
+ */
+function isAlly(faction: Faction, unit: Unit): boolean {
+  const rules = [
+    ...faction.constraints,
+    ...faction.detachments.flatMap((d) => d.constraints),
+    ...faction.units.flatMap((u) => u.constraints),
+  ];
+
+  return rules.some((c) => c.allow === 'faction' && c.select.units !== undefined && matchesUnit(unit, c.select.units));
+}
+
+/**
+ * Problems in one unit's data: unknown weapons and model types, impossible sizes, attachment mistakes, unknown
+ * references in its rules, and a missing faction keyword (unless the faction's rules let it in as an ally).
+ */
 export function unitIssues(faction: Faction, unit: Unit): Issue[] {
   const ref = `${faction.id}/${unit.id}`;
-  const keyword = unit.factionKeywords.some((k) => keywordKey(k) === keywordKey(faction.factionKeyword));
+
+  const keyword =
+    unit.factionKeywords.some((k) => keywordKey(k) === keywordKey(faction.factionKeyword)) || isAlly(faction, unit);
 
   return [
     ...weaponIssues(unit, ref),
