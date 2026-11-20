@@ -44,4 +44,24 @@ npm run build   # static sites in apps/rulebook/dist/ and apps/builder/dist/
 node apps/relay/scripts/package.mjs 1.0.0   # relay release in apps/relay/release/
 ```
 
-Deploying the apps and installing a relay: `docs/hosting.md`.
+## Run a relay
+
+Relays store and share the rules. Anyone can run one; it finds the others, copies their data and announces itself so the
+apps find it. It needs Linux with systemd, Node.js 22 or newer, and a domain name with TLS (browsers only connect to
+`wss://` from HTTPS pages; a dynamic DNS name works on a home connection).
+
+```sh
+curl -fsSL https://github.com/Manwe-777/rulebook/releases/latest/download/install.sh | sudo sh -s -- \
+  --public-url wss://relay.example.org --name "Example relay"
+```
+
+Run it again to update or change settings. Put a TLS proxy such as Caddy in front of port 8080. Options, updates and
+removal: `docs/hosting.md`.
+
+## Contribute rules
+
+Open the rulebook, pick a faction, choose **Edit or contribute** and ask to contribute. A key is made in your browser
+the first time you write (protect it with a password on the Account page). Once a maintainer of that faction accepts
+you, you can propose changes; maintainers review and release them.
+
+Deploying the apps: `docs/hosting.md`. Rules format: `docs/data-model.md`.
