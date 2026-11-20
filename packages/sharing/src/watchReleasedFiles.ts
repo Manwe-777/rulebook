@@ -1,4 +1,5 @@
 import type { ReleasedRules } from './schemas';
+import { mergeReleasedRules } from './utils/mergeReleasedRules';
 
 /** Where the released rules shown come from. */
 export type ReleaseSource = 'loading' | 'cached' | 'offline' | 'relays' | 'failed';
@@ -16,7 +17,8 @@ interface Options {
 }
 
 /**
- * Shows the cached releases first (`cached`), then the relays' (`relays`), saving them for next time. When the relays
+ * Shows the cached releases first (`cached`), then the relays' merged into them (`relays`), saving them for next time:
+ * a faction the relays didn't return keeps its cached release. When the relays
  * can't be reached the cached copy stays (`offline`), or there is nothing (`failed`). Returns a function that stops
  * further updates.
  */
@@ -36,7 +38,10 @@ export function watchReleasedFiles({ load, cache, onChange, now = Date.now }: Op
   });
 
   load()
-    .then(async (rules) => {
+    .then(async (fresh) => {
+      // What the relays gave is merged into the saved copy, so factions missing from a partial answer stay.
+      const saved = await cached.catch(() => null);
+      const rules = saved ? mergeReleasedRules(saved.rules, fresh) : fresh;
       const at = now();
 
       shown = true;

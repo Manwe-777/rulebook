@@ -58,7 +58,7 @@ describe('watchReleasedFiles', () => {
     expect(t.write).toHaveBeenCalledWith(NEW, NOW);
   });
 
-  it('never replaces the relays’ rules with an older cached copy that arrives late', async () => {
+  it('the relays’ rules come last even when the cached copy arrives late, so they are never replaced by it', async () => {
     const t = setup(OLD);
 
     t.relays.resolve(NEW);
@@ -66,7 +66,29 @@ describe('watchReleasedFiles', () => {
     t.cacheRead();
     await settle();
 
-    expect(t.seen).toEqual([[NEW, 'relays', NOW]]);
+    expect(t.seen.at(-1)).toEqual([NEW, 'relays', NOW]);
+    expect(t.seen.filter(([, source]) => source === 'relays')).toHaveLength(1);
+  });
+
+  it('a faction the relays leave out this time stays from the cache, and stays saved', async () => {
+    const both: ReleasedRules = {
+      files: [
+        { path: 'demo/a.md', source: 'old' },
+        { path: 'orks/faction.md', source: 'orks' },
+      ],
+      releases: [],
+    };
+
+    const t = setup(both);
+
+    t.cacheRead();
+    t.relays.resolve(NEW);
+    await settle();
+
+    const [shown] = t.seen.at(-1)!;
+
+    expect(shown?.files.map((f) => f.source).sort()).toEqual(['new', 'orks']);
+    expect(t.write).toHaveBeenCalledWith(shown, NOW);
   });
 
   it('keeps the cached rules when the relays are unreachable', async () => {
