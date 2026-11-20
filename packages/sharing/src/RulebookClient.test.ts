@@ -404,6 +404,24 @@ describe('hiding', () => {
     expect(await stranger.head(FACTION, 'unit', 'field-captain')).not.toBeNull();
   });
 
+  it('a release with a hidden record still loads, only without that record', async () => {
+    const inFaction = (r: { files: { path: string }[] }) => r.files.filter((f) => f.path.startsWith(`${FACTION}/`));
+
+    const rules = await eventually(
+      () => stranger.latestReleases(),
+      (r) => {
+        const info = r.releases.find((i) => i.faction === FACTION);
+
+        return info !== undefined && inFaction(r).length === info.records - 1;
+      },
+    );
+
+    const info = rules.releases.find((i) => i.faction === FACTION);
+
+    expect(info).toBeDefined();
+    expect(inFaction(rules)).toHaveLength(info!.records - 1);
+  });
+
   it('only the owner can hide content', async () => {
     await intruder.hide([KEYS.head(FACTION, 'unit', 'field-captain')], [], 'mine').catch(() => undefined);
 

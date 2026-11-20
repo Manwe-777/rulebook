@@ -278,7 +278,10 @@ export class RulebookClient {
     return (await this.latestReleases()).files;
   }
 
-  /** The newest trusted release of every released faction (core included): its files and what the release is. */
+  /**
+   * The newest trusted release of every released faction (core included): its files and what the release is.
+   * Factions that couldn't be read in full are left out, so callers keep what they had for them.
+   */
   async latestReleases(): Promise<ReleasedRules> {
     // One search finds every faction's release keys; searching per faction is slow and times out when run together.
     const keys = await this.db.queryKeys('release/', false, READ_TIMEOUT_MS);
@@ -290,20 +293,36 @@ export class RulebookClient {
       byFaction.set(faction, [...(byFaction.get(faction) ?? []), key]);
     }
 
-    const found = await mapInBatches([...byFaction], PARALLEL_FACTIONS, async ([faction, factionKeys]) => {
-      const [newest] = await this.manifests(factionKeys);
-
-      if (!newest) return null;
-
-      const { version, date, hash, notes, records } = newest;
-      const info: ReleaseInfo = { faction, version, date, hash, notes, records: Object.keys(records).length };
-
-      return { info, files: await this.releaseFiles(faction, hash) };
-    });
-
-    const releases = found.filter((f) => f !== null);
+    const load = ([faction, factionKeys]: [string, string[]]) => this.completeRelease(faction, factionKeys);
+    const first = await mapInBatches([...byFaction], PARALLEL_FACTIONS, load);
+    // Reads that timed out (a slow relay, a phone network) get one more try, one faction at a time.
+    const missed = [...byFaction].filter(([faction]) => !first.some((r) => r?.info.faction === faction));
+    const second = await mapInBatches(missed, 1, load);
+    const releases = [...first, ...second].filter((r) => r !== null);
 
     return { files: releases.flatMap((r) => r.files), releases: releases.map((r) => r.info) };
+  }
+
+  /**
+   * The newest trusted release among these keys with every one of its record files (but those the owner hid), or null
+   * when the release or any file couldn't be read: a faction is never given with records missing.
+   */
+  private async completeRelease(
+    faction: string,
+    keys: string[],
+  ): Promise<{ info: ReleaseInfo; files: RulesFile[] } | null> {
+    const [newest] = await this.manifests(keys);
+
+    if (!newest) return null;
+
+    const { version, date, hash, notes, records } = newest;
+    const info: ReleaseInfo = { faction, version, date, hash, notes, records: Object.keys(records).length };
+    const files = await this.releaseFiles(faction, hash);
+    // Records the owner hid are left out on purpose; every other one must have arrived.
+    const hidden = (await this.roles.hidden()).blobs;
+    const expected = Object.values(records).filter((blob) => !hidden.includes(blob)).length;
+
+    return files.length === expected ? { info, files } : null;
   }
 
   /** Publishes every record of a faction (or `core`) folder and releases them. Maintainers of that faction only. */
