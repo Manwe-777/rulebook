@@ -22,6 +22,8 @@ const limits = {
     perUnit: count.default(1),
     /** Enhancement slots the army's upgrades use up together, as soon as it takes any. */
     enhancementSlots: count.default(0),
+    /** Each upgrade at most once per army; off, the same upgrade can go on several units. */
+    once: z.boolean().default(false),
   }),
 };
 

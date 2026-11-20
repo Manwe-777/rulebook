@@ -57,6 +57,8 @@ const composition = z.strictObject({
   points: z.array(z.strictObject({ models: z.int().min(1), points })).min(1),
   /** From the `from`th copy of this datasheet in an army, each copy costs `points` more. */
   copies: z.strictObject({ from: z.int().min(2), points }).optional(),
+  /** Wargear that costs extra, by id: each one the unit carries (by default or by choice) adds its points. */
+  itemPoints: z.record(slug, points).default({}),
   /** Default weapon ids per model type. */
   wargear: z.record(z.string(), z.array(slug)).default({}),
 });

@@ -36,7 +36,11 @@ export function itemIssues(ctx: ValidationContext, kind: Kind): Issue[] {
   for (const id of new Set(ids)) {
     const holders = bearers.filter((b) => b.id === id).map((b) => b.r.entry.id);
 
-    if (holders.length > 1) issues.push(issue(`${kind}-twice`, `"${id}" is taken more than once.`, holders));
+    const repeatable = kind === 'upgrade' && !ctx.limits.upgrades.once;
+
+    if (holders.length > 1 && !repeatable) {
+      issues.push(issue(`${kind}-twice`, `"${id}" is taken more than once.`, holders));
+    }
   }
 
   if (used > max) {

@@ -31,7 +31,8 @@ Run in this order; every check runs even when an earlier one fails.
 2. **Faction.** Every unit has the army's faction keyword, unless a constraint allows it.
 3. **Unit size.** The model count matches one of the unit's `points` sizes and each model type's `min`/`max`.
 4. **Wargear.** Each option is taken by no more models than its `per` allows, and chosen lists exist.
-5. **Points.** Units, wargear options, enhancements and upgrades are summed; a datasheet's later copies add its
+5. **Points.** Units, wargear options, wargear priced per item carried (`itemPoints`), enhancements and upgrades are
+   summed; a datasheet's later copies add its
    `copies` surcharge, counted in list order. Over the battle size's limit is an error. Detachments don't cost
    points.
 6. **Detachments.** At least `detachments.min` (and at most `max` when set), each once. Their `cost` adds up to no
@@ -43,7 +44,8 @@ Run in this order; every check runs even when an earlier one fails.
 8. **Enhancements.** Each enhancement comes from a chosen detachment, is taken once, goes on a unit with one of
    `enhancements.roles`, its `keywords` and none of its `excludeKeywords` or `excludeRoles`, and each model has at most `perModel`. The army has
    at most `enhancements.max`, counting `upgrades.enhancementSlots` more as soon as it takes any upgrade.
-9. **Upgrades.** The same rules for unit upgrades, with `upgrades.perUnit` and `upgrades.max`.
+9. **Upgrades.** The same rules for unit upgrades, with `upgrades.perUnit` and `upgrades.max`; the same upgrade can go
+   on several units unless `upgrades.once` is on.
 10. **Warlord.** Present when required, and has one of the warlord roles.
 11. **Attachments.** A leader or support unit is attached only to a bodyguard listed on its datasheet; each bodyguard
     has at most `leadersPerBodyguard` leader units and `supportPerBodyguard` support units, unless a constraint allows

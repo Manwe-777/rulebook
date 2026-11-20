@@ -79,6 +79,7 @@ describe('datasheet text', () => {
   it('lists the cost of each unit size', () => {
     expect(pointsLines(unit('veteran-squad'))).toEqual(['5 models: 90 pts', '10 models: 180 pts']);
     expect(pointsLines(unit('field-captain'))).toEqual(['1 model: 70 pts']);
+    expect(pointsLines(unit('line-troopers'))).toContain('Flamer: +5 pts each');
     expect(pointsLines(unit('armoured-carrier'))).toEqual(['1 model: 80 pts', '3rd+ in your army: +10 pts']);
   });
 

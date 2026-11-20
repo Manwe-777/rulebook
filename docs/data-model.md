@@ -88,6 +88,7 @@ composition:
   points: # cost by unit size, total models
     - { models: 1, points: 70 }
   copies: { from: 3, points: 10 } # optional: from the 3rd copy in an army, each costs 10 more
+  itemPoints: { grenade-launcher: 5 } # optional: each one carried (by default or chosen) costs this much more
   wargear: # default wargear per model type
     Field Captain: [service-pistol, sabre, signal-flare]
 equipment: # wargear without a weapon profile, referred to by id like weapons
@@ -194,7 +195,7 @@ datasheetLimits: # copies of the same datasheet, by role; the first matching rol
   - { role: dedicated-transport, max: 6 }
   - { role: default, max: 3 }
 enhancements: { max: 4, perModel: 1, roles: [character], excludeRoles: [epic-hero] } # roles: who can take one
-upgrades: { max: 3, perUnit: 1, enhancementSlots: 1 } # any upgrades together use this many enhancement slots
+upgrades: { max: 3, perUnit: 1, enhancementSlots: 1, once: false } # upgrades together use enhancementSlots; once: each upgrade at most once
 warlord: { required: true, roles: [character] }
 attachments: { leadersPerBodyguard: 1, supportPerBodyguard: 1 }
 strategicReserves: { maxShare: 0.5 }

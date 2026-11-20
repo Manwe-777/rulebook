@@ -18,6 +18,7 @@ composition:
   points:
     - { models: 10, points: 65 }
     - { models: 20, points: 130 }
+  itemPoints: { flamer: 5 } # each flamer carried costs 5 more
   wargear:
     Sergeant: [service-pistol, close-combat-weapon, signal-flare]
     Trooper: [service-rifle, close-combat-weapon]

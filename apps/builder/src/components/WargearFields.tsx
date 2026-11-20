@@ -1,6 +1,7 @@
 import { type ListEntry, type Unit, wargearAllowance, wargearName } from '@rulebook/rules';
 
 import type { ArmyDraft } from '../army/ArmyDraft';
+import { choicePoints } from '../utils/choicePoints';
 import { optionLabel } from '../utils/optionLabel';
 import { INPUT, LABEL } from './styles';
 
@@ -51,7 +52,12 @@ export default function WargearFields({ draft, entry, unit, onChange }: Props) {
                   onChange(draft.setWargear(entry.id, option.id, n, choice));
                 }}
               />
-              <span>{names(choice)}</span>
+              <span>
+                {names(choice)}
+                {choicePoints(unit, choice) > 0 && (
+                  <span className="text-text/60"> (+{choicePoints(unit, choice)} pts each)</span>
+                )}
+              </span>
             </label>
           );
         })}

@@ -248,6 +248,18 @@ describe('validateList: enhancements and upgrades', () => {
     expect(codes(withUpgrade, library)).toEqual(['enhancement-limit']);
   });
 
+  it('the same upgrade can go on several units, unless the muster rules allow each only once', () => {
+    const carriers = demoList({
+      detachments: ['shield-wall'],
+      units: [1, 2].map((n) => ({ id: `c${n}`, unit: 'armoured-carrier', models: 1, upgrade: 'reinforced-plating' })),
+    });
+
+    const once = withMuster({ upgrades: { ...demoLibrary.muster!.upgrades, once: true } });
+
+    expect(codes(carriers)).not.toContain('upgrade-twice');
+    expect(codes(carriers, once)).toContain('upgrade-twice');
+  });
+
   it('an upgrade goes on a unit with its keywords, and is not an enhancement', () => {
     expect(codes(withUnits({ unit: 'armoured-carrier', upgrade: 'reinforced-plating' }))).toEqual([]);
     expect(codes(replaceUnit('vets', { upgrade: 'reinforced-plating' }))).toEqual(['upgrade-bearer']);
@@ -428,6 +440,25 @@ describe('listPoints', () => {
       carrier3: 90,
       carrier4: 90,
     });
+  });
+
+  it('wargear that costs extra adds its points for each one carried', () => {
+    const flamers = (models: number) =>
+      listPoints(
+        demoList({
+          units: [
+            {
+              id: 't',
+              unit: 'line-troopers',
+              models: 20,
+              wargear: models ? [{ option: 'flamer', models, choice: ['flamer'] }] : [],
+            },
+          ],
+        }),
+        demoLibrary,
+      ).entries.t;
+
+    expect([flamers(0), flamers(1), flamers(2)]).toEqual([130, 135, 140]);
   });
 
   it('a list that cannot be checked costs nothing and has no limit', () => {
