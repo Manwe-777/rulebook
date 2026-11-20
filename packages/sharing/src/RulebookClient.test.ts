@@ -2,7 +2,7 @@ import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 
 import { Library } from '@rulebook/rules';
-import { generateSecretKey, getPublicKey, ToolDb } from 'tool-db';
+import { generateSecretKey, getPublicKey, MapCrdt, ToolDb } from 'tool-db';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import { KEYS, TOPIC } from './constants';
@@ -261,6 +261,11 @@ describe('relay announcements', () => {
       updated: new Date().toISOString(),
     });
 
+    const forged = new MapCrdt<unknown>(intruder.me);
+
+    forged.SET(maintainer.me, { url: 'wss://evil', name: '' });
+    await intruderDb.putCrdt(KEYS.relays, forged).catch(() => undefined);
+
     await contributor.announceRelay('wss://old.example', '', new Date(Date.now() - 10 * 24 * 3600 * 1000));
 
     await new Promise((resolve) => setTimeout(resolve, 300));
@@ -369,10 +374,28 @@ describe('releases', () => {
     expect(releases[0].hash).toBe(hash);
   });
 
-  it("a stranger's release is not trusted", async () => {
+  it("a stranger's release is not trusted, and can't become the faction's newest", async () => {
     await intruder.release(FACTION, 'fake').catch(() => undefined);
 
     expect((await maintainer.releases(FACTION)).map((r) => r.version)).toEqual(['2026-11', 'draft']);
+
+    const latest = await stranger.latestReleases();
+
+    expect(latest.releases.find((r) => r.faction === FACTION)?.version).toBe('2026-11');
+  });
+
+  it('the index holds only map changes its authors may make', async () => {
+    const forged = new MapCrdt<unknown>(intruder.me);
+
+    forged.SET('core', { hash, version: 'x', date: new Date().toISOString(), records: 1, notes: '' });
+    await intruderDb.putCrdt(KEYS.index, forged).catch(() => undefined);
+    await intruderDb.putData(KEYS.index, { core: 'plain value' }).catch(() => undefined);
+
+    const kept = new MapCrdt<unknown>('');
+
+    await raw.getCrdt(KEYS.index, kept);
+    expect(Object.keys(kept.value).sort()).toEqual(['core', FACTION]);
+    expect((kept.value.core as { version: string }).version).not.toBe('x');
   });
 
   it('a release stays trusted after its signer is removed only if a current maintainer signed it too', async () => {
@@ -396,14 +419,14 @@ describe('releases', () => {
 });
 
 describe('hiding', () => {
-  it('hidden keys and record texts stop being served', async () => {
+  it('hidden record texts stop being served, and their records drop out of the heads', async () => {
     const blob = (await maintainer.head(FACTION, 'unit', 'veteran-squad'))!;
 
-    await owner.hide([KEYS.head(FACTION, 'unit', 'line-troopers')], [blob], 'Takedown request');
+    await owner.hide([], [blob], 'Takedown request');
 
     expect(
       await eventually(
-        () => stranger.head(FACTION, 'unit', 'line-troopers'),
+        () => stranger.head(FACTION, 'unit', 'veteran-squad'),
         (v) => v === null,
       ),
     ).toBeNull();
@@ -437,7 +460,9 @@ describe('hiding', () => {
   });
 
   it('only the owner can hide content', async () => {
-    await intruder.hide([KEYS.head(FACTION, 'unit', 'field-captain')], [], 'mine').catch(() => undefined);
+    const blob = (await maintainer.head(FACTION, 'unit', 'field-captain'))!;
+
+    await intruder.hide([], [blob], 'mine').catch(() => undefined);
 
     expect(await maintainer.head(FACTION, 'unit', 'field-captain')).not.toBeNull();
   });

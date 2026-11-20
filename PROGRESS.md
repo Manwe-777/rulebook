@@ -162,6 +162,11 @@
   detachments the first time they're used, and files already read aren't read again when another faction arrives
   (startup with 35 factions ~1.5 s → ~60 ms; a full sync's rebuilds ~30 s → ~50 ms). The home page counts datasheets
   without reading them; the data checks run when asked.
+- Lists live in tool-db map CRDTs under fixed keys (`index`, `releases/<f>`, `heads/<f>`, `proposals/<f>`,
+  `requests/<f>`, `relays`); nothing scans keys any more (key scans downloaded and verified the whole topic). Each map
+  change is checked against who may set that entry, on the relays and in the apps. A client reads `index` once and
+  downloads only factions whose release hash changed (up-to-date check ~6 s → ~10 ms). Relays copy map change sets
+  between each other. `npm run reindex -w @rulebook/relay` moves existing data into the maps (owner key).
 
 ## Known issues
 
@@ -202,6 +207,9 @@
   CONVERSION, OVERCHARGE, Damaged X, MOBILE) have no glossary entries.
 
 ## Next
+
+- Deploy: update the droplet relay to a release with the maps, run `reindex` with the owner key, then push the apps.
+- First download of every faction reads each record with its own query (~12 s for 1,300 records); batch them.
 
 - Push the repo, set the Pages variables, create the owner key and install a relay (`docs/hosting.md`). Editor follow-ups: form fields for the common frontmatter
   (stats, weapons, points) next to the text editor, a page for the core muster record and the hidden list, and merging

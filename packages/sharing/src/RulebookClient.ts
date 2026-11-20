@@ -1,5 +1,6 @@
 import { parseRecord, type RulesFile } from '@rulebook/rules';
-import type { ToolDb } from 'tool-db';
+import { MapCrdt, type ToolDb } from 'tool-db';
+import type { z } from 'zod';
 
 import { KEYS, PARALLEL_FACTIONS, READ_TIMEOUT_MS, RELAY_STALE_MS } from './constants';
 import { parseKey } from './rules/parseKey';
@@ -7,13 +8,17 @@ import { Roles } from './rules/Roles';
 import { registerWriteRules } from './rules/writeRules';
 import {
   headSchema,
+  indexEntrySchema,
   type Manifest,
   manifestSchema,
   type Proposal,
+  proposalRefSchema,
   proposalSchema,
   type RelayAnnouncement,
+  relayEntrySchema,
   relaySchema,
   type ReleasedRules,
+  releaseEntrySchema,
   type ReleaseInfo,
   requestSchema,
   reviewSchema,
@@ -23,6 +28,7 @@ import { mapInBatches } from './utils/mapInBatches';
 import { sha256Hex } from './utils/sha256Hex';
 
 type Kind = Proposal['kind'];
+type IndexEntry = z.output<typeof indexEntrySchema>;
 
 export interface ProposalEntry extends Proposal {
   /** The proposal's final key, `:<p>.proposal/<f>/<n>`. */
@@ -80,6 +86,52 @@ export class RulebookClient {
     await this.db.putData(key, value, namespaced);
   }
 
+  /**
+   * The entries of a map key that parse with `schema`. One exact-key read: the relays send that key's change sets
+   * only, and the write rules have checked every change.
+   */
+  private async map<T>(key: string, schema: z.ZodType<T>): Promise<Record<string, T>> {
+    const crdt = new MapCrdt<unknown>(this.me);
+
+    await this.db.getCrdt(key, crdt, false, READ_TIMEOUT_MS);
+
+    const entries: Record<string, T> = {};
+
+    for (const [entry, value] of Object.entries(crdt.value)) {
+      const parsed = schema.safeParse(value);
+
+      if (parsed.success) entries[entry] = parsed.data;
+    }
+
+    return entries;
+  }
+
+  /** Sets (or, with `undefined`, deletes) one entry of a map key, on top of the changes known for it. */
+  private async setEntry(key: string, entry: string, value: unknown): Promise<void> {
+    await this.setEntries(key, { [entry]: value });
+  }
+
+  /**
+   * Sets (or, with `undefined`, deletes) entries of a map key in one change set. Entries that already hold the same
+   * value are left alone, so writing the same data again adds nothing. The map's write rules decide which entries the
+   * signed-in key may set; the owner may set any.
+   */
+  async setEntries(key: string, entries: Record<string, unknown>): Promise<void> {
+    const crdt = new MapCrdt<unknown>(this.me);
+
+    await this.db.getCrdt(key, crdt, false, READ_TIMEOUT_MS);
+
+    const current = crdt.value;
+
+    for (const [entry, value] of Object.entries(entries)) {
+      if (value === undefined) {
+        if (entry in current) crdt.DEL(entry);
+      } else if (canonicalJson(current[entry]) !== canonicalJson(value)) crdt.SET(entry, value);
+    }
+
+    await this.db.putCrdt(key, crdt);
+  }
+
   /** Stores a record's text under its hash and returns the hash. */
   async putBlob(text: string): Promise<string> {
     const hash = await sha256Hex(text);
@@ -108,24 +160,15 @@ export class RulebookClient {
   }
 
   async requestAccess(faction: string, message: string) {
-    await this.put(KEYS.request(faction), { message }, true);
+    await this.setEntry(KEYS.requests(faction), this.me, { message });
   }
 
   /** Open contributor requests for a faction, from people who are not contributors yet. */
   async requests(faction: string): Promise<{ author: string; message: string }[]> {
-    const keys = (await this.db.queryKeys(':', false, READ_TIMEOUT_MS)).filter(
-      (k) => parseKey(k).parts.join('/') === KEYS.request(faction),
-    );
+    const found = Object.entries(await this.map(KEYS.requests(faction), requestSchema));
+    const open = await Promise.all(found.map(async ([author]) => !(await this.roles.isContributor(faction, author))));
 
-    const found = await Promise.all(
-      keys.map(async (key) => ({ author: parseKey(key).owner!, value: requestSchema.safeParse(await this.get(key)) })),
-    );
-
-    const open = await Promise.all(
-      found.map(async (r) => r.value.success && !(await this.roles.isContributor(faction, r.author))),
-    );
-
-    return found.filter((_, i) => open[i]).map((r) => ({ author: r.author, message: r.value.data!.message }));
+    return found.filter((_, i) => open[i]).map(([author, { message }]) => ({ author, message }));
   }
 
   /** Proposes a new version of a record. Returns the proposal's key. */
@@ -136,19 +179,22 @@ export class RulebookClient {
     const proposal = { kind: change.kind, id: change.id, base: head ?? undefined, blob, note: change.note ?? '' };
 
     await this.put(KEYS.proposal(faction, n), proposal, true);
+    await this.setEntry(KEYS.proposals(faction), `${this.me}/${n}`, {});
 
     return `:${this.me}.${KEYS.proposal(faction, n)}`;
   }
 
   /** Every proposal for a faction from its contributors, with its review if it has one. */
   async proposals(faction: string): Promise<ProposalEntry[]> {
-    const prefix = `proposal/${faction}/`;
+    const refs = Object.keys(await this.map(KEYS.proposals(faction), proposalRefSchema));
 
-    const keys = (await this.db.queryKeys(':', false, READ_TIMEOUT_MS)).filter((k) =>
-      parseKey(k).parts.join('/').startsWith(prefix),
+    const entries = await Promise.all(
+      refs.map((ref) => {
+        const [author, n] = ref.split('/');
+
+        return this.proposal(faction, `:${author}.${KEYS.proposal(faction, n)}`);
+      }),
     );
-
-    const entries = await Promise.all(keys.map((key) => this.proposal(faction, key)));
 
     return entries.filter((e): e is ProposalEntry => e !== null);
   }
@@ -172,7 +218,11 @@ export class RulebookClient {
 
   /** Maintainers only: makes the proposal the record's accepted version. */
   async accept(faction: string, proposal: ProposalEntry, comment = '') {
-    await this.put(KEYS.head(faction, proposal.kind, proposal.id), { blob: proposal.blob, proposal: proposal.key });
+    await this.setEntry(KEYS.heads(faction), `${proposal.kind}/${proposal.id}`, {
+      blob: proposal.blob,
+      proposal: proposal.key,
+    });
+
     await this.put(this.reviewKey(faction, proposal.key), { status: 'accepted', comment });
   }
 
@@ -183,26 +233,21 @@ export class RulebookClient {
 
   /** Maintainers only: changes a record without a proposal. */
   async edit(faction: string, kind: Kind, id: string, text: string) {
-    await this.put(KEYS.head(faction, kind, id), { blob: await this.putBlob(text) });
+    await this.setEntry(KEYS.heads(faction), `${kind}/${id}`, { blob: await this.putBlob(text) });
   }
 
   /** Hash of a record's accepted text, or null. */
   async head(faction: string, kind: Kind, id: string): Promise<string | null> {
-    const parsed = headSchema.safeParse(await this.get(KEYS.head(faction, kind, id)));
-
-    return parsed.success ? parsed.data.blob : null;
+    return (await this.heads(faction))[`${kind}/${id}`] ?? null;
   }
 
-  /** Every accepted record of a faction, as `kind/id` to the hash of its text. */
+  /** Every accepted record of a faction, as `kind/id` to the hash of its text; hidden texts are left out. */
   async heads(faction: string): Promise<Record<string, string>> {
-    const keys = await this.db.queryKeys(KEYS.headPrefix(faction), false, READ_TIMEOUT_MS);
+    const hidden = (await this.roles.hidden()).blobs;
     const records: Record<string, string> = {};
 
-    for (const key of keys) {
-      const [, , kind, id] = parseKey(key).parts;
-      const parsed = headSchema.safeParse(await this.get(key));
-
-      if (parsed.success) records[`${kind}/${id}`] = parsed.data.blob;
+    for (const [record, head] of Object.entries(await this.map(KEYS.heads(faction), headSchema))) {
+      if (!hidden.includes(head.blob)) records[record] = head.blob;
     }
 
     return records;
@@ -223,6 +268,15 @@ export class RulebookClient {
     const hash = await sha256Hex(canonicalJson(value));
 
     await this.put(KEYS.release(faction, hash), value);
+    await this.setEntry(KEYS.releases(faction), hash, { version, date: manifest.date });
+
+    await this.setEntry(KEYS.index, faction, {
+      hash,
+      version,
+      date: manifest.date,
+      records: Object.keys(manifest.records).length,
+      notes,
+    });
 
     return hash;
   }
@@ -236,7 +290,9 @@ export class RulebookClient {
 
   /** Every trusted release of a faction, newest first. */
   async releases(faction: string): Promise<(Manifest & { hash: string })[]> {
-    return this.manifests(await this.db.queryKeys(KEYS.releasePrefix(faction), false, READ_TIMEOUT_MS));
+    const hashes = Object.keys(await this.map(KEYS.releases(faction), releaseEntrySchema));
+
+    return this.manifests(hashes.map((h) => KEYS.release(faction, h)));
   }
 
   /** The trusted releases stored under these release keys, newest first. */
@@ -255,15 +311,19 @@ export class RulebookClient {
 
   /** Relay nodes only: says where this relay can be reached, signed with the relay's own key. */
   async announceRelay(url: string, name = '', now = new Date()): Promise<void> {
+    const listed = (await this.map(KEYS.relays, relayEntrySchema))[this.me];
+
+    if (listed?.url !== url || listed.name !== name) await this.setEntry(KEYS.relays, this.me, { url, name });
+
     await this.put(KEYS.relay(this.me), { url, name, updated: now.toISOString() });
   }
 
   /** Relays that announced themselves recently, newest first. Older announcements are left out. */
   async relays(now = Date.now()): Promise<RelayAnnouncement[]> {
-    const keys = await this.db.queryKeys(KEYS.relayPrefix, false, READ_TIMEOUT_MS);
+    const keys = Object.keys(await this.map(KEYS.relays, relayEntrySchema));
 
     const found = await Promise.all(
-      keys.map(async (key) => ({ key: parseKey(key).parts[1], parsed: relaySchema.safeParse(await this.get(key)) })),
+      keys.map(async (key) => ({ key, parsed: relaySchema.safeParse(await this.get(KEYS.relay(key))) })),
     );
 
     return found
@@ -274,9 +334,7 @@ export class RulebookClient {
 
   /** Every faction (and `core`) that has at least one release. */
   async releasedFactions(): Promise<string[]> {
-    const keys = await this.db.queryKeys('release/', false, READ_TIMEOUT_MS);
-
-    return [...new Set(keys.map((k) => parseKey(k).parts[1]))].sort();
+    return Object.keys(await this.map(KEYS.index, indexEntrySchema)).sort();
   }
 
   /** The files of the newest trusted release of every released faction, core included, for `Library.fromFiles`. */
@@ -291,29 +349,21 @@ export class RulebookClient {
    * as soon as it is read.
    */
   async latestReleases(options: LatestOptions = {}): Promise<ReleasedRules> {
-    // One search finds every faction's release keys; searching per faction is slow and times out when run together.
-    const keys = await this.db.queryKeys('release/', false, READ_TIMEOUT_MS);
-    const byFaction = new Map<string, string[]>();
-
-    for (const key of keys) {
-      const faction = parseKey(key).parts[1];
-
-      byFaction.set(faction, [...(byFaction.get(faction) ?? []), key]);
-    }
-
+    // The index names every faction's newest release: one read, then only the releases that changed.
+    const index = Object.entries(await this.map(KEYS.index, indexEntrySchema));
     const known = new Set((options.have ?? []).map((r) => r.hash));
 
-    const load = async ([faction, factionKeys]: [string, string[]]) => {
-      const found = await this.completeRelease(faction, factionKeys, known);
+    const load = async ([faction, entry]: [string, IndexEntry]) => {
+      const found = await this.completeRelease(faction, entry, known);
 
       if (found) options.onRelease?.({ files: found.files, releases: [found.info] });
 
       return found;
     };
 
-    const first = await mapInBatches([...byFaction], PARALLEL_FACTIONS, load);
+    const first = await mapInBatches(index, PARALLEL_FACTIONS, load);
     // Reads that timed out (a slow relay, a phone network) get one more try, one faction at a time.
-    const missed = [...byFaction].filter(([faction]) => !first.some((r) => r?.info.faction === faction));
+    const missed = index.filter(([faction]) => !first.some((r) => r?.info.faction === faction));
     const second = await mapInBatches(missed, 1, load);
     const releases = [...first, ...second].filter((r) => r !== null);
 
@@ -321,24 +371,25 @@ export class RulebookClient {
   }
 
   /**
-   * The newest trusted release among these keys with every one of its record files (but those the owner hid), or null
-   * when the release or any file couldn't be read: a faction is never given with records missing. A release whose hash
-   * is `known` comes without files: the caller has them.
+   * The release an index entry names, with every one of its record files (but those the owner hid), or null when the
+   * release or any file couldn't be read, or it isn't trusted: a faction is never given with records missing. A
+   * release whose hash is `known` comes without files: the caller has them.
    */
   private async completeRelease(
     faction: string,
-    keys: string[],
+    entry: IndexEntry,
     known: Set<string>,
   ): Promise<{ info: ReleaseInfo; files: RulesFile[] } | null> {
-    const [newest] = await this.manifests(keys);
+    const { hash } = entry;
 
-    if (!newest) return null;
+    if (known.has(hash)) return { info: { faction, ...entry }, files: [] };
 
-    const { version, date, hash, notes, records } = newest;
+    const [manifest] = await this.manifests([KEYS.release(faction, hash)]);
+
+    if (!manifest) return null;
+
+    const { version, date, notes, records } = manifest;
     const info: ReleaseInfo = { faction, version, date, hash, notes, records: Object.keys(records).length };
-
-    if (known.has(hash)) return { info, files: [] };
-
     const files = await this.releaseFiles(faction, hash);
     // Records the owner hid are left out on purpose; every other one must have arrived.
     const hidden = (await this.roles.hidden()).blobs;
@@ -349,6 +400,8 @@ export class RulebookClient {
 
   /** Publishes every record of a faction (or `core`) folder and releases them. Maintainers of that faction only. */
   async publishFolder(faction: string, files: { name: string; source: string }[], version: string, notes = '') {
+    const heads: Record<string, { blob: string }> = {};
+
     for (const { name, source } of files) {
       const parsed = parseRecord(source, `${faction}/${name}`, name.replace(/\.md$/, ''));
 
@@ -356,8 +409,11 @@ export class RulebookClient {
 
       const id = parsed.value.kind === 'faction' ? faction : parsed.value.id;
 
-      await this.edit(faction, parsed.value.kind, id, source);
+      heads[`${parsed.value.kind}/${id}`] = { blob: await this.putBlob(source) };
     }
+
+    // One change set for the whole folder, holding only the records whose text changed.
+    await this.setEntries(KEYS.heads(faction), heads);
 
     return this.release(faction, version, notes);
   }

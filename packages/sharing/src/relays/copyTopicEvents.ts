@@ -2,8 +2,9 @@ import { RelayPool, type WebSocketConstructor } from 'tool-db';
 
 import { TOPIC } from '../constants';
 
-/** tool-db's kind for values (NIP-78 application data). */
+/** tool-db's kinds for values (NIP-78 application data) and for CRDT change sets. */
 const VALUE_KIND = 30078;
+const CRDT_KIND = 1078;
 
 /** A pool connected to these relays, once each has connected or `timeoutMs` passed. */
 async function connected(urls: string[], WebSocket: WebSocketConstructor, timeoutMs: number): Promise<RelayPool> {
@@ -17,7 +18,7 @@ async function connected(urls: string[], WebSocket: WebSocketConstructor, timeou
 }
 
 /**
- * Copies every message of the Rulebook topic stored on `from` into `to`, as signed: `to` checks each one with its own
+ * Copies every message of the Rulebook topic stored on `from` into `to` (values and map change sets), as signed: `to` checks each one with its own
  * write rules, so nothing a relay wouldn't accept from a client gets in. Returns how many were found and accepted.
  */
 export async function copyTopicEvents(
@@ -33,7 +34,9 @@ export async function copyTopicEvents(
   const target = await connected([to], WebSocket, timeoutMs);
 
   try {
-    const events = await source.query([{ kinds: [VALUE_KIND], '#t': [TOPIC] }], timeoutMs);
+    const found = await source.query([{ kinds: [VALUE_KIND, CRDT_KIND], '#t': [TOPIC] }], timeoutMs);
+    // Oldest first, so role lists arrive before the writes they allow.
+    const events = [...found].sort((a, b) => a.created_at - b.created_at);
     let accepted = 0;
 
     for (const event of events) {

@@ -30,17 +30,19 @@ export const KEYS = {
   maintainers: (f: string) => `maintainers/${f}`,
   contributors: (f: string) => `contributors/${f}`,
   blob: (h: string) => `blob/${h}`,
-  head: (f: string, kind: string, id: string) => `head/${f}/${kind}/${id}`,
-  headPrefix: (f: string) => `head/${f}/`,
   release: (f: string, h: string) => `release/${f}/${h}`,
-  releasePrefix: (f: string) => `release/${f}/`,
   review: (f: string, p: string, n: string) => `review/${f}/${p}/${n}`,
   hidden: 'hidden',
   proposal: (f: string, n: string) => `proposal/${f}/${n}`,
-  request: (f: string) => `request/${f}`,
   list: (n: string) => `list/${n}`,
   relay: (p: string) => `relay/${p}`,
-  relayPrefix: 'relay/',
+  /** Map CRDTs: see docs/sharing.md. */
+  index: 'index',
+  releases: (f: string) => `releases/${f}`,
+  heads: (f: string) => `heads/${f}`,
+  proposals: (f: string) => `proposals/${f}`,
+  requests: (f: string) => `requests/${f}`,
+  relays: 'relays',
 } as const;
 
 /** A relay re-announces its address this often, in milliseconds. */
@@ -63,3 +65,9 @@ export const KNOWN_RELAYS_KEY = 'rulebook:relays';
 
 /** IndexedDB database the browser apps keep released rules in. */
 export const CACHE_DB = 'rulebook-cache';
+
+/** tool-db's type name for map CRDTs, which every list key holds. */
+export const MAP_TYPE = 'MAP';
+
+/** First part of every key that holds a map CRDT. */
+export const MAP_TYPES = ['index', 'releases', 'heads', 'proposals', 'requests', 'relays'];

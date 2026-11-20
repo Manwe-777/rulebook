@@ -107,7 +107,7 @@ apps/relay/tests/installer.sh
 saved only password-protected, and the public key goes into `project.json`. Keep the file and its password apart, each
 with a backup.
 
-The owner key only appoints maintainers, from the terminal, so it never goes into a browser:
+The owner key appoints maintainers (and moves old data, below) from the terminal, so it never goes into a browser:
 
 ```sh
 npm run appoint -w @rulebook/relay -- <npub or hex key> <faction…|all> [--remove] [--key owner.ncryptsec]
@@ -117,3 +117,14 @@ It asks for the password, checks the file holds the project owner's key, and add
 each faction's maintainers on the bootstrap and announced relays. `all` means `core` and every released faction; the
 key file defaults to `~/rulebook-owner.ncryptsec`. Maintainers then work with their own browser key or a Nostr signer
 extension.
+
+Data written before lists were kept in maps (heads, releases, relays, requests and proposals under one key each) is
+moved into the maps once, signed with the owner key:
+
+```sh
+RELAYS=wss://relay.example npm run reindex -w @rulebook/relay -- ~/rulebook-owner.ncryptsec
+```
+
+It reads every stored value, keeps those the earlier write rules trusted, and writes the map entries and the `index`
+of each faction's newest release. Running it again adds nothing. Relays must run a release that knows the maps first,
+or they refuse the change sets.

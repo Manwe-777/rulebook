@@ -1,26 +1,21 @@
 import { recordKind } from '@rulebook/rules';
 import type { z } from 'zod';
 
-import { MAX_BLOB_BYTES } from '../constants';
-import {
-  headSchema,
-  manifestSchema,
-  proposalSchema,
-  relaySchema,
-  requestSchema,
-  reviewSchema,
-  roleListSchema,
-} from '../schemas';
+import { MAP_TYPE, MAP_TYPES, MAX_BLOB_BYTES } from '../constants';
+import { manifestSchema, proposalSchema, relaySchema, reviewSchema, roleListSchema } from '../schemas';
 import { canonicalJson } from '../utils/canonicalJson';
 import { sha256Hex } from '../utils/sha256Hex';
 import { parseKey } from './parseKey';
 import type { Roles } from './Roles';
+import { validMapWrite } from './validMapWrite';
 
 /** What a write rule sees of a value: its key, author and value. */
 export interface Write {
   k: string;
   a: string;
   v: unknown;
+  /** The CRDT type, for change sets; null (or absent) for plain values. */
+  c?: string | null;
 }
 
 export interface WriteRule {
@@ -30,7 +25,7 @@ export interface WriteRule {
 }
 
 /** First part of every shared (not namespaced) key the project uses. */
-const SHARED_TYPES = ['maintainers', 'contributors', 'blob', 'head', 'release', 'review', 'relay'];
+const VALUE_TYPES = ['maintainers', 'contributors', 'blob', 'release', 'review', 'relay'];
 
 const fits = (schema: z.ZodType, value: unknown) => schema.safeParse(value).success;
 
@@ -59,8 +54,6 @@ async function validNamespaced(roles: Roles, { k, a, v }: Write): Promise<boolea
     return fits(proposalSchema, v) && (await roles.isContributor(faction, a));
   }
 
-  if (type === 'request' && parts.length === 2) return fits(requestSchema, v);
-
   return type === 'list' && parts.length === 2;
 }
 
@@ -74,13 +67,14 @@ export function writeRules(roles: Roles): WriteRule[] {
   return [
     {
       prefix: '',
-      check: async ({ k }) => {
-        if (k === 'hidden') return true;
+      check: async ({ k, c }) => {
+        if (k === 'hidden') return !c;
 
         const { owner, parts } = parseKey(k);
         const [type, hash] = parts;
 
-        if (!owner && !SHARED_TYPES.includes(type)) return false;
+        // Map keys hold map change sets and nothing else; every other key holds plain values.
+        if (!owner && !(MAP_TYPES.includes(type) ? c === MAP_TYPE : !c && VALUE_TYPES.includes(type))) return false;
 
         const hidden = await roles.hidden();
 
@@ -90,10 +84,6 @@ export function writeRules(roles: Roles): WriteRule[] {
     { prefix: 'maintainers/', check: async ({ a, v }) => a === roles.owner && fits(roleListSchema, v) },
     { prefix: 'hidden', check: async ({ a }) => a === roles.owner },
     { prefix: 'contributors/', check: async (w) => fits(roleListSchema, w.v) && (await maintainer(w)) },
-    {
-      prefix: 'head/',
-      check: async (w) => parseKey(w.k).parts.length === 4 && fits(headSchema, w.v) && (await maintainer(w)),
-    },
     {
       prefix: 'review/',
       check: async (w) => parseKey(w.k).parts.length === 4 && fits(reviewSchema, w.v) && (await maintainer(w)),
@@ -117,6 +107,7 @@ export function writeRules(roles: Roles): WriteRule[] {
       },
     },
     { prefix: ':', check: (w) => validNamespaced(roles, w) },
+    ...MAP_TYPES.map((type) => ({ prefix: type, check: (w: Write) => validMapWrite(roles, w.k, w.v) })),
   ];
 }
 

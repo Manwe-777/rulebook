@@ -10,7 +10,7 @@ const kind = slug;
 /** `maintainers.<f>` and `contributors.<f>`. */
 export const roleListSchema = z.strictObject({ keys: z.array(pubkey) });
 
-/** `head.<f>.<kind>.<id>`: the accepted version of a record. */
+/** An entry of a `heads/<f>` map: the accepted version of a record. */
 export const headSchema = z.strictObject({ blob: hash, proposal: z.string().optional() });
 
 /** `release.<f>.<h>`: a fixed snapshot of one faction. */
@@ -31,6 +31,24 @@ export const relaySchema = z.strictObject({
   /** When the relay last announced itself, ISO 8601. */
   updated: z.string().min(1),
 });
+
+/** An entry of the `index` map: the newest release of one faction. */
+export const indexEntrySchema = z.strictObject({
+  hash,
+  version: z.string().min(1),
+  date: z.string().min(1),
+  records: z.number().int().nonnegative(),
+  notes: z.string().default(''),
+});
+
+/** An entry of a `releases/<f>` map: one release of the faction. */
+export const releaseEntrySchema = z.strictObject({ version: z.string().min(1), date: z.string().min(1) });
+
+/** An entry of a `proposals/<f>` map: it only names the proposal. */
+export const proposalRefSchema = z.strictObject({});
+
+/** An entry of the `relays` map: where a relay node can be reached. */
+export const relayEntrySchema = relaySchema.omit({ updated: true });
 
 /** A relay as the apps list it: its key (the relay's public key) and its announcement. */
 export type RelayAnnouncement = z.output<typeof relaySchema> & { key: string };

@@ -10,7 +10,8 @@
     "test": "vitest run",
     "publish": "tsx src/publish.ts",
     "owner-key": "tsx src/ownerKey.ts",
-    "appoint": "tsx src/appoint.ts"
+    "appoint": "tsx src/appoint.ts",
+    "reindex": "tsx src/reindex.ts"
   },
   "dependencies": {
     "@rulebook/sharing": "*",

@@ -1,5 +1,6 @@
 export { ReleaseCache, type SavedReleases } from './cache/ReleaseCache';
 export * from './constants';
+export { legacyIndexes, type LegacyValue, type MapEntries } from './legacy/legacyIndexes';
 export { loadRelayAnnouncements } from './loadRelayAnnouncements';
 export { loadRemoteReleases } from './loadRemoteReleases';
 export { copyTopicEvents } from './relays/copyTopicEvents';
