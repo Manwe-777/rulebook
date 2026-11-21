@@ -1,8 +1,8 @@
 import type { ArmyList, Library } from '@rulebook/rules';
 
+import EyeIcon from '../../../components/icons/EyeIcon';
 import { useShowCoreStratagems } from '../../hooks/useShowCoreStratagems';
 import { stratagemGroups } from '../../utils/stratagemGroups';
-import EyeIcon from '../EyeIcon';
 import StratagemTile from './StratagemTile';
 
 /**
