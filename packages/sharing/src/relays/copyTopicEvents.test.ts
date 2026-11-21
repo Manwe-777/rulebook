@@ -5,6 +5,7 @@ import { KEYS, TOPIC } from '../constants';
 import { RulebookRelay } from '../relay/RulebookRelay';
 import { RulebookClient } from '../RulebookClient';
 import { copyTopicEvents } from './copyTopicEvents';
+import { pushTopicEvents } from './pushTopicEvents';
 
 const relays: RulebookRelay[] = [];
 const dbs: ToolDb[] = [];
@@ -71,5 +72,35 @@ describe('copyTopicEvents', () => {
 
   it('nothing to copy from is nothing copied', async () => {
     expect(await copyTopicEvents([], 'ws://unused')).toEqual({ found: 0, accepted: 0 });
+  });
+});
+
+describe('pushTopicEvents', () => {
+  it('sends another relay what it lacks, and next time only what is new', async () => {
+    const ownerSecret = generateSecretKey();
+    const owner = getPublicKey(ownerSecret);
+    const ours = await startRelay(owner);
+    const pub = await startRelay(null);
+    const writer = new RulebookClient(await client(ours.url, ownerSecret), owner, 0);
+
+    await writer.setMaintainers('demo-host', ['a'.repeat(64)]);
+    await writer.announceRelay('wss://ours.example');
+
+    const first = (await pushTopicEvents(ours.url, [pub.url], { spacingMs: 0, timeoutMs: 3000 }))[pub.url];
+    const reader = new RulebookClient(await client(pub.url), owner, 0);
+
+    expect(first.sent).toBeGreaterThanOrEqual(2);
+    expect(first.stopped).toBeUndefined();
+    expect(await reader.roles.maintainers('demo-host')).toEqual(['a'.repeat(64)]);
+    expect((await reader.relays()).map((r) => r.url)).toEqual(['wss://ours.example']);
+
+    await writer.setMaintainers('demo-host', ['b'.repeat(64)]);
+
+    const again = (
+      await pushTopicEvents(ours.url, [pub.url], { spacingMs: 0, timeoutMs: 3000, done: { [pub.url]: first.done } })
+    )[pub.url];
+
+    expect(again.sent).toBe(1);
+    expect(await reader.roles.maintainers('demo-host')).toEqual(['b'.repeat(64)]);
   });
 });

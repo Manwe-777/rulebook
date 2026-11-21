@@ -20,7 +20,10 @@ write rules; the apps and the relay all register the same rules, so bad data is 
   connection test, and remember the ones that answer for the next visit. A relay that fails three checks in a row is
   dropped until it announces itself again.
 - Relay nodes copy data from each other: every hour a relay reads the announcements, tests the bootstrap and announced
-  relays, and copies every message of the topic (values and map change sets, oldest first) from the ones that answer. Messages keep their original signatures,
+  relays, and copies every message of the topic (values and map change sets, oldest first) from the ones that answer.
+  Then it sends the bootstrap relays, which copy from nobody, every message they don't have from it yet, one at a time
+  with a short pause, stopping for the round when a relay asks it to slow down. It remembers what each one took
+  (`pushed.json` in its data folder), so later rounds send only new messages. Messages keep their original signatures,
   and the receiving relay applies its own write rules to each, so a new relay fills itself from the others.
 - Browsers can't serve each other: every client needs at least one reachable relay. A client that loaded the rules
   before keeps its cached copy and works offline; a first-time visitor sees only the demo until a relay answers.

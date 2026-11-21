@@ -1,15 +1,35 @@
-import { copyTopicEvents, RELAY_ANNOUNCE_MS, RulebookClient, TOPIC } from '@rulebook/sharing';
+import { copyTopicEvents, pushTopicEvents, RELAY_ANNOUNCE_MS, RulebookClient, TOPIC } from '@rulebook/sharing';
 import { pingRelay } from '@rulebook/sharing/relays';
 import { ToolDb } from 'tool-db';
 
+import { readPushed, writePushed } from './pushedLog';
 import type { RelayConfig } from './readConfig';
 
 /** How often the relay copies data from the others, in milliseconds. */
 const SYNC_MS = 60 * 60 * 1000;
 
 /**
- * One round: announce this relay's address (when it has a public one) on the bootstrap relays and itself, then copy
- * the topic's data from the bootstrap relays and every other announced relay that answers.
+ * Sends the bootstrap relays (public Nostr relays, which never copy from anyone) what they don't have from this relay
+ * yet, slowly, so data written while one was down or busy still reaches it.
+ */
+async function share(config: RelayConfig, localUrl: string, reachable: string[]) {
+  const targets = config.bootstrap.filter((url) => reachable.includes(url));
+
+  if (!targets.length) return;
+
+  const results = await pushTopicEvents(localUrl, targets, { done: readPushed(config.dataDir) });
+
+  writePushed(config.dataDir, Object.fromEntries(Object.entries(results).map(([url, r]) => [url, r.done])));
+
+  for (const [url, { sent, stopped }] of Object.entries(results)) {
+    if (sent || stopped) console.log(`Shared ${sent} messages with ${url}${stopped ? ` (stopped: ${stopped})` : ''}`);
+  }
+}
+
+/**
+ * One round: announce this relay's address (when it has a public one) on the bootstrap relays and itself, copy the
+ * topic's data from the bootstrap relays and every other announced relay that answers, then send the bootstrap relays
+ * what they lack.
  */
 async function round(config: RelayConfig, secretKey: string, localUrl: string, announce: boolean) {
   const db = new ToolDb({ relays: [localUrl, ...config.bootstrap], topic: TOPIC });
@@ -48,6 +68,8 @@ async function round(config: RelayConfig, secretKey: string, localUrl: string, a
     console.log(
       `Synced from ${reachable.length} of ${candidates.length} relays: ${accepted} of ${found} messages kept`,
     );
+
+    await share(config, localUrl, reachable);
   } catch (error) {
     console.error('Relay network round failed:', (error as Error).message);
   } finally {
@@ -56,8 +78,8 @@ async function round(config: RelayConfig, secretKey: string, localUrl: string, a
 }
 
 /**
- * Keeps the relay part of the network: announces its address every few hours and copies data from the other relays
- * every hour. Returns a function that stops it.
+ * Keeps the relay part of the network: announces its address every few hours, and every hour copies data from the
+ * other relays and sends the public ones what they lack. Returns a function that stops it.
  */
 export function runNetwork(config: RelayConfig, secretKey: string, localUrl: string): () => void {
   let lastAnnounce = 0;

@@ -176,6 +176,9 @@
   `apps/builder` is gone. It uses the rulebook's header, footer, rules (no second download) and release info; the print
   link opens the app's own print page. GitHub Pages deploys the one app; `builder/index.html` is the app shell, so old
   builder links still open, and the old builder's service worker goes away when its script is no longer found.
+- Relay nodes also push: every hour they send the public bootstrap relays what those lack from them (paced, stopping on
+  rate limits, remembering what each took), so data only a project relay holds, like an index a public relay dropped,
+  reaches the public relays too.
 
 ## Known issues
 
