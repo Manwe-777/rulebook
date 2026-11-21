@@ -66,3 +66,17 @@ export const ADDED_TICK_MS = 600;
 
 /** localStorage key of the unit cards folded down to their title, by army id. */
 export const COLLAPSED_KEY = 'rulebook-builder:collapsed';
+
+/**
+ * Headings of the Add units list, in order; a unit goes under the first one whose role it has, and under "Other
+ * datasheets" when it has none of them.
+ */
+export const UNIT_SECTIONS = [
+  { role: 'epic-hero', title: 'Epic heroes' },
+  { role: 'character', title: 'Characters' },
+  { role: 'battleline', title: 'Battleline' },
+  { role: 'dedicated-transport', title: 'Dedicated transports' },
+  { role: 'fortification', title: 'Fortifications' },
+] as const;
+
+export const OTHER_UNITS_TITLE = 'Other datasheets';
