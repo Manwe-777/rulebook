@@ -26,6 +26,8 @@ export default function EntryChoices({ draft, library, entry, unit, onChange }: 
     }));
 
   const sizes = unitSizes(unit);
+  const size = entrySize(unit, entry);
+  const sizeIndex = size ? sizes.findIndex((s) => s.models === size.models && s.points === size.points) : 0;
   const enhancements = items('model');
   const upgrades = items('unit');
 
@@ -33,7 +35,7 @@ export default function EntryChoices({ draft, library, entry, unit, onChange }: 
     <div className="flex flex-wrap gap-3">
       <SelectField
         label="Models"
-        value={String(sizes.indexOf(entrySize(unit, entry)!))}
+        value={String(sizeIndex)}
         options={sizes.map((s, i) => ({ value: String(i), label: `${sizeLabel(s)} (${s.points} pts)` }))}
         onChange={(v) => onChange(draft.setModels(entry.id, sizes[Number(v)].models, sizeCounts(sizes[Number(v)])))}
       />
