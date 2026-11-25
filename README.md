@@ -6,6 +6,9 @@
 Community-written Warhammer 40,000 rules: a datasheet reader and editor, a list builder, and the relay that shares the rules.
 
 The datasheets, stratagems and codex rules are sourced from [40k.app](https://40k.app) and maintained by the community.
+
+<img width="911" height="649" alt="image" src="https://github.com/user-attachments/assets/d60a4dbe-3770-4dd4-af38-b5d6790abf1b" />
+
 This repository holds only the apps and a small demo faction: no faction rules are stored here. They are published to
 and loaded from the community's relays. This is not official Games Workshop material.
 
