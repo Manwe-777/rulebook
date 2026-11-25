@@ -80,23 +80,21 @@
       100% 100%;
   }
 
-  /* Blurred camouflage behind the header, with film grain and darker edges. */
+  /* Dark textured background behind the header, with darker edges. */
   .sheet-camo {
-    background-color: #4a4f42;
+    background-color: #1a1d1f;
     background-image:
       linear-gradient(90deg, rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.05) 40%, rgb(0 0 0 / 0.1) 60%, rgb(0 0 0 / 0.5)),
-      linear-gradient(rgb(0 0 0 / 0.15), rgb(0 0 0 / 0.35)), url('./assets/grain.svg'), url('./assets/camo.svg');
+      linear-gradient(rgb(0 0 0 / 0.15), rgb(0 0 0 / 0.35)), url('./assets/banner-bg.jpeg');
     background-position:
       0 0,
       0 0,
-      0 0,
-      left center;
-    background-repeat: no-repeat, no-repeat, repeat, no-repeat;
+      center center;
+    background-repeat: no-repeat, no-repeat, no-repeat;
     background-size:
       100% 100%,
       100% 100%,
-      200px 200px,
-      max(100%, 1600px) auto;
+      cover;
   }
 
   /* Faction-coloured band behind the unit name, fading out to the right. */
