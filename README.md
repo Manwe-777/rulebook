@@ -7,6 +7,8 @@ Community-written Warhammer 40,000 rules: a datasheet reader and editor, a list 
 
 The datasheets, stratagems and codex rules are sourced from [40k.app](https://40k.app) and maintained by the community.
 
+**[Try it now](https://manwe-777.github.io/rulebook/)**
+
 <img width="911" height="649" alt="image" src="https://github.com/user-attachments/assets/d60a4dbe-3770-4dd4-af38-b5d6790abf1b" />
 
 This repository holds only the apps and a small demo faction: no faction rules are stored here. They are published to
